@@ -10,13 +10,53 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --glass-bg: rgba(14, 18, 26, 0.82);
-      --glass-card: rgba(255, 255, 255, 0.055);
-      --glass-card-hover: rgba(255, 255, 255, 0.095);
-      --glass-border: rgba(255, 255, 255, 0.15);
-      --glass-highlight: rgba(255, 255, 255, 0.28);
+      --in-oklab: ;
+      --glass-bg: linear-gradient(
+        168deg,
+        rgba(255, 255, 255, 0.20) 0%,
+        rgba(148, 174, 214, 0.10) 44%,
+        rgba(15, 23, 42, 0.38) 100%
+      );
+      --glass-card: linear-gradient(
+        155deg,
+        rgba(255, 255, 255, 0.14) 0%,
+        rgba(255, 255, 255, 0.04) 55%,
+        rgba(15, 23, 42, 0.18) 100%
+      );
+      --glass-card-hover: linear-gradient(
+        155deg,
+        rgba(255, 255, 255, 0.22) 0%,
+        rgba(255, 255, 255, 0.08) 58%,
+        rgba(15, 23, 42, 0.14) 100%
+      );
+      --glass-border: rgba(255, 255, 255, 0.34);
+      --glass-highlight: rgba(255, 255, 255, 0.65);
       --spring-ease: cubic-bezier(0.32, 1.18, 0.45, 1);
       --smooth-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @supports (background: linear-gradient(in oklab, white, black)) {
+      :root {
+        --in-oklab: in oklab;
+        --glass-bg: linear-gradient(
+          168deg var(--in-oklab),
+          rgba(255, 255, 255, 0.20) 0%,
+          rgba(148, 174, 214, 0.10) 44%,
+          rgba(15, 23, 42, 0.38) 100%
+        );
+        --glass-card: linear-gradient(
+          155deg var(--in-oklab),
+          rgba(255, 255, 255, 0.14) 0%,
+          rgba(255, 255, 255, 0.04) 55%,
+          rgba(15, 23, 42, 0.18) 100%
+        );
+        --glass-card-hover: linear-gradient(
+          155deg var(--in-oklab),
+          rgba(255, 255, 255, 0.22) 0%,
+          rgba(255, 255, 255, 0.08) 58%,
+          rgba(15, 23, 42, 0.14) 100%
+        );
+      }
     }
 
     * { box-sizing: border-box; user-select: none; }
@@ -37,13 +77,53 @@
       min-height: 100vh;
       width: 100%;
       background:
-        radial-gradient(1100px 620px at 50% -10%, rgba(56, 139, 253, 0.16), transparent 65%),
-        radial-gradient(700px 500px at 85% 75%, rgba(16, 185, 129, 0.10), transparent 60%),
-        radial-gradient(650px 450px at 15% 80%, rgba(99, 102, 241, 0.12), transparent 60%),
-        linear-gradient(180deg, #090d16 0%, #0d1320 55%, #070a10 100%);
+        radial-gradient(640px 260px at 50% 4%, rgba(56, 189, 248, 0.28), transparent 68%),
+        radial-gradient(460px 260px at 34% 8%, rgba(129, 140, 248, 0.22), transparent 65%),
+        radial-gradient(460px 260px at 66% 8%, rgba(52, 211, 153, 0.20), transparent 65%),
+        radial-gradient(760px 520px at 85% 75%, rgba(16, 185, 129, 0.14), transparent 60%),
+        radial-gradient(680px 460px at 15% 80%, rgba(99, 102, 241, 0.16), transparent 60%),
+        linear-gradient(180deg, #0b1120 0%, #10182b 55%, #070b13 100%);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      transition: background 0.45s ease;
+    }
+
+    /* Extreme Wallpaper Stress-Test Themes */
+    .win-desktop.wp-bright {
+      background:
+        radial-gradient(900px 500px at 20% 15%, rgba(186, 230, 253, 0.95), transparent 60%),
+        radial-gradient(800px 520px at 80% 25%, rgba(254, 240, 138, 0.75), transparent 60%),
+        linear-gradient(180deg, #f8fafc 0%, #e2e8f0 55%, #cbd5e1 100%);
+    }
+    .win-desktop.wp-bright .morph-island,
+    .win-desktop.wp-bright .hud-island,
+    .win-desktop.wp-bright .import-confirm,
+    .win-desktop.wp-bright .clip-popover,
+    .win-desktop.wp-bright #demoCard {
+      background: linear-gradient(168deg var(--in-oklab), rgba(15, 23, 42, 0.54) 0%, rgba(15, 23, 42, 0.72) 100%);
+      backdrop-filter: blur(28px) saturate(195%) brightness(0.92);
+      -webkit-backdrop-filter: blur(28px) saturate(195%) brightness(0.92);
+      border-color: rgba(255, 255, 255, 0.46);
+      box-shadow:
+        0 20px 48px rgba(15, 23, 42, 0.30),
+        0 4px 14px rgba(15, 23, 42, 0.18),
+        inset 0 1.5px 1px rgba(255, 255, 255, 0.58),
+        inset 0 -1.5px 2px rgba(255, 255, 255, 0.22);
+    }
+
+    .win-desktop.wp-cyber {
+      background:
+        radial-gradient(600px 420px at 18% 12%, rgba(236, 72, 153, 0.78), transparent 58%),
+        radial-gradient(650px 460px at 82% 14%, rgba(6, 182, 212, 0.75), transparent 58%),
+        radial-gradient(720px 500px at 50% 48%, rgba(245, 158, 11, 0.62), transparent 62%),
+        repeating-linear-gradient(45deg, #1e1b4b 0px, #1e1b4b 18px, #311042 18px, #311042 36px);
+    }
+    .win-desktop.wp-cyber .morph-island {
+      background: linear-gradient(168deg var(--in-oklab), rgba(255, 255, 255, 0.16) 0%, rgba(12, 16, 30, 0.52) 100%);
+      backdrop-filter: blur(28px) saturate(230%) brightness(1.06);
+      -webkit-backdrop-filter: blur(28px) saturate(230%) brightness(1.06);
+      border-color: rgba(255, 255, 255, 0.38);
     }
 
     .island-anchor {
@@ -81,6 +161,23 @@
       pointer-events: auto;
     }
 
+    .morph-island.is-shell-hidden {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    .island-anchor.idle-dim .morph-island:not(.expanded):not(.fusing):not(.is-shell-hidden) {
+      opacity: 0.72 !important;
+      filter: saturate(0.85);
+      transition: opacity 0.55s ease, filter 0.55s ease, border-color 0.35s ease;
+    }
+    .island-anchor.idle-dim .left-pill-bar > div > span:last-child,
+    .island-anchor.idle-dim #pillTimeDate {
+      opacity: 0.45;
+      transition: opacity 0.45s ease;
+    }
+
     .clip-popover {
       position: fixed;
       top: 274px;
@@ -88,11 +185,12 @@
       transform: translateX(-50%) translateY(-6px) scale(0.96);
       width: min(416px, calc(100vw - 24px));
       padding: 10px 12px;
-      border-radius: 14px;
-      background: rgba(14, 18, 26, 0.94);
-      backdrop-filter: blur(28px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.65);
+      border-radius: 16px;
+      background: linear-gradient(168deg var(--in-oklab), rgba(255, 255, 255, 0.16) 0%, rgba(15, 23, 42, 0.56) 100%);
+      backdrop-filter: blur(28px) saturate(210%) brightness(1.06);
+      -webkit-backdrop-filter: blur(28px) saturate(210%) brightness(1.06);
+      border: 1px solid rgba(255, 255, 255, 0.30);
+      box-shadow: 0 20px 46px rgba(2, 6, 23, 0.46), inset 0 1.5px 1px rgba(255, 255, 255, 0.52), inset 0 -1px 1px rgba(255, 255, 255, 0.18);
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.18s ease, transform 0.24s var(--spring-ease);
@@ -110,11 +208,12 @@
       transform: translateX(-50%) translateY(-8px) scale(0.94);
       width: min(390px, calc(100vw - 24px));
       padding: 10px 12px;
-      border-radius: 16px;
-      background: rgba(15, 20, 30, 0.94);
-      backdrop-filter: blur(30px) saturate(185%);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.68), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      border-radius: 18px;
+      background: linear-gradient(168deg var(--in-oklab), rgba(255, 255, 255, 0.18) 0%, rgba(15, 23, 42, 0.54) 100%);
+      backdrop-filter: blur(28px) saturate(215%) brightness(1.08);
+      -webkit-backdrop-filter: blur(28px) saturate(215%) brightness(1.08);
+      border: 1px solid rgba(125, 211, 252, 0.42);
+      box-shadow: 0 22px 50px rgba(2, 6, 23, 0.48), inset 0 1.5px 1px rgba(255, 255, 255, 0.55), inset 0 -1px 1px rgba(255, 255, 255, 0.18);
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s ease, transform 0.34s var(--spring-ease);
@@ -133,17 +232,22 @@
       top: 0;
       left: 0;
       border-radius: 20px;
+      isolation: isolate;
       background: var(--glass-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(26px) saturate(210%) brightness(1.09) contrast(1.04);
+      -webkit-backdrop-filter: blur(26px) saturate(210%) brightness(1.09) contrast(1.04);
       border: 1px solid var(--glass-border);
       box-shadow:
-        0 20px 52px rgba(0, 0, 0, 0.62),
-        0 4px 14px rgba(0, 0, 0, 0.36),
-        inset 0 1px 0 var(--glass-highlight);
+        0 22px 54px rgba(2, 6, 23, 0.44),
+        0 6px 18px rgba(2, 6, 23, 0.26),
+        inset 0 1.5px 1px var(--glass-highlight),
+        inset 0 10px 24px rgba(255, 255, 255, 0.11),
+        inset 0 -1.5px 2px rgba(255, 255, 255, 0.24),
+        inset 1px 0 1px rgba(255, 255, 255, 0.16),
+        inset -1px 0 1px rgba(255, 255, 255, 0.12);
       overflow: hidden;
       will-change: width, height, border-radius, transform, opacity;
-      transition: border-color 0.35s ease, box-shadow 0.35s ease;
+      transition: border-color 0.35s ease, box-shadow 0.38s ease;
     }
 
     #leftIsland { transform-origin: 22% 14%; }
@@ -155,22 +259,19 @@
       inset: 0;
       border-radius: inherit;
       background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.12) 0%,
-        rgba(255, 255, 255, 0.02) 38%,
-        transparent 62%,
-        rgba(255, 255, 255, 0.04) 100%
+        152deg var(--in-oklab),
+        rgba(255, 255, 255, 0.26) 0%,
+        rgba(255, 255, 255, 0.08) 26%,
+        transparent 52%,
+        rgba(255, 255, 255, 0.10) 100%
       );
+      mix-blend-mode: screen;
       pointer-events: none;
+      z-index: 2;
     }
 
-    .morph-island.is-animating {
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
-      background: rgba(14, 18, 26, 0.94);
-    }
     .morph-island.is-animating::after {
-      display: none;
+      opacity: 0;
     }
     .morph-island::after {
       content: '';
@@ -179,10 +280,10 @@
       border-radius: inherit;
       padding: 1px;
       background: radial-gradient(
-        180px circle at var(--mx, -200px) var(--my, -200px),
-        rgba(255, 255, 255, 0.52),
-        rgba(255, 255, 255, 0.14) 38%,
-        transparent 68%
+        210px circle at var(--mx, -200px) var(--my, -200px),
+        rgba(255, 255, 255, 0.78),
+        rgba(255, 255, 255, 0.24) 38%,
+        transparent 70%
       );
       -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
@@ -197,7 +298,7 @@
     .grain-overlay {
       position: absolute;
       inset: 0;
-      opacity: 0.18;
+      opacity: 0.07;
       mix-blend-mode: overlay;
       pointer-events: none;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -213,9 +314,11 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      cursor: pointer;
+      cursor: grab;
       overflow: hidden;
+      z-index: 10;
     }
+    .left-pill-bar:active { cursor: grabbing; }
 
     @keyframes pillSlideDown {
       0% { opacity: 0; transform: translateY(12px) scale(0.96); filter: blur(4px); }
@@ -283,10 +386,10 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       padding: 2px;
-      background: rgba(255, 255, 255, 0.055);
-      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: 10px;
-      width: 194px;
+      width: 186px;
     }
     .ltab-indicator {
       position: absolute;
@@ -295,9 +398,9 @@
       left: 2px;
       width: calc((100% - 4px) / 3);
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.16);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      background: linear-gradient(180deg var(--in-oklab), rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.14) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.34);
+      box-shadow: 0 2px 8px rgba(2, 6, 23, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.46);
       transition: transform 0.36s var(--spring-ease);
       pointer-events: none;
     }
@@ -439,6 +542,8 @@
     }
 
     .island-inner {
+      position: relative;
+      z-index: 10;
       width: 100%;
       padding: 8px 14px 14px;
       display: flex;
@@ -497,7 +602,6 @@
     #proxyIsland.expanded .stagger-3 { transition-delay: 0.10s; }
     #proxyIsland.expanded .stagger-4 { transition-delay: 0.13s; }
     #proxyIsland.expanded .stagger-5 { transition-delay: 0.16s; }
-    #proxyIsland.expanded .stagger-6 { transition-delay: 0.19s; }
 
     .hud-island {
       position: absolute;
@@ -507,10 +611,11 @@
       height: 36px;
       padding: 0 14px;
       border-radius: 999px;
-      background: rgba(16, 20, 29, 0.90);
-      backdrop-filter: blur(28px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      background: linear-gradient(168deg var(--in-oklab), rgba(255, 255, 255, 0.22) 0%, rgba(15, 23, 42, 0.44) 100%);
+      backdrop-filter: blur(26px) saturate(210%) brightness(1.08);
+      -webkit-backdrop-filter: blur(26px) saturate(210%) brightness(1.08);
+      border: 1px solid rgba(255, 255, 255, 0.34);
+      box-shadow: 0 16px 38px rgba(2, 6, 23, 0.42), inset 0 1.5px 1px rgba(255, 255, 255, 0.56), inset 0 -1px 1px rgba(255, 255, 255, 0.2);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -529,27 +634,28 @@
 
     .glass-tile {
       background: var(--glass-card);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: 14px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -1px 0 rgba(255, 255, 255, 0.06);
       transition: background 0.22s ease, border-color 0.22s ease, box-shadow 0.26s ease, transform 0.14s var(--smooth-ease);
     }
 
     #clipSearch {
       user-select: text;
       -webkit-user-select: text;
-      background: rgba(7, 11, 19, 0.78);
+      background: rgba(15, 23, 42, 0.36);
       color: #f8fafc;
       caret-color: #38bdf8;
     }
     #clipSearch::placeholder {
-      color: #64748b;
+      color: #94a3b8;
     }
     #clipSearch:focus {
-      background: rgba(5, 8, 15, 0.92);
-      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.22);
+      background: rgba(15, 23, 42, 0.50);
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.28);
     }
 
-    .glass-tile:hover { background: var(--glass-card-hover); border-color: rgba(255, 255, 255, 0.16); }
+    .glass-tile:hover { background: var(--glass-card-hover); border-color: rgba(255, 255, 255, 0.26); }
     .glass-tile:active { transform: scale(0.982); }
 
     .glass-tile.active-blue {
@@ -639,29 +745,9 @@
       animation: shelfBounceIn 0.42s var(--spring-ease) both;
     }
 
-    /* Vinyl Disc Inertial Spin & Interactive Seek Bar */
     .vinyl-disc {
       border-radius: 999px !important;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55), inset 0 0 0 2px rgba(255, 255, 255, 0.14);
       will-change: transform;
-    }
-    .vinyl-disc::before {
-      content: '';
-      position: absolute;
-      inset: 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      pointer-events: none;
-    }
-    .vinyl-disc::after {
-      content: '';
-      position: absolute;
-      width: 14px;
-      height: 14px;
-      border-radius: 999px;
-      background: #0b0f18;
-      border: 2px solid rgba(255, 255, 255, 0.35);
-      pointer-events: none;
     }
     .music-seek-bar {
       position: relative;
@@ -727,9 +813,10 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       padding: 4px;
-      background: var(--glass-card);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: 14px;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12);
     }
     .seg-indicator {
       position: absolute;
@@ -738,9 +825,9 @@
       left: 4px;
       width: calc((100% - 8px) / 3);
       border-radius: 10px;
-      background: rgba(255, 255, 255, 0.16);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      background: linear-gradient(180deg var(--in-oklab), rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.14) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.34);
+      box-shadow: 0 3px 10px rgba(2, 6, 23, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.45);
       transition: transform 0.38s var(--spring-ease);
       pointer-events: none;
     }
@@ -750,14 +837,14 @@
       padding: 5px 0;
       font-size: 11.5px;
       font-weight: 500;
-      color: #94a3b8;
+      color: #cbd5e1;
       transition: color 0.2s ease;
     }
     .seg-btn.active { color: #ffffff; font-weight: 600; }
 
     .node-scroll::-webkit-scrollbar { width: 4px; }
     .node-scroll::-webkit-scrollbar-track { background: transparent; }
-    .node-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.16); border-radius: 99px; }
+    .node-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.22); border-radius: 99px; }
 
     .node-row {
       width: 100%;
@@ -768,16 +855,16 @@
       justify-content: space-between;
       gap: 8px;
       text-align: left;
-      background: rgba(255, 255, 255, 0.035);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       transition: background 0.22s ease, border-color 0.22s ease, transform 0.14s var(--smooth-ease);
     }
-    .node-row:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.14); }
+    .node-row:hover { background: rgba(255, 255, 255, 0.13); border-color: rgba(255, 255, 255, 0.24); }
     .node-row:active { transform: scale(0.982); }
     .node-row.active {
-      background: rgba(56, 139, 253, 0.17);
-      border-color: rgba(96, 165, 250, 0.45);
-      box-shadow: inset 0 1px 0 rgba(191, 219, 254, 0.2);
+      background: linear-gradient(155deg var(--in-oklab), rgba(96, 165, 250, 0.26) 0%, rgba(56, 139, 253, 0.14) 100%);
+      border-color: rgba(147, 197, 253, 0.55);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.36);
     }
 
     @keyframes eqBar {
@@ -809,96 +896,264 @@
 
     @keyframes faultPulse {
       0%, 100% {
-        border-color: rgba(244, 63, 94, 0.55);
-        box-shadow: 0 20px 52px rgba(0, 0, 0, 0.62), 0 0 0 0 rgba(244, 63, 94, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+        border-color: rgba(251, 113, 133, 0.65);
+        box-shadow: 0 22px 54px rgba(2, 6, 23, 0.45), 0 0 0 0 rgba(244, 63, 94, 0.38), inset 0 1.5px 1px rgba(255, 255, 255, 0.48);
       }
       50% {
-        border-color: rgba(244, 63, 94, 0.92);
-        box-shadow: 0 20px 52px rgba(0, 0, 0, 0.62), 0 0 18px 2px rgba(244, 63, 94, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+        border-color: rgba(251, 113, 133, 0.95);
+        box-shadow: 0 22px 54px rgba(2, 6, 23, 0.45), 0 0 18px 2px rgba(244, 63, 94, 0.32), inset 0 1.5px 1px rgba(255, 255, 255, 0.48);
       }
     }
     #proxyIsland.fault-pulse {
       animation: faultPulse 1.8s ease-in-out infinite;
     }
 
-    .metaball-bridge {
+    /* Independent Fused Super-Island Shell (Liquid Glass Edition) */
+    #fusedIsland {
       position: absolute;
-      top: 6px;
+      top: 0;
       left: 0;
-      height: 28px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, rgba(52, 211, 153, 0.35), rgba(56, 189, 248, 0.45));
-      filter: blur(5px);
+      height: 42px;
+      border-radius: 21px;
+      border-color: rgba(186, 230, 253, 0.44);
+      box-shadow:
+        0 24px 56px rgba(2, 6, 23, 0.46),
+        0 0 28px rgba(56, 189, 248, 0.16),
+        inset 0 1.5px 1px rgba(255, 255, 255, 0.68),
+        inset 0 10px 24px rgba(255, 255, 255, 0.12),
+        inset 0 -1.5px 2px rgba(255, 255, 255, 0.26);
       opacity: 0;
       pointer-events: none;
-      z-index: 12;
-      will-change: transform, width, opacity;
+      z-index: 24;
+      cursor: grab;
     }
-
-    .morph-island.fusing {
-      border-color: rgba(56, 189, 248, 0.55) !important;
-      box-shadow:
-        0 20px 52px rgba(0, 0, 0, 0.65),
-        0 0 28px rgba(56, 189, 248, 0.25),
-        inset 0 1px 0 rgba(255, 255, 255, 0.32) !important;
-    }
+    #fusedIsland:active { cursor: grabbing; }
+    #fusedIsland.expanded { cursor: default; }
 
     .fusion-pill-content {
-      position: absolute;
-      inset: 0;
-      padding: 0 16px;
+      position: relative;
+      width: 100%;
+      height: 42px;
+      padding: 0 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      opacity: 0;
-      pointer-events: none;
-      transform: scale(0.95);
-      filter: blur(4px);
-      transition: opacity 0.25s ease, transform 0.36s var(--spring-ease), filter 0.25s ease;
+      gap: 6px;
+      z-index: 12;
+      flex-shrink: 0;
     }
-    .fusion-pill-content.active {
-      opacity: 1;
-      pointer-events: auto;
+
+    #fusionLeftZone {
+      display: flex;
+      align-items: center;
+      flex: 1 1 0%;
+      min-width: 0;
+    }
+    #fusionMusicGroup.flex {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex: 1 1 0%;
+      width: 100%;
+      min-width: 0;
+    }
+    .fusion-music-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1 1 0%;
+      min-width: 0;
+    }
+    .fusion-music-ctrls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+
+    .fusion-proxy-toggle {
+      width: 102px;
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-shrink: 0;
+      border: 1px solid rgba(52, 211, 153, 0.34);
+      background: rgba(16, 185, 129, 0.18);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+      transition:
+        background-color 0.34s var(--smooth-ease),
+        border-color 0.34s var(--smooth-ease),
+        box-shadow 0.34s var(--smooth-ease),
+        transform 0.32s var(--spring-ease);
+    }
+    .fusion-proxy-toggle:active { transform: scale(0.94); }
+    .fusion-proxy-toggle.state-ok:hover { background: rgba(16, 185, 129, 0.28); }
+    .fusion-proxy-toggle.state-off {
+      background: rgba(100, 116, 139, 0.20);
+      border-color: rgba(148, 163, 184, 0.32);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    }
+    .fusion-proxy-toggle.state-off:hover { background: rgba(100, 116, 139, 0.30); }
+    .fusion-proxy-toggle.state-error {
+      background: rgba(244, 63, 94, 0.20);
+      border-color: rgba(251, 113, 133, 0.38);
+      box-shadow: 0 0 12px rgba(244, 63, 94, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    }
+    .fusion-proxy-toggle.state-error:hover { background: rgba(244, 63, 94, 0.30); }
+
+    .fusion-proxy-dot,
+    .proxy-mini-dot {
+      border-radius: 999px;
+      flex-shrink: 0;
+      transition:
+        background-color 0.34s var(--smooth-ease),
+        box-shadow 0.36s var(--smooth-ease),
+        transform 0.38s var(--spring-ease),
+        opacity 0.28s ease;
+    }
+    .fusion-proxy-dot { width: 8px; height: 8px; }
+    .proxy-mini-dot { width: 12px; height: 12px; }
+
+    .fusion-proxy-dot.state-ok,
+    .proxy-mini-dot.state-ok {
+      background-color: #34d399;
       transform: scale(1);
-      filter: blur(0);
+      animation: pulseDot 2.2s infinite;
     }
+    .fusion-proxy-dot.state-off,
+    .proxy-mini-dot.state-off {
+      background-color: rgba(148, 163, 184, 0.82);
+      box-shadow: none;
+      transform: scale(0.82);
+    }
+    .fusion-proxy-dot.state-error,
+    .proxy-mini-dot.state-error {
+      background-color: #fb7185;
+      transform: scale(1.06);
+      box-shadow: 0 0 8px rgba(244, 63, 94, 0.55);
+    }
+
+    .fusion-proxy-text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.32s ease;
+    }
+
+    @keyframes proxyTogglePop {
+      0% { transform: scale(0.92); }
+      55% { transform: scale(1.045); }
+      100% { transform: scale(1); }
+    }
+    .proxy-toggle-pop { animation: proxyTogglePop 0.36s var(--spring-ease); }
+
+    @keyframes fusionTextSwap {
+      0% { opacity: 0; transform: translateY(4px) scale(0.95); filter: blur(2px); }
+      100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+    .fusion-text-swap { animation: fusionTextSwap 0.28s var(--smooth-ease); }
+
+    .fusion-expanded-body {
+      position: relative;
+      width: 100%;
+      padding: 4px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+      pointer-events: none;
+      transition: opacity 0.20s ease, transform 0.30s var(--smooth-ease);
+      z-index: 12;
+    }
+    #fusedIsland.expanded .fusion-expanded-body {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .proxy-mini-status {
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 14;
+      will-change: transform, opacity;
+    }
+
+    /* Shared Element Album Proxy (continuous size, radius, position & shortest-angle rotation) */
+    .shared-album-proxy {
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 25;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      will-change: transform, width, height, border-radius;
+    }
+
+    .drag-tear-hint {
+      position: absolute;
+      top: 48px;
+      left: 0;
+      transform: translateX(-50%);
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: linear-gradient(168deg var(--in-oklab), rgba(255, 255, 255, 0.20) 0%, rgba(15, 23, 42, 0.48) 100%);
+      backdrop-filter: blur(22px) saturate(200%);
+      -webkit-backdrop-filter: blur(22px) saturate(200%);
+      border: 1px solid rgba(186, 230, 253, 0.44);
+      box-shadow: 0 10px 28px rgba(2, 6, 23, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.46);
+      font-size: 10px;
+      color: #e0f2fe;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.16s ease;
+      z-index: 45;
+    }
+    .drag-tear-hint.show { opacity: 1; }
 
     .win-taskbar {
       height: 46px;
-      background: rgba(14, 18, 26, 0.72);
-      backdrop-filter: blur(24px) saturate(160%);
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(180deg var(--in-oklab), rgba(255, 255, 255, 0.12) 0%, rgba(15, 23, 42, 0.42) 100%);
+      backdrop-filter: blur(26px) saturate(190%);
+      -webkit-backdrop-filter: blur(26px) saturate(190%);
+      border-top: 1px solid rgba(255, 255, 255, 0.20);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
     }
   </style>
 </head>
 <body>
   <div class="win-desktop">
     <div id="islandAnchor" class="island-anchor">
-      <!-- Liquid Metaball Bridge between Left and Right Islands -->
-      <div id="metaballBridge" class="metaball-bridge"></div>
+      <div id="dragTearHint" class="drag-tear-hint">继续拉近自动融合 · 双向拽开分裂</div>
 
       <!-- Left Island: Time + Heatmap / Auxiliary Clipboard / Workbench OR Music -->
       <div id="leftIsland" class="morph-island" role="region" aria-label="时间与音乐灵动岛">
         <div class="grain-overlay"></div>
         <div id="musicAmbientMesh" class="music-ambient-mesh"></div>
-
-        <!-- Super-Island Fused Content -->
-        <div id="fusionPillContent" class="fusion-pill-content">
-          <div class="flex items-center gap-2 min-w-0">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 dot-pulse shrink-0"></span>
-            <span id="fusionClock" class="mono text-xs font-semibold text-white">08:03</span>
-            <span class="text-white/25">|</span>
-            <span id="fusionNodeText" class="text-xs font-medium text-sky-200 truncate">HK-01 · 38ms</span>
-          </div>
-          <div class="flex items-center gap-2 shrink-0">
-            <span id="fusionStatusBadge" class="mono text-[10px] px-2 py-0.5 rounded-full bg-sky-500/20 border border-sky-400/35 text-sky-200">⚡ 双岛液态融合中</span>
-            <button id="btnSplitFusion" type="button" class="px-2 py-0.5 rounded-full bg-white/12 hover:bg-white/22 text-[10px] text-white transition">分裂回弹</button>
-          </div>
+        <div id="sharedAlbumProxy" class="shared-album-proxy bg-gradient-to-br from-rose-500/60 to-amber-600/60 border border-white/25">
+          <svg id="sharedAlbumSvg" class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
         </div>
 
         <!-- Compact Mini Pill (shown when Right Proxy Island is expanded) -->
-        <div id="leftMiniPill" class="absolute inset-0 px-2.5 flex items-center justify-center gap-1.5 opacity-0 pointer-events-none transition-opacity duration-200 cursor-pointer" title="点击切回左侧岛屿">
+        <div id="leftMiniPill" class="absolute inset-0 px-2.5 flex items-center justify-center gap-1.5 opacity-0 pointer-events-none transition-opacity duration-200 cursor-pointer z-10" title="点击切回左侧岛屿">
           <span id="leftMiniDot" class="w-2 h-2 rounded-full bg-sky-400 shrink-0"></span>
           <span id="leftMiniText" class="mono text-[11px] font-semibold text-white truncate">08:03</span>
         </div>
@@ -908,7 +1163,7 @@
           <div id="timePillContent" class="flex items-center justify-between w-full gap-2">
             <span class="flex items-center gap-2 min-w-0">
               <span id="pillTimeClock" class="mono text-xs font-semibold text-white">08:03</span>
-              <span id="pillTimeDate" class="text-[11px] text-slate-400 truncate">11/17 周二</span>
+              <span id="pillTimeDate" class="text-[11px] text-slate-400 truncate">11/18 周三</span>
             </span>
             <span class="flex items-center gap-1.5 shrink-0">
               <span id="btnQuickClip" role="button" tabindex="0" title="打开辅助粘贴板" class="w-6 h-5 rounded-md bg-white/8 hover:bg-white/16 text-slate-300 hover:text-white flex items-center justify-center transition"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg></span>
@@ -953,10 +1208,10 @@
         <!-- Expanded Left Content -->
         <div id="leftExpandedInner" class="left-expanded-inner">
           <div id="timeCardContent" class="p-3.5 flex flex-col gap-2.5">
-            <div class="flex items-center justify-between gap-2">
-              <div class="flex items-baseline gap-2 min-w-0">
-                <div id="expandedClock" class="mono text-xl font-bold text-white tracking-tight leading-none">08:03:29</div>
-                <div id="expandedDate" class="text-[11px] text-slate-400 truncate">11月17日 · 周二</div>
+            <div class="flex items-center justify-between gap-1.5">
+              <div class="flex items-baseline gap-1.5 min-w-0">
+                <div id="expandedClock" class="mono text-lg font-bold text-white tracking-tight leading-none shrink-0">08:03:29</div>
+                <div id="expandedDate" class="text-[11px] text-slate-400 whitespace-nowrap">11月18日 · 周三</div>
               </div>
               <div class="flex items-center gap-1.5 shrink-0">
                 <div class="ltab-wrap">
@@ -986,6 +1241,7 @@
                   </span>
                 </div>
               </div>
+
               <!-- Pane 2: Auxiliary Clipboard -->
               <div id="clipPanel" class="ltab-pane pane-clip-exit flex flex-col gap-2">
                 <div class="flex items-center gap-1.5">
@@ -1007,8 +1263,8 @@
 
           <!-- Expanded Music Card -->
           <div id="musicCardContent" class="hidden p-4 items-center gap-4 h-[146px]">
-            <div id="albumArt" class="vinyl-disc w-24 h-24 bg-gradient-to-br from-rose-500/45 via-red-700/35 to-stone-900 border border-white/15 shadow-lg flex items-center justify-center shrink-0 relative overflow-hidden">
-              <span class="text-[10px] font-bold tracking-widest text-white/90 uppercase -translate-y-4">OCEAN</span>
+            <div id="albumArt" class="vinyl-disc w-24 h-24 bg-gradient-to-br from-rose-500/60 to-amber-600/60 border border-white/25 flex items-center justify-center shrink-0 relative overflow-hidden">
+              <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
             </div>
 
             <div class="flex-1 min-w-0 flex flex-col justify-between gap-2">
@@ -1044,8 +1300,152 @@
         </div>
       </div>
 
-      <!-- Right Island: Proxy -->
-      <div id="proxyIsland" class="morph-island" role="region" aria-label="v2rayN 灵动岛">
+      <!-- Independent Fused Super-Island (372x42 High-Frequency Micro-Controls + Expandable Joint View) -->
+      <div id="fusedIsland" class="morph-island flex flex-col is-shell-hidden" role="region" aria-label="双岛超级控制条">
+        <div class="grain-overlay"></div>
+        <div id="fusionPillContent" class="fusion-pill-content">
+          <div id="fusionLeftZone" class="flex items-center gap-1.5 min-w-0 flex-1 cursor-pointer" title="滚轮切换模式 · 点击展开合岛">
+            <!-- Time Mode Left Content -->
+            <div id="fusionTimeGroup" class="flex items-center gap-2 min-w-0 flex-1">
+              <span class="w-5 h-5 rounded-full bg-sky-500/20 border border-sky-400/35 flex items-center justify-center text-sky-300 shrink-0">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+              </span>
+              <span id="fusionClockText" class="mono text-xs font-semibold text-white shrink-0">08:03</span>
+              <span id="fusionDateText" class="text-[11px] text-slate-400 truncate">11/18 周三</span>
+            </div>
+
+            <!-- Clipboard Mode Left Content -->
+            <div id="fusionClipGroup" class="hidden items-center gap-2 min-w-0 flex-1">
+              <span class="w-5 h-5 rounded-full bg-sky-500/20 border border-sky-400/35 flex items-center justify-center text-sky-300 shrink-0">
+                <svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+              </span>
+              <span class="text-[11px] font-semibold text-slate-100 truncate">辅助粘贴板</span>
+              <span id="fusionClipCount" class="mono text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 text-slate-300 shrink-0">4 条</span>
+            </div>
+
+            <!-- Workbench Shelf Mode Left Content -->
+            <div id="fusionShelfGroup" class="hidden items-center gap-2 min-w-0 flex-1">
+              <span class="w-5 h-5 rounded-full bg-indigo-500/25 border border-indigo-400/35 flex items-center justify-center text-indigo-200 shrink-0">
+                <svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              </span>
+              <span class="text-[11px] font-semibold text-slate-100 truncate">工作栏</span>
+              <span id="fusionShelfCount" class="mono text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 text-slate-300 shrink-0">4 项</span>
+            </div>
+
+            <!-- Music Mode Left Content (Shown ONLY when musicActive is true) -->
+            <div id="fusionMusicGroup" class="hidden items-center justify-between gap-2 min-w-0 flex-1">
+              <div class="fusion-music-meta">
+                <span id="fusionMusicBadge" class="w-5 h-5 rounded-full bg-gradient-to-br from-rose-500/60 to-amber-500/60 border border-white/25 flex items-center justify-center text-white shrink-0">
+                  <svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                </span>
+                <span id="fusionTrackTitle" class="text-[11px] font-semibold text-white truncate">你的爱情</span>
+              </div>
+              <div class="fusion-music-ctrls">
+                <button id="btnFusionPrev" type="button" title="上一首" class="w-5 h-5 rounded-md hover:scale-110 active:scale-95 flex items-center justify-center transition"><svg class="w-5 h-5" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="f_fl_prev" x1="6" y1="6" x2="26" y2="26" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#f8fafc"/><stop offset="100%" stop-color="#94a3b8"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="8" fill="rgba(255,255,255,0.09)" stroke="rgba(255,255,255,0.18)"/><rect x="8.5" y="9" width="3" height="14" rx="1.5" fill="url(#f_fl_prev)"/><path d="M22.5 10.2c0-1.1-1.2-1.7-2.1-1.1l-7.2 5.3c-.7.5-.7 1.6 0 2.2l7.2 5.3c.9.6 2.1 0 2.1-1.1V10.2z" fill="url(#f_fl_prev)"/></svg></button>
+                <button id="btnFusionPlay" type="button" title="播放 / 暂停" class="w-[22px] h-[22px] rounded-md hover:scale-105 active:scale-95 flex items-center justify-center transition"><svg class="w-[22px] h-[22px]" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="f_fl_bg" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#0284c7"/></linearGradient><linearGradient id="f_fl_hi" x1="16" y1="2" x2="16" y2="16" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="rgba(255,255,255,0.45)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="9" fill="url(#f_fl_bg)"/><rect x="2.5" y="2.5" width="27" height="27" rx="8.5" stroke="url(#f_fl_hi)"/><rect x="10.5" y="9" width="4" height="14" rx="2" fill="#ffffff"/><rect x="17.5" y="9" width="4" height="14" rx="2" fill="#ffffff"/></svg></button>
+                <button id="btnFusionNext" type="button" title="下一首" class="w-5 h-5 rounded-md hover:scale-110 active:scale-95 flex items-center justify-center transition"><svg class="w-5 h-5" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="f_fl_next" x1="6" y1="6" x2="26" y2="26" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#f8fafc"/><stop offset="100%" stop-color="#94a3b8"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="8" fill="rgba(255,255,255,0.09)" stroke="rgba(255,255,255,0.18)"/><rect x="20.5" y="9" width="3" height="14" rx="1.5" fill="url(#f_fl_next)"/><path d="M9.5 10.2c0-1.1 1.2-1.7 2.1-1.1l7.2 5.3c.7.5.7 1.6 0 2.2l-7.2 5.3c-.9.6-2.1 0-2.1-1.1V10.2z" fill="url(#f_fl_next)"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <span class="w-[1px] h-4 bg-white/15 shrink-0"></span>
+
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button id="btnFusionProxyToggle" type="button" title="快捷开/关代理" class="fusion-proxy-toggle state-ok">
+              <span id="fusionDot" class="fusion-proxy-dot state-ok"></span>
+              <span id="fusionNodeText" class="fusion-proxy-text mono text-[10px] font-medium text-emerald-200">HK-01 · 38ms</span>
+            </button>
+            <button id="btnSplitFusion" type="button" title="点击或向两侧拽开分裂" class="w-5 h-5 rounded-full bg-white/10 hover:bg-white/22 text-slate-200 flex items-center justify-center text-[10px] transition">↔</button>
+            <button id="btnCollapseFusion" type="button" title="收起合岛面板" class="hidden w-5 h-5 rounded-full bg-white/10 hover:bg-white/22 text-slate-200 items-center justify-center transition">
+              <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="18 15 12 9 6 15"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Expandable Joint Panel for Fused Island (Design Prototype Draft) -->
+        <div id="fusionExpandedBody" class="fusion-expanded-body" style="width: min(468px, calc(100vw - 24px));">
+          <div class="flex items-center justify-between text-[10px] text-slate-400 px-0.5">
+            <span>合岛联合中控（设计草案预览 · 滚轮切换左侧模块）</span>
+            <span id="fusionExpModeTag" class="mono text-sky-300">时间 · 代理协同</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5">
+            <!-- Left Dynamic Half Summary (Supports Wheel Switch + Music Vinyl/EQ/Mesh Animations) -->
+            <div id="fusionExpLeftCard" class="glass-tile p-3 flex flex-col justify-between gap-2 min-h-[168px] relative overflow-hidden">
+              <div id="fusionAmbientMesh" class="music-ambient-mesh"></div>
+              <div id="fusionExpLeftContent" class="relative z-10 flex flex-col gap-1.5 min-w-0 flex-1">
+                <!-- Pane A: Time -->
+                <div id="fusionExpTimePane" class="flex flex-col gap-1">
+                  <div id="fusionExpClockText" class="mono text-xl font-bold text-white tracking-tight leading-none">08:03:29</div>
+                  <div id="fusionExpDateText" class="text-[11px] text-slate-300 mt-0.5">11月18日 · 周三</div>
+                  <div class="mt-2 px-2 py-1.5 rounded-lg bg-white/5 border border-white/8 text-[10px] text-slate-400 leading-relaxed">
+                    在此卡片滚轮切换「粘贴板 / 工作栏 / 音乐」
+                  </div>
+                </div>
+
+                <!-- Pane B: Music (Vinyl Spin + EQ Bars + Ambient Mesh) -->
+                <div id="fusionExpMusicPane" class="hidden flex-col gap-2">
+                  <div class="flex items-center gap-2.5">
+                    <div id="fusionExpVinyl" class="vinyl-disc w-12 h-12 bg-gradient-to-br from-rose-500/60 to-amber-600/60 border border-white/25 flex items-center justify-center shrink-0 relative overflow-hidden">
+                      <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center justify-between gap-1.5">
+                        <div id="fusionExpTrackTitle" class="text-xs font-semibold text-white truncate">你的爱情</div>
+                        <span class="flex items-end gap-0.5 h-3 shrink-0">
+                          <span class="eq-bar" style="animation-delay:0s"></span>
+                          <span class="eq-bar" style="animation-delay:0.22s"></span>
+                          <span class="eq-bar" style="animation-delay:0.42s"></span>
+                        </span>
+                      </div>
+                      <div id="fusionExpTrackArtist" class="text-[10px] text-slate-400 truncate mt-0.5">逃跑计划</div>
+                    </div>
+                  </div>
+                  <div id="fusionExpLyric" class="text-[10px] text-emerald-200/90 truncate px-2 py-1 rounded-lg bg-white/5 border border-white/8">♪ 最闪亮的星，照亮你的眼睛 ♪</div>
+                </div>
+
+                <!-- Pane C: Clipboard -->
+                <div id="fusionExpClipPane" class="hidden flex-col gap-1.5">
+                  <div id="fusionExpClipHeader" class="text-[11px] font-semibold text-sky-200">最近剪贴板</div>
+                  <div id="fusionExpClipItems" class="flex flex-col gap-1.5"></div>
+                </div>
+
+                <!-- Pane D: Workbench Shelf -->
+                <div id="fusionExpShelfPane" class="hidden flex-col gap-1.5">
+                  <div id="fusionExpShelfHeader" class="text-[11px] font-semibold text-indigo-200">桌面工作栏</div>
+                  <div id="fusionExpShelfItems" class="flex flex-col gap-1.5"></div>
+                </div>
+              </div>
+              <button id="btnFusionToLeftFull" type="button" class="relative z-10 w-full py-1.5 rounded-lg bg-white/8 hover:bg-white/14 text-[11px] text-slate-200 transition">展开完整左侧视图 ↗</button>
+            </div>
+
+            <!-- Right Proxy Quick Controls -->
+            <div class="glass-tile p-3 flex flex-col justify-between gap-2 min-h-[168px]">
+              <div class="flex flex-col gap-2">
+                <div class="flex items-center justify-between gap-1">
+                  <span id="fusionExpNodeName" class="text-xs font-semibold text-white truncate">HK-01 · IPLC 专线</span>
+                  <span id="fusionExpPing" class="mono text-[10px] text-emerald-300 shrink-0">38ms</span>
+                </div>
+                <div class="grid grid-cols-2 gap-1.5">
+                  <button id="btnFusionExpSys" type="button" class="py-1.5 px-2 rounded-lg text-[11px] font-medium border transition text-center">系统代理</button>
+                  <button id="btnFusionExpTun" type="button" class="py-1.5 px-2 rounded-lg text-[11px] font-medium border transition text-center">TUN 模式</button>
+                </div>
+                <div class="grid grid-cols-3 gap-1 bg-black/35 p-1 rounded-lg border border-white/8">
+                  <button type="button" data-fmode="rule" class="fusion-seg-btn py-1 rounded text-[10px] font-medium transition">Rule</button>
+                  <button type="button" data-fmode="global" class="fusion-seg-btn py-1 rounded text-[10px] font-medium transition">Global</button>
+                  <button type="button" data-fmode="direct" class="fusion-seg-btn py-1 rounded text-[10px] font-medium transition">Direct</button>
+                </div>
+              </div>
+              <button id="btnFusionToProxyFull" type="button" class="w-full py-1.5 rounded-lg bg-sky-500/18 hover:bg-sky-500/28 border border-sky-400/30 text-[11px] text-sky-200 transition">拆开并管理节点 ↗</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Island: Proxy (Pure Minimal 40x40 Status Dot when Collapsed; Full Panel when Expanded) -->
+      <div id="proxyIsland" class="morph-island" role="region" aria-label="v2rayN 灵动岛" title="左键展开面板 · 右键快捷开/关代理">
+        <div id="proxyMiniStatus" class="proxy-mini-status">
+          <span id="proxyMiniDot" class="proxy-mini-dot state-ok"></span>
+        </div>
         <div class="island-inner">
           <div id="expandableHeader" class="expandable-header">
             <div class="flex items-center justify-between gap-2 w-full min-w-0 pr-0" id="proxyHeaderLeft">
@@ -1060,7 +1460,6 @@
             </div>
 
             <div class="header-extra shrink-0">
-              <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-white/10 text-slate-300 mono">:10808</span>
               <button id="btnPingAll" type="button" title="批量真连接测速" class="px-2 py-1 rounded-lg text-[11px] font-medium bg-white/8 hover:bg-white/15 border border-white/10 text-slate-200 transition flex items-center gap-1">
                 <svg id="pingSpinner" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 12a9 9 0 1 1-2.64-6.36" />
@@ -1139,18 +1538,6 @@
               </div>
               <svg id="trafficChart" class="w-44 h-8 shrink-0" viewBox="0 0 160 36" preserveAspectRatio="none"></svg>
             </div>
-
-            <div class="stagger-item stagger-6 grid grid-cols-3 gap-2">
-              <button id="btnCopyPs" type="button" class="glass-tile py-1.5 px-2 text-[11px] font-medium text-slate-200 hover:text-white flex items-center justify-center gap-1">
-                <span>复制 PS 代理</span>
-              </button>
-              <button id="btnCopyBash" type="button" class="glass-tile py-1.5 px-2 text-[11px] font-medium text-slate-200 hover:text-white flex items-center justify-center gap-1">
-                <span>复制 Bash 代理</span>
-              </button>
-              <button id="btnOpenMain" type="button" class="glass-tile py-1.5 px-2 text-[11px] font-medium text-sky-300 hover:text-sky-200 flex items-center justify-center gap-1">
-                <span>唤起 v2rayN</span>
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -1182,11 +1569,11 @@
       <div id="demoCard" class="max-w-xl w-full glass-tile p-6 text-center backdrop-blur-xl bg-slate-900/45 border-white/10">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/8 border border-white/10 text-xs text-slate-300 mb-3">
           <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span>双岛物理触感层 · 橡皮筋阻尼 · 磁吸张力 · 双向共存</span>
+          <span>双向共存 · 液态融合 · 物理触感层</span>
         </div>
-        <h1 class="text-lg font-semibold text-white tracking-tight">已修复语法冲突并完整启用三层物理手感细节</h1>
+        <h1 class="text-lg font-semibold text-white tracking-tight">island-demo — 双岛流体交互完整版</h1>
         <p class="text-xs text-slate-400 mt-2 leading-relaxed">
-          鼠标靠近顶部胶囊边缘可体验水滴表面张力磁吸鼓起；在胶囊或列表边界快速滑动可体验橡皮筋阻尼回弹；展开任一岛屿均保持双岛共存与液态桥接。
+          点击或拖拽顶部左/右岛体验表面张力磁吸融合与撕裂分裂、黑胶共享元素连续变形、工作栏 0.5s 预览与拖出还原，以及全局快捷键循环切换。
         </p>
 
         <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
@@ -1237,13 +1624,20 @@
           <button id="btnToggleDock" type="button" class="px-2.5 py-1 rounded-lg bg-white/6 text-slate-300 hover:text-white ml-2">切换位置：居中 / 右上角</button>
         </div>
 
+        <div class="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center justify-center gap-2 text-[11px]">
+          <span class="text-slate-400">壁纸压力测试：</span>
+          <button type="button" data-wp="dark" class="wp-btn px-2.5 py-1 rounded-lg bg-white/16 text-white font-medium">深空暗夜</button>
+          <button type="button" data-wp="bright" class="wp-btn px-2.5 py-1 rounded-lg bg-white/6 text-slate-300 hover:text-white">纯白高亮壁纸</button>
+          <button type="button" data-wp="cyber" class="wp-btn px-2.5 py-1 rounded-lg bg-white/6 text-slate-300 hover:text-white">高饱和杂乱壁纸</button>
+        </div>
+
         <div class="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center justify-center gap-2 text-[11px] text-slate-400">
           <span>快捷键直达：</span>
           <span class="px-2 py-0.5 rounded bg-white/8 border border-white/12 mono text-slate-200">Alt + Space</span><span>唤起/收起</span>
           <span class="px-2 py-0.5 rounded bg-white/8 border border-white/12 mono text-slate-200">Alt + V</span><span>粘贴板</span>
           <span class="px-2 py-0.5 rounded bg-white/8 border border-white/12 mono text-slate-200">Alt + W</span><span>工作栏</span>
           <span class="px-2 py-0.5 rounded bg-white/8 border border-white/12 mono text-slate-200">Alt + P</span><span>一键测速</span>
-          <span class="px-2 py-0.5 rounded bg-white/8 border border-white/12 mono text-slate-200">右键右岛</span><span>盲操代理开关</span>
+          <span class="px-2 py-0.5 rounded bg-white/8 border border-white/12 mono text-slate-200">右键右岛</span><span>快捷开/关代理</span>
         </div>
       </div>
     </main>
@@ -1336,18 +1730,10 @@
         { id: 'c2', type: 'code', tag: 'CLI', pinned: false, time: '2分钟前', text: 'export ALL_PROXY=socks5://127.0.0.1:10808' },
         { id: 'c3', type: 'text', tag: '文本', pinned: false, time: '10分钟前', text: '~/Projects/island-demo' }
       ],
-      clipQuery: '',
-      lastNewClipId: null,
-      clipStaggerPending: false,
-      clips: [
-        { id: 'c1', type: 'node', tag: 'vless://', pinned: true, time: '刚刚', text: 'vless://a9c4e2-reality@jp-02.example.com:443#JP-02' },
-        { id: 'c_img1', type: 'image', tag: '图片', pinned: false, time: '1分钟前', text: '桌面截图 1920×1080 · 428 KB', meta: '1920×1080 · PNG · 428 KB', imgSrc: "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 270'%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%230f172a'/%3E%3Cstop offset='100%25' stop-color='%231e293b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='480' height='270' fill='url(%23g1)'/%3E%3Crect x='24' y='24' width='432' height='222' rx='14' fill='%230b1120' stroke='%2338bdf8' stroke-opacity='0.35'/%3E%3Ccircle cx='52' cy='48' r='6' fill='%23f43f5e'/%3E%3Ccircle cx='72' cy='48' r='6' fill='%23fbbf24'/%3E%3Ccircle cx='92' cy='48' r='6' fill='%2334d399'/%3E%3Crect x='48' y='78' width='180' height='14' rx='4' fill='%2338bdf8' fill-opacity='0.45'/%3E%3Crect x='48' y='106' width='320' height='10' rx='4' fill='%2394a3b8' fill-opacity='0.3'/%3E%3Crect x='48' y='128' width='260' height='10' rx='4' fill='%2394a3b8' fill-opacity='0.25'/%3E%3Crect x='48' y='162' width='384' height='60' rx='10' fill='%2310b981' fill-opacity='0.15' stroke='%2334d399' stroke-opacity='0.4'/%3E%3Ctext x='240' y='198' fill='%23a7f3d0' font-family='monospace' font-size='15' text-anchor='middle'%3E1920 x 1080 Screen Capture%3C/text%3E%3C/svg%3E" },
-        { id: 'c2', type: 'code', tag: 'CLI', pinned: false, time: '2分钟前', text: 'export ALL_PROXY=socks5://127.0.0.1:10808' },
-        { id: 'c3', type: 'text', tag: '文本', pinned: false, time: '10分钟前', text: '~/Projects/Island-proxy' }
-      ],
       musicActive: false,
       musicPlaying: true,
       fusedMode: false,
+      fusionExpanded: false,
       trackIdx: 0,
       lyricIdx: 0,
       musicPct: 42,
@@ -1376,6 +1762,7 @@
     const $ = (id) => document.getElementById(id);
     const proxyEl = $('proxyIsland');
     const leftEl = $('leftIsland');
+    const fusedEl = $('fusedIsland');
     const leftPillBar = $('leftPillBar');
     const leftExpandedInner = $('leftExpandedInner');
     const hudEl = $('hudIsland');
@@ -1384,12 +1771,87 @@
     let cachedWinW = window.innerWidth;
     const proxySpring = { p: 0, v: 0, target: 0, rafId: null, lastTime: 0, speed: 0.85 };
     const leftSpring = { p: 0, v: 0, target: 0, rafId: null, lastTime: 0, speed: 1.0 };
-    const fusionSpring = { p: 0, v: 0, target: 0, rafId: null, lastTime: 0, speed: 0.9 };
+    const fusionSpring = { p: 0, v: 0, target: 0, rafId: null, lastTime: 0, speed: 0.84 };
+    const fusionExpandSpring = { p: 0, v: 0, target: 0, rafId: null, lastTime: 0, speed: 0.92 };
     const bumpSpring = { x: 0, v: 0, rafId: null, lastTime: 0 };
     const leftRubber = { y: 0, v: 0, rafId: null, lastTime: 0 };
+    const fusionRubber = { y: 0, v: 0, rafId: null, lastTime: 0 };
+    let lastProxyPrefs = { sysProxy: true, tunMode: false };
     const leftHeightSpring = { p: 216, v: 0, target: 216, rafId: null, lastTime: 0 };
     const vinylSpin = { angle: 0, vel: 0, rafId: null, lastTime: 0 };
+    const albumAnim = { retractStartAngle: 0, isRetracting: false };
+
+    // Continuous spring physics for drag/pull gestures (never snaps instantly to 0 on release)
+    const dragPhys = {
+      left: { x: 0, v: 0, target: 0 },
+      proxy: { x: 0, v: 0, target: 0 },
+      split: { x: 0, v: 0, target: 0 },
+      rafId: null,
+      lastTime: 0
+    };
+
+    const dragGesture = {
+      active: false,
+      source: null,
+      startX: 0,
+      lastX: 0,
+      lastT: 0,
+      vx: 0,
+      dx: 0,
+      moved: false
+    };
     let isSeekingMusic = false;
+
+    function smoothstep(e0, e1, x) {
+      const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0)));
+      return t * t * (3 - 2 * t);
+    }
+
+    function normalizeShortestAngle(deg) {
+      return ((((deg % 360) + 540) % 360) - 180);
+    }
+
+    function softRubber(val, limit) {
+      const sign = val < 0 ? -1 : 1;
+      const abs = Math.abs(val);
+      return sign * (limit * (1 - Math.exp(-abs / (limit * 1.15))));
+    }
+
+    function ensureDragPhysLoop() {
+      if (dragPhys.rafId) return;
+      dragPhys.lastTime = 0;
+      const stepDragPhys = (now) => {
+        if (!dragPhys.lastTime) dragPhys.lastTime = now;
+        const dt = Math.min(0.032, Math.max(0.008, (now - dragPhys.lastTime) / 1000));
+        dragPhys.lastTime = now;
+
+        let anyActive = dragGesture.active;
+        ['left', 'proxy', 'split'].forEach((key) => {
+          const sp = dragPhys[key];
+          const k = dragGesture.active && dragGesture.source === (key === 'split' ? 'fusion-split' : key) ? 420 : 260;
+          const c = dragGesture.active && dragGesture.source === (key === 'split' ? 'fusion-split' : key) ? 32 : 19;
+          const accel = -k * (sp.x - sp.target) - c * sp.v;
+          sp.v += accel * dt;
+          sp.x += sp.v * dt;
+          if (Math.abs(sp.x - sp.target) > 0.08 || Math.abs(sp.v) > 0.6) {
+            anyActive = true;
+          } else {
+            sp.x = sp.target;
+            sp.v = 0;
+          }
+        });
+
+        renderIslands();
+
+        if (!anyActive) {
+          dragPhys.rafId = null;
+          dragPhys.lastTime = 0;
+          return;
+        }
+        dragPhys.rafId = requestAnimationFrame(stepDragPhys);
+      };
+      dragPhys.rafId = requestAnimationFrame(stepDragPhys);
+    }
 
     function syncVinylSpin() {
       if (vinylSpin.rafId) return;
@@ -1398,11 +1860,19 @@
         if (!vinylSpin.lastTime) vinylSpin.lastTime = now;
         const dt = Math.min(0.05, Math.max(0.008, (now - vinylSpin.lastTime) / 1000));
         vinylSpin.lastTime = now;
-        const targetVel = (state.musicActive && state.musicPlaying) ? 28 : 0; // deg/s
-        vinylSpin.vel += (targetVel - vinylSpin.vel) * Math.min(1, dt * 3.2);
+        const shouldSpin = state.musicActive && state.musicPlaying && (state.openMode === 'left' || state.fusionExpanded) && !albumAnim.isRetracting;
+        const targetVel = shouldSpin ? 28 : 0;
+        vinylSpin.vel += (targetVel - vinylSpin.vel) * Math.min(1, dt * 3.4);
         vinylSpin.angle = (vinylSpin.angle + vinylSpin.vel * dt) % 360;
+
         const art = $('albumArt');
-        if (art) art.style.transform = `rotate(${vinylSpin.angle.toFixed(2)}deg)`;
+        if (art && leftSpring.p >= 0.998) {
+          art.style.transform = `rotate(${vinylSpin.angle.toFixed(2)}deg)`;
+        }
+        const fVinyl = $('fusionExpVinyl');
+        if (fVinyl && (state.fusionExpanded || fusionExpandSpring.p > 0.05)) {
+          fVinyl.style.transform = `rotate(${vinylSpin.angle.toFixed(2)}deg)`;
+        }
         if (targetVel === 0 && Math.abs(vinylSpin.vel) < 0.08) {
           vinylSpin.vel = 0;
           vinylSpin.rafId = null;
@@ -1564,28 +2034,62 @@
       const lp = leftSpring.p;
       const pp = proxySpring.p;
       const fp = fusionSpring.p;
+      const fe = fusionExpandSpring.p;
+      const fpClamped = Math.max(0, Math.min(1, fp));
+      const feClamped = Math.max(0, Math.min(1, fe));
+      const fpOver = fp - fpClamped;
+      const isMerging = fusionSpring.target === 1;
       const bump = bumpSpring.x;
 
+      const fusedW = Math.min(372, cachedWinW - 24);
+      const fusedExpW = Math.min(468, cachedWinW - 24);
+      const halfFused = fusedW / 2;
+      const splitJointX = 32; // Seam between left (-halfFused..+32) and right (+32..+halfFused)
+
+      // Drag physics offsets + mutual magnetic attraction + volume-preserving stretch/squash
+      const dlx = dragPhys.left.x;
+      const drx = dragPhys.proxy.x;
+      const dSplit = dragPhys.split.x;
+
+      const leftPullIn = dlx > 0 ? dlx : 0;
+      const proxyPullIn = drx < 0 ? -drx : 0;
+
+      // Opposite island gently leans inward via magnetic field when the other approaches
+      const leftAttractPull = proxyPullIn * 0.34;
+      const proxyAttractPull = -leftPullIn * 0.34;
+
+      const leftStretch = Math.min(14, Math.abs(dlx) * 0.24 + proxyPullIn * 0.14);
+      const proxyStretch = Math.min(14, Math.abs(drx) * 0.24 + leftPullIn * 0.14);
+      const leftSquashY = Math.min(2.6, leftStretch * 0.16);
+      const proxySquashY = Math.min(2.6, proxyStretch * 0.16);
+
+      // Centripetal collision squeeze during merge transition (0 -> peak at fp=0.5 -> 0)
+      const mergeSqueeze = (isMerging && fpClamped > 0 && fpClamped < 1) ? Math.sin(fpClamped * Math.PI) : 0;
+
+      // 1. Left Island geometry
       const lwMini = 78;
       const lwCollapsed = 222 - (222 - lwMini) * pp;
       const lwExpanded = Math.min(416, cachedWinW - 24);
-      const lwFused = Math.min(372, cachedWinW - 24);
+      const lwFusedHalf = halfFused + splitJointX; // e.g. 186 + 32 = 218
       const lhExpanded = leftHeightSpring.p;
 
       let lw = lwCollapsed + (lwExpanded - lwCollapsed) * lp;
-      lw = lw + (lwFused - lw) * fp;
-      const lh = (40 + (lhExpanded - 40) * lp) * (1 - fp) + 42 * fp;
-      const lr = 20 + (24 - 20) * lp * (1 - fp);
+      lw = lw * (1 - fpClamped) + lwFusedHalf * fpClamped + leftStretch * (1 - lp) * (1 - fpClamped) - 8 * mergeSqueeze;
+      const lh = (40 - leftSquashY * (1 - lp) + (lhExpanded - 40 + leftSquashY) * lp) * (1 - fpClamped) + (42 + 3.4 * mergeSqueeze) * fpClamped;
+      const lr = 20 + (24 - 20) * lp * (1 - fpClamped);
 
-      const pwMini = 78;
-      const pwCollapsed = 118 - (118 - pwMini) * lp;
+      // 2. Right Island geometry (Minimal 40x40 pure circle dot when collapsed; expands to 456x466 panel)
+      const pwMini = 40;
+      const pwCollapsed = 40;
       const pwExpanded = Math.min(456, cachedWinW - 24);
-      const pw = (pwCollapsed + (pwExpanded - pwCollapsed) * pp) * (1 - fp * 0.45);
-      const ph = 40 + (522 - 40) * pp * (1 - fp);
-      const pr = 20 + (24 - 20) * pp * (1 - fp);
+      const pwFusedHalf = halfFused - splitJointX; // e.g. 186 - 32 = 154
 
-      const magnetPull = fp > 0 && fp < 1 ? Math.sin(fp * Math.PI) * 14 : 0;
+      let pw = pwCollapsed + (pwExpanded - pwCollapsed) * pp;
+      pw = pw * (1 - fpClamped) + pwFusedHalf * fpClamped + proxyStretch * (1 - pp) * (1 - fpClamped) - 6 * mergeSqueeze;
+      const ph = (40 - proxySquashY * (1 - pp) + (466 - 40 + proxySquashY) * pp) * (1 - fpClamped) + (42 + 3.4 * mergeSqueeze) * fpClamped;
+      const pr = 20 + (24 - 20) * pp * (1 - fpClamped);
 
+      // 3. Centers & Collision-free Symmetric Positioning ([-137 .. +137] perfectly centered!)
       let lxCenter, pxCenter;
       if (state.dockRight) {
         lxCenter = -lw / 2;
@@ -1594,69 +2098,170 @@
         const expandedProxyCenter = Math.min((cachedWinW / 2) - (pw / 2) - 8, 42);
         const leftBesideExpandedProxy = Math.max(-(cachedWinW / 2) + (lw / 2) + 8, expandedProxyCenter - (pw / 2) - (lw / 2) - 8);
 
-        const lxBase = (-66 * (1 - lp) + magnetPull) * (1 - pp) + leftBesideExpandedProxy * pp;
-        lxCenter = lxBase * (1 - fp);
+        const lxRest = -26;
+        const lxFusedCenter = (-halfFused + splitJointX) / 2; // -77
+        const lxBase = (lxRest * (1 - lp) + dlx + leftAttractPull) * (1 - pp) + leftBesideExpandedProxy * pp;
+        lxCenter = lxBase * (1 - fpClamped) + lxFusedCenter * fpClamped + 16 * mergeSqueeze;
 
-        const restX = 118;
+        const rxRest = 117;
         const besideLeftX = Math.min((cachedWinW / 2) - (pw / 2) - 10, (lw / 2) + (pw / 2) + 8);
-        const collapsedX = restX + (besideLeftX - restX) * lp + bump - magnetPull * 1.4;
-        pxCenter = (collapsedX * (1 - pp) + expandedProxyCenter * pp) * (1 - fp);
+        const rxFusedCenter = (splitJointX + halfFused) / 2; // +109
+        const collapsedX = rxRest + (besideLeftX - rxRest) * lp + bump + drx + proxyAttractPull;
+        const pxBase = collapsedX * (1 - pp) + expandedProxyCenter * pp;
+        pxCenter = pxBase * (1 - fpClamped) + rxFusedCenter * fpClamped - 18 * mergeSqueeze;
       }
 
-      const leftPos = lxCenter - lw / 2;
-      const proxyLeft = pxCenter - pw / 2;
+      // Split tear impulse shifts both halves outward smoothly right from fp=1
+      const splitPull = fpClamped > 0 ? Math.abs(dSplit) * 0.42 : 0;
+      const leftPos = lxCenter - lw / 2 - splitPull * 0.55;
+      const proxyLeft = pxCenter - pw / 2 + splitPull * 0.55;
 
-      const leftOpacity = (state.dockRight ? Math.max(0, 1 - pp * 2.5) : 1);
+      // Prevent crossing past seam while dragging in normal separated mode
+      const rawGap = proxyLeft - (leftPos + lw);
+      const clampTouch = !state.dockRight && fpClamped < 0.05 && lp < 0.05 && pp < 0.05 && rawGap < -2;
+      const safeLeftPos = clampTouch && dragGesture.source === 'left' ? proxyLeft - lw + 2 : leftPos;
+      const safeProxyLeft = clampTouch && dragGesture.source === 'proxy' ? leftPos + lw - 2 : proxyLeft;
+
+      // Directional solid-first handoff so merged obsidian glass never flashes semi-transparent
+      const fusedShellAlpha = isMerging
+        ? smoothstep(0.24, 0.48, fpClamped)
+        : smoothstep(0.66, 0.88, fpClamped);
+      const pairUnderFusedAlpha = isMerging
+        ? 1 - smoothstep(0.46, 0.64, fpClamped)
+        : 1 - smoothstep(0.84, 0.96, fpClamped);
+
+      const leftOpacity = (state.dockRight ? Math.max(0, 1 - pp * 2.5) : 1) * pairUnderFusedAlpha;
       leftEl.style.width = `${lw.toFixed(2)}px`;
       leftEl.style.height = `${lh.toFixed(2)}px`;
       leftEl.style.borderRadius = `${lr.toFixed(2)}px`;
       leftEl.style.opacity = leftOpacity.toFixed(3);
-      leftEl.style.pointerEvents = leftOpacity > 0.2 ? 'auto' : 'none';
-      leftEl.style.transform = `translate3d(${leftPos.toFixed(2)}px, ${leftRubber.y.toFixed(2)}px, 0)`;
-      leftEl.style.zIndex = (lp >= pp || fp > 0.1) ? '20' : '15';
-      leftEl.classList.toggle('fusing', fp > 0.15);
+      leftEl.classList.toggle('is-shell-hidden', leftOpacity <= 0.004);
+      leftEl.style.pointerEvents = (leftOpacity > 0.25 && fpClamped < 0.6) ? 'auto' : 'none';
+      leftEl.style.transform = `translate3d(${safeLeftPos.toFixed(2)}px, ${leftRubber.y.toFixed(2)}px, 0)`;
+      leftEl.style.zIndex = (lp >= pp) ? '20' : '15';
 
-      const pillFade = Math.max(0, 1 - lp * 3.5) * Math.max(0, 1 - fp * 2.6) * Math.max(0, 1 - pp * 3.2);
-      leftPillBar.style.opacity = pillFade.toFixed(3);
-      leftPillBar.style.pointerEvents = (lp < 0.15 && fp < 0.15 && pp < 0.2) ? 'auto' : 'none';
-
-      const cardFade = Math.max(0, Math.min(1, (lp - 0.18) / 0.82)) * (1 - fp);
-      leftExpandedInner.style.opacity = cardFade.toFixed(3);
-      leftExpandedInner.style.pointerEvents = (lp > 0.5 && fp < 0.2) ? 'auto' : 'none';
-
-      const leftMini = $('leftMiniPill');
-      const miniFade = Math.max(0, Math.min(1, (pp - 0.35) / 0.55)) * (1 - fp);
-      leftMini.style.opacity = miniFade.toFixed(3);
-      leftMini.style.pointerEvents = pp > 0.5 ? 'auto' : 'none';
-
-      const fusionContent = $('fusionPillContent');
-      fusionContent.classList.toggle('active', fp > 0.55);
-
-      const proxyOpacity = (state.dockRight ? Math.max(0, 1 - lp * 2.5) : 1) * Math.max(0, 1 - fp * 1.65);
+      const proxyOpacity = (state.dockRight ? Math.max(0, 1 - lp * 2.5) : 1) * pairUnderFusedAlpha;
       proxyEl.style.width = `${pw.toFixed(2)}px`;
       proxyEl.style.height = `${ph.toFixed(2)}px`;
       proxyEl.style.borderRadius = `${pr.toFixed(2)}px`;
       proxyEl.style.opacity = proxyOpacity.toFixed(3);
-      proxyEl.style.pointerEvents = proxyOpacity > 0.25 ? 'auto' : 'none';
-      proxyEl.style.transform = `translate3d(${proxyLeft.toFixed(2)}px, 0, 0)`;
-      proxyEl.classList.toggle('is-animating', proxySpring.rafId !== null);
-      leftEl.classList.toggle('is-animating', leftSpring.rafId !== null || fusionSpring.rafId !== null);
+      proxyEl.classList.toggle('is-shell-hidden', proxyOpacity <= 0.004);
+      proxyEl.style.pointerEvents = (proxyOpacity > 0.25 && fpClamped < 0.6) ? 'auto' : 'none';
+      proxyEl.style.transform = `translate3d(${safeProxyLeft.toFixed(2)}px, 0, 0)`;
+      proxyEl.classList.toggle('is-animating', proxySpring.rafId !== null || fusionSpring.rafId !== null || dragPhys.rafId !== null);
+      leftEl.classList.toggle('is-animating', leftSpring.rafId !== null || fusionSpring.rafId !== null || dragPhys.rafId !== null);
       proxyEl.style.zIndex = pp > lp ? '20' : '15';
       $('capsuleNode').style.display = (lp > 0.35 && pp < 0.2) ? 'none' : 'inline';
 
-      const bridge = $('metaballBridge');
-      const leftRightEdge = leftPos + lw;
-      const gap = proxyLeft - leftRightEdge;
-      const activeStretch = (gap > -12 && gap < 36 && (lp > 0.04 || pp > 0.04 || fp > 0.02 || Math.abs(bump) > 0.5) && !state.dockRight);
-      if (activeStretch && proxyOpacity > 0.15) {
-        const bridgeLeft = leftRightEdge - 8;
-        const bridgeW = Math.max(16, gap + 16);
-        const stretchFactor = Math.max(0, 1 - Math.max(0, gap) / 36);
-        bridge.style.opacity = (stretchFactor * 0.85).toFixed(3);
-        bridge.style.width = `${bridgeW.toFixed(1)}px`;
-        bridge.style.transform = `translate3d(${bridgeLeft.toFixed(1)}px, 0, 0) scaleY(${(0.75 + stretchFactor * 0.35).toFixed(2)})`;
+      // Unified Fused Super-Island Shell: seamlessly morphs from colliding pair bounds & supports expansion
+      const pairOuterLeft = Math.min(safeLeftPos, safeProxyLeft);
+      const pairOuterRight = Math.max(safeLeftPos + lw, safeProxyLeft + pw);
+      const pairOuterW = pairOuterRight - pairOuterLeft;
+
+      const splitStretchW = Math.min(44, Math.abs(dSplit) * 0.62);
+      const splitWaistPinch = Math.min(4.2, Math.abs(dSplit) * 0.065);
+      const baseFusedW = fusedW + (fusedExpW - fusedW) * fe;
+      const baseFusedH = 42 + (266 - 42) * fe;
+      const targetFusedW = baseFusedW + fpOver * 110 * (1 - feClamped) + splitStretchW * (1 - feClamped);
+      const targetFusedH = Math.max(36, baseFusedH - fpOver * 18 * (1 - feClamped) - splitWaistPinch * (1 - feClamped));
+      const targetFusedLeft = (state.dockRight ? -targetFusedW : -targetFusedW / 2) + dSplit * 0.16 * (1 - feClamped);
+
+      let fusedDrawW, fusedDrawH, fusedDrawLeft;
+      if (isMerging && fe === 0) {
+        const followT = smoothstep(0.28, 0.90, fpClamped);
+        const startH = Math.max(lh, ph);
+        fusedDrawW = pairOuterW + (targetFusedW - pairOuterW) * followT;
+        fusedDrawH = startH + (targetFusedH - startH) * followT;
+        fusedDrawLeft = pairOuterLeft + (targetFusedLeft - pairOuterLeft) * followT;
       } else {
-        bridge.style.opacity = '0';
+        fusedDrawW = targetFusedW;
+        fusedDrawH = targetFusedH;
+        fusedDrawLeft = targetFusedLeft;
+      }
+      const fusedDrawR = 21 * (1 - feClamped) + 24 * feClamped;
+
+      fusedEl.style.width = `${fusedDrawW.toFixed(2)}px`;
+      fusedEl.style.height = `${fusedDrawH.toFixed(2)}px`;
+      fusedEl.style.borderRadius = `${fusedDrawR.toFixed(2)}px`;
+      fusedEl.style.transform = `translate3d(${fusedDrawLeft.toFixed(2)}px, ${(splitWaistPinch * 0.5 + fusionRubber.y * (1 - feClamped)).toFixed(2)}px, 0)`;
+      fusedEl.style.opacity = fusedShellAlpha.toFixed(3);
+      fusedEl.classList.toggle('is-shell-hidden', fusedShellAlpha <= 0.004);
+      fusedEl.style.pointerEvents = fusedShellAlpha > 0.55 ? 'auto' : 'none';
+      fusedEl.classList.toggle('is-animating', fusionSpring.rafId !== null || fusionExpandSpring.rafId !== null || dragPhys.rafId !== null);
+
+      // Fused pill inner content elastic reveal / hide
+      const fusionContentEl = $('fusionPillContent');
+      const fusionContentAlpha = isMerging
+        ? smoothstep(0.42, 0.92, fpClamped)
+        : smoothstep(0.72, 0.96, fpClamped);
+      const fusionContentScale = 0.92 + 0.08 * fusionContentAlpha;
+      fusionContentEl.style.opacity = fusionContentAlpha.toFixed(3);
+      fusionContentEl.style.transform = `scale(${fusionContentScale.toFixed(3)})`;
+
+      // Shared Element Album Proxy: 100% continuous position, size, radius, icon scale & shortest-angle rotation
+      const sharedAlbum = $('sharedAlbumProxy');
+      const sharedSvg = $('sharedAlbumSvg');
+      const albumArtEl = $('albumArt');
+      const pillDotEl = $('pillAlbumDot');
+      if (state.musicActive && lp > 0.002 && lp < 0.998 && fpClamped < 0.15) {
+        const ax = 12 + (16 - 12) * lp;
+        const ay = 10 + (25 - 10) * lp;
+        const asize = 20 + (96 - 20) * lp;
+        const arad = 6 + (48 - 6) * lp;
+        const svgSize = 12 + (24 - 12) * lp;
+        const effectiveAngle = albumAnim.isRetracting
+          ? albumAnim.retractStartAngle * lp
+          : vinylSpin.angle;
+
+        sharedAlbum.style.opacity = '1';
+        sharedAlbum.style.width = `${asize.toFixed(1)}px`;
+        sharedAlbum.style.height = `${asize.toFixed(1)}px`;
+        sharedAlbum.style.borderRadius = `${arad.toFixed(1)}px`;
+        sharedAlbum.style.transform = `translate3d(${ax.toFixed(1)}px, ${ay.toFixed(1)}px, 0) rotate(${effectiveAngle.toFixed(2)}deg)`;
+        sharedSvg.style.width = `${svgSize.toFixed(1)}px`;
+        sharedSvg.style.height = `${svgSize.toFixed(1)}px`;
+        albumArtEl.style.visibility = 'hidden';
+        pillDotEl.style.visibility = 'hidden';
+      } else {
+        sharedAlbum.style.opacity = '0';
+        albumArtEl.style.visibility = 'visible';
+        pillDotEl.style.visibility = 'visible';
+      }
+
+      const mergeTextFade = isMerging
+        ? 1 - smoothstep(0.06, 0.38, fpClamped)
+        : 1 - smoothstep(0.45, 0.80, fpClamped);
+
+      const pillFade = Math.max(0, 1 - lp * 3.5) * Math.max(0, 1 - pp * 3.2) * mergeTextFade;
+      leftPillBar.style.opacity = pillFade.toFixed(3);
+      leftPillBar.style.transform = fpClamped > 0 ? `scale(${(0.92 + 0.08 * mergeTextFade).toFixed(3)})` : 'none';
+      leftPillBar.style.pointerEvents = (lp < 0.15 && fpClamped < 0.35 && pp < 0.2) ? 'auto' : 'none';
+
+      const cardFade = Math.max(0, Math.min(1, (lp - 0.18) / 0.82)) * (1 - fpClamped);
+      leftExpandedInner.style.opacity = cardFade.toFixed(3);
+      leftExpandedInner.style.pointerEvents = (lp > 0.5 && fpClamped < 0.2) ? 'auto' : 'none';
+
+      const leftMini = $('leftMiniPill');
+      const miniFade = Math.max(0, Math.min(1, (pp - 0.35) / 0.55)) * (1 - fpClamped);
+      leftMini.style.opacity = miniFade.toFixed(3);
+      leftMini.style.pointerEvents = pp > 0.5 ? 'auto' : 'none';
+
+      // Right island: Minimal orb when collapsed (pp < 0.28); full header appears on expand
+      const miniStatusEl = $('proxyMiniStatus');
+      const miniOrbFade = (1 - smoothstep(0.02, 0.28, pp)) * mergeTextFade;
+      const miniOrbScale = 1 - 0.28 * smoothstep(0.02, 0.28, pp);
+      miniStatusEl.style.opacity = miniOrbFade.toFixed(3);
+      miniStatusEl.style.transform = `scale(${miniOrbScale.toFixed(3)})`;
+
+      const proxyHeaderLeft = $('proxyHeaderLeft');
+      const headerExpandReveal = smoothstep(0.16, 0.54, pp) * mergeTextFade;
+      proxyHeaderLeft.style.opacity = headerExpandReveal.toFixed(3);
+      if (pp > 0.01 && pp < 0.99) {
+        proxyHeaderLeft.style.transform = `translateX(${((1 - pp) * 6).toFixed(1)}px)`;
+      } else if (fpClamped > 0) {
+        proxyHeaderLeft.style.transform = `scale(${(0.92 + 0.08 * mergeTextFade).toFixed(3)})`;
+      } else {
+        proxyHeaderLeft.style.transform = 'translateX(0)';
       }
 
       $('capsuleDownWrap').style.display = 'none';
@@ -1670,8 +2275,12 @@
       sp.lastTime = now;
 
       const base = SPRING_PRESETS[state.springPreset];
-      const stiffness = sp.target === 0 ? base.stiffness * 0.95 : base.stiffness;
-      const damping = sp.target === 0 ? Math.max(base.damping * 1.45, 2 * Math.sqrt(stiffness) * 1.04) : base.damping;
+      let stiffness = sp.target === 0 ? base.stiffness * 0.95 : base.stiffness;
+      let damping = sp.target === 0 ? Math.max(base.damping * 1.45, 2 * Math.sqrt(stiffness) * 1.04) : base.damping;
+      if (sp === fusionSpring && sp.target === 1) {
+        stiffness = 182;
+        damping = 16.5;
+      }
 
       const force = -stiffness * (sp.p - sp.target);
       const accel = force - damping * sp.v;
@@ -1691,6 +2300,10 @@
         sp.v = 0;
         sp.rafId = null;
         sp.lastTime = 0;
+        if (sp === leftSpring && sp.target === 0) {
+          albumAnim.isRetracting = false;
+          vinylSpin.angle = 0;
+        }
         renderIslands();
         if (sp === leftSpring && state.openMode === 'left' && !state.musicActive && state.leftTab === 'heatmap' && matrixTrail.start) {
           matrixTrail.start();
@@ -1777,17 +2390,46 @@
       }
     }
 
-    function setFusedMode(fused) {
+    function setFusionExpanded(expanded) {
+      if (expanded && !state.fusedMode) return;
+      state.fusionExpanded = expanded;
+      fusedEl.classList.toggle('expanded', expanded);
+      $('btnSplitFusion').classList.toggle('hidden', expanded);
+      $('btnCollapseFusion').classList.toggle('hidden', !expanded);
+      $('btnCollapseFusion').classList.toggle('flex', expanded);
+      if (expanded) {
+        hudEl.classList.remove('show');
+        $('importConfirm').classList.remove('show');
+        $('islandAnchor').classList.remove('idle-dim');
+        renderFusionExpanded();
+      }
+      syncVinylSpin();
+      kickSpring(fusionExpandSpring, expanded ? 1 : 0);
+    }
+
+    function setFusedMode(fused, releaseImpulse = 0) {
       state.fusedMode = fused;
       $('fusionSimLabel').textContent = fused ? '已融合' : '分离';
+      dragPhys.left.target = 0;
+      dragPhys.proxy.target = 0;
+      dragPhys.split.target = 0;
+      ensureDragPhysLoop();
+
+      if (state.fusionExpanded) {
+        setFusionExpanded(false);
+      }
+
       if (fused) {
         state.openMode = 'none';
         proxyEl.classList.remove('expanded');
         leftEl.classList.remove('expanded');
         kickSpring(proxySpring, 0);
         kickSpring(leftSpring, 0);
+        // Inject forward centripetal velocity for an immediately visible, fluid merge transition
+        const boostV = releaseImpulse ? Math.min(3.0, 1.4 + Math.abs(releaseImpulse) / 360) : 1.1;
+        fusionSpring.v = Math.max(fusionSpring.v, boostV);
       } else {
-        triggerElasticBump(18);
+        triggerElasticBump(18 + Math.min(18, Math.abs(releaseImpulse) * 0.04));
       }
       kickSpring(fusionSpring, fused ? 1 : 0);
     }
@@ -1796,21 +2438,36 @@
       if (mode !== 'none' && state.fusedMode) {
         state.fusedMode = false;
         $('fusionSimLabel').textContent = '分离';
+        setFusionExpanded(false);
         kickSpring(fusionSpring, 0);
       }
       const wasLeftClosed = state.openMode !== 'left';
       const wasProxyClosed = state.openMode !== 'proxy';
       state.openMode = mode;
-      if (mode === 'left' && wasLeftClosed && !state.dockRight) {
-        triggerElasticBump(14);
-      } else if (mode === 'proxy' && wasProxyClosed && !state.dockRight) {
-        triggerElasticBump(-10);
+      if (mode !== 'none') {
+        hudEl.classList.remove('show');
+        $('importConfirm').classList.remove('show');
+        $('islandAnchor').classList.remove('idle-dim');
       }
-      if (mode !== 'none') { hudEl.classList.remove('show'); $('importConfirm').classList.remove('show'); }
       $('clipPopover').classList.remove('show');
       proxyEl.classList.toggle('expanded', mode === 'proxy');
       leftEl.classList.toggle('expanded', mode === 'left');
-      $('proxyHeaderLeft').style.paddingRight = mode === 'proxy' ? '142px' : '0px';
+      $('proxyHeaderLeft').style.paddingRight = mode === 'proxy' ? '104px' : '0px';
+
+      if (mode === 'left' && state.musicActive) {
+        albumAnim.isRetracting = false;
+        if (wasLeftClosed && leftSpring.p <= 0.02) {
+          vinylSpin.angle = 0;
+          vinylSpin.vel = 0;
+        }
+        syncVinylSpin();
+      } else if (mode !== 'left' && state.musicActive) {
+        const curAngle = albumAnim.isRetracting ? albumAnim.retractStartAngle * leftSpring.p : vinylSpin.angle;
+        albumAnim.retractStartAngle = normalizeShortestAngle(curAngle);
+        albumAnim.isRetracting = true;
+        vinylSpin.vel = 0;
+      }
+
       kickSpring(proxySpring, mode === 'proxy' ? 1 : 0);
       kickSpring(leftSpring, mode === 'left' ? 1 : 0);
 
@@ -2004,7 +2661,8 @@
         pin.className = `w-6 h-6 rounded-md text-[11px] flex items-center justify-center transition ${item.pinned ? 'bg-amber-500/25 text-amber-200' : 'bg-white/6 text-slate-400 hover:text-white'}`;
         pin.innerHTML = '<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="17" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>';
         pin.title = item.pinned ? '取消置顶' : '置顶';
-        pin.addEventListener('click', () => {
+        pin.addEventListener('click', (e) => {
+          e.stopPropagation();
           item.pinned = !item.pinned;
           renderClips(true);
         });
@@ -2015,7 +2673,8 @@
         del.className = 'w-6 h-6 rounded-md text-[11px] bg-white/6 text-slate-400 hover:bg-rose-500/25 hover:text-rose-200 flex items-center justify-center transition';
         del.innerHTML = '<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
         del.title = '删除条目';
-        del.addEventListener('click', () => {
+        del.addEventListener('click', (e) => {
+          e.stopPropagation();
           state.clips = state.clips.filter((c) => c.id !== item.id);
           renderClips(true);
         });
@@ -2129,22 +2788,208 @@
       });
     }
 
+    function getProxyStatusVisual(activeNode, isConnected) {
+      if (state.nodeTimeout) {
+        return {
+          kind: 'error',
+          dotClass: 'w-2.5 h-2.5 rounded-full bg-rose-400 shrink-0',
+          pingText: '超时',
+          pingClass: 'mono text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500/18 text-rose-300 border border-rose-400/30',
+          fusionTextClass: 'fusion-proxy-text mono text-[10px] font-medium text-rose-200',
+          fusionLabel: `${activeNode.name.split('·')[0].trim()} · 超时`,
+          trayHtml: '<span class="w-2 h-2 rounded-full bg-rose-400"></span>节点超时',
+          trayClass: 'flex items-center gap-1.5 text-rose-300'
+        };
+      }
+      if (!isConnected) {
+        return {
+          kind: 'off',
+          dotClass: 'w-2.5 h-2.5 rounded-full bg-slate-400/80 shrink-0',
+          pingText: '已关闭',
+          pingClass: 'mono text-[10px] px-1.5 py-0.5 rounded-full bg-slate-500/20 text-slate-300 border border-slate-400/25',
+          fusionTextClass: 'fusion-proxy-text mono text-[10px] font-medium text-slate-300',
+          fusionLabel: '已关闭代理',
+          trayHtml: '<span class="w-2 h-2 rounded-full bg-slate-400"></span>v2rayN 已关闭',
+          trayClass: 'flex items-center gap-1.5 text-slate-400'
+        };
+      }
+      const pingStr = activeNode.ping ? `${activeNode.ping}ms` : '测速中';
+      return {
+        kind: 'ok',
+        dotClass: 'w-2.5 h-2.5 rounded-full bg-emerald-400 dot-pulse shrink-0',
+        pingText: pingStr,
+        pingClass: 'mono text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/20',
+        fusionTextClass: 'fusion-proxy-text mono text-[10px] font-medium text-emerald-200',
+        fusionLabel: `${activeNode.name.split('·')[0].trim()} · ${activeNode.ping ? activeNode.ping + 'ms' : '--'}`,
+        trayHtml: `<span class="w-2 h-2 rounded-full bg-emerald-400"></span>${state.routingMode === 'direct' ? 'v2rayN 直连' : 'v2rayN 已连接'}`,
+        trayClass: 'flex items-center gap-1.5 text-emerald-300'
+      };
+    }
+
+    function toggleProxyMaster(prefix = '') {
+      if (state.sysProxy || state.tunMode) {
+        lastProxyPrefs = { sysProxy: state.sysProxy, tunMode: state.tunMode };
+        state.sysProxy = false;
+        state.tunMode = false;
+        render();
+        triggerJellySwitch($('sysProxyTrack'));
+        triggerJellySwitch($('tunTrack'));
+        showToast(`${prefix}已关闭代理（再次操作恢复开启）`);
+      } else {
+        state.sysProxy = lastProxyPrefs.sysProxy || !lastProxyPrefs.tunMode;
+        state.tunMode = lastProxyPrefs.tunMode;
+        render();
+        triggerJellySwitch($('sysProxyTrack'));
+        triggerJellySwitch($('tunTrack'));
+        showToast(`${prefix}已开启代理`);
+      }
+    }
+
+    function renderFusionExpanded() {
+      const activeNode = state.nodes.find((n) => n.id === state.activeNodeId) || state.nodes[0];
+      const isConnected = state.sysProxy || state.tunMode;
+      const pv = getProxyStatusVisual(activeNode, isConnected);
+      const pillMode = state.musicActive ? 'music' : (state.leftTab === 'shelf' ? 'shelf' : state.leftTab === 'clipboard' ? 'clipboard' : 'time');
+
+      const modeLabels = { time: '时间 · 代理协同', clipboard: '粘贴板 · 代理协同', shelf: '工作栏 · 代理协同', music: '音乐 · 代理协同' };
+      $('fusionExpModeTag').textContent = modeLabels[pillMode];
+
+      // Toggle persistent left panes without destroying animated elements
+      $('fusionExpTimePane').classList.toggle('hidden', pillMode !== 'time');
+      $('fusionExpTimePane').classList.toggle('flex', pillMode === 'time');
+      $('fusionExpMusicPane').classList.toggle('hidden', pillMode !== 'music');
+      $('fusionExpMusicPane').classList.toggle('flex', pillMode === 'music');
+      $('fusionExpClipPane').classList.toggle('hidden', pillMode !== 'clipboard');
+      $('fusionExpClipPane').classList.toggle('flex', pillMode === 'clipboard');
+      $('fusionExpShelfPane').classList.toggle('hidden', pillMode !== 'shelf');
+      $('fusionExpShelfPane').classList.toggle('flex', pillMode === 'shelf');
+
+      const fMesh = $('fusionAmbientMesh');
+      if (pillMode === 'music') {
+        const tr = TRACKS[state.trackIdx];
+        $('fusionExpVinyl').className = `vinyl-disc w-12 h-12 bg-gradient-to-br ${tr.dotClass} border border-white/25 flex items-center justify-center shrink-0 relative overflow-hidden`;
+        $('fusionExpTrackTitle').textContent = tr.title;
+        $('fusionExpTrackArtist').textContent = tr.artist;
+        $('fusionExpLyric').textContent = tr.lyrics[state.lyricIdx % tr.lyrics.length];
+        fMesh.style.setProperty('--ambient-c1', tr.meshC1);
+        fMesh.style.setProperty('--ambient-c2', tr.meshC2);
+        fMesh.classList.toggle('active', state.musicPlaying);
+        syncVinylSpin();
+      } else {
+        fMesh.classList.remove('active');
+        if (pillMode === 'clipboard') {
+          $('fusionExpClipHeader').textContent = `最近剪贴板（${state.clips.length} 条）`;
+          const clipItems = $('fusionExpClipItems');
+          const items = state.clips.slice(0, 2);
+          clipItems.innerHTML = items.map((c) => `
+            <button type="button" data-fclip="${c.id}" class="fusion-quick-clip w-full text-left px-2 py-1.5 rounded-lg bg-white/6 hover:bg-white/12 border border-white/8 transition">
+              <div class="flex items-center justify-between text-[9px] text-slate-400"><span>${c.tag}</span><span>${c.time}</span></div>
+              <div class="mono text-[10px] text-slate-200 truncate mt-0.5">${c.text.replace(/</g, '&lt;')}</div>
+            </button>
+          `).join('') || '<div class="text-[10px] text-slate-400 py-3">暂无记录</div>';
+          clipItems.querySelectorAll('.fusion-quick-clip').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const found = state.clips.find((x) => x.id === btn.dataset.fclip);
+              if (found) copyText(found.text, '剪贴板条目');
+            });
+          });
+        } else if (pillMode === 'shelf') {
+          $('fusionExpShelfHeader').textContent = `桌面工作栏（${state.shelf.length} 项）`;
+          const items = state.shelf.slice(0, 2);
+          $('fusionExpShelfItems').innerHTML = items.map((s) => `
+            <div class="px-2 py-1.5 rounded-lg bg-white/6 border border-white/8">
+              <div class="text-[11px] font-medium text-slate-100 truncate">${s.name}</div>
+              <div class="mono text-[9px] text-slate-400 truncate">${s.sub}</div>
+            </div>
+          `).join('') || '<div class="text-[10px] text-slate-400 py-3">工作栏为空</div>';
+        }
+      }
+
+      $('fusionExpNodeName').textContent = activeNode.name;
+      $('fusionExpPing').textContent = pv.pingText;
+      $('fusionExpPing').className = pv.kind === 'error'
+        ? 'mono text-[10px] text-rose-300 shrink-0'
+        : pv.kind === 'off'
+          ? 'mono text-[10px] text-slate-400 shrink-0'
+          : 'mono text-[10px] text-emerald-300 shrink-0';
+
+      $('btnFusionExpSys').className = `py-1.5 px-2 rounded-lg text-[11px] font-medium border transition text-center ${state.sysProxy ? 'bg-sky-500/22 border-sky-400/45 text-sky-100' : 'bg-white/6 border-white/10 text-slate-400 hover:text-white'}`;
+      $('btnFusionExpTun').className = `py-1.5 px-2 rounded-lg text-[11px] font-medium border transition text-center ${state.tunMode ? 'bg-emerald-500/22 border-emerald-400/45 text-emerald-100' : 'bg-white/6 border-white/10 text-slate-400 hover:text-white'}`;
+
+      document.querySelectorAll('.fusion-seg-btn').forEach((btn) => {
+        const active = btn.dataset.fmode === state.routingMode;
+        btn.className = `fusion-seg-btn py-1 rounded text-[10px] font-medium transition ${active ? 'bg-white/18 text-white shadow' : 'text-slate-400 hover:text-slate-200'}`;
+      });
+    }
+
+    function playPauseSvgHtml(isPlaying, sizeCls, idPrefix) {
+      const bgId = `${idPrefix}_${isPlaying ? 'bg' : 'bg_p'}`;
+      const hiId = `${idPrefix}_${isPlaying ? 'hi' : 'hi_p'}`;
+      const glyph = isPlaying
+        ? '<rect x="10.5" y="9" width="4" height="14" rx="2" fill="#ffffff"/><rect x="17.5" y="9" width="4" height="14" rx="2" fill="#ffffff"/>'
+        : '<path d="M12.2 9.6c0-1 1.1-1.6 2-1.1l9.2 5.9c.8.5.8 1.7 0 2.2l-9.2 5.9c-.9.5-2-.1-2-1.1V9.6z" fill="#ffffff"/>';
+      return `<svg class="${sizeCls}" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="${bgId}" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#0284c7"/></linearGradient><linearGradient id="${hiId}" x1="16" y1="2" x2="16" y2="16" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="rgba(255,255,255,0.45)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="9" fill="url(#${bgId})"/><rect x="2.5" y="2.5" width="27" height="27" rx="8.5" stroke="url(#${hiId})"/>${glyph}</svg>`;
+    }
+
+    let lastProxyKind = null;
+    let lastFusionLabel = null;
+
     function render(popNodeId = null) {
       const activeNode = state.nodes.find((n) => n.id === state.activeNodeId) || state.nodes[0];
       const isConnected = state.sysProxy || state.tunMode;
+      const pv = getProxyStatusVisual(activeNode, isConnected);
 
       $('musicSimLabel').textContent = state.musicActive ? '开' : '关';
       $('capsuleNode').textContent = activeNode.name.split('·')[0].trim();
+      $('capsulePing').textContent = pv.pingText;
+      $('capsulePing').className = pv.pingClass;
 
-      if (state.nodeTimeout) {
-        $('capsulePing').textContent = '超时';
-        $('capsulePing').className = 'mono text-[10px] px-1.5 py-0.5 rounded-full border shrink-0 bg-rose-500/20 text-rose-300 border-rose-400/35';
-      } else {
-        $('capsulePing').textContent = activeNode.ping ? `${activeNode.ping}ms` : '--';
-        $('capsulePing').className = `mono text-[10px] px-1.5 py-0.5 rounded-full border shrink-0 ${pingBadgeClass(activeNode.ping)}`;
+      const stateCls = `state-${pv.kind}`;
+      [$('proxyMiniDot'), $('fusionDot'), $('btnFusionProxyToggle')].forEach((el) => {
+        el.classList.remove('state-ok', 'state-off', 'state-error');
+        el.classList.add(stateCls);
+      });
+
+      const fBtn = $('btnFusionProxyToggle');
+      const fTxt = $('fusionNodeText');
+      if (lastProxyKind !== null && lastProxyKind !== pv.kind) {
+        fBtn.classList.remove('proxy-toggle-pop');
+        void fBtn.offsetWidth;
+        fBtn.classList.add('proxy-toggle-pop');
       }
+      if (lastFusionLabel !== null && lastFusionLabel !== pv.fusionLabel) {
+        fTxt.className = pv.fusionTextClass;
+        void fTxt.offsetWidth;
+        fTxt.className = `${pv.fusionTextClass} fusion-text-swap`;
+      } else {
+        fTxt.className = pv.fusionTextClass;
+      }
+      fTxt.textContent = pv.fusionLabel;
+      lastProxyKind = pv.kind;
+      lastFusionLabel = pv.fusionLabel;
 
       const pillMode = state.musicActive ? 'music' : (state.leftTab === 'shelf' ? 'shelf' : state.leftTab === 'clipboard' ? 'clipboard' : 'time');
+
+      // Fused island left zone syncs all 4 modes (Time / Clipboard / Shelf / Music)
+      $('fusionTimeGroup').classList.toggle('hidden', pillMode !== 'time');
+      $('fusionTimeGroup').classList.toggle('flex', pillMode === 'time');
+      $('fusionClipGroup').classList.toggle('hidden', pillMode !== 'clipboard');
+      $('fusionClipGroup').classList.toggle('flex', pillMode === 'clipboard');
+      $('fusionShelfGroup').classList.toggle('hidden', pillMode !== 'shelf');
+      $('fusionShelfGroup').classList.toggle('flex', pillMode === 'shelf');
+      $('fusionMusicGroup').classList.toggle('hidden', pillMode !== 'music');
+      $('fusionMusicGroup').classList.toggle('flex', pillMode === 'music');
+      $('fusionClipCount').textContent = `${state.clips.length} 条`;
+      $('fusionShelfCount').textContent = `${state.shelf.length} 项`;
+
+      if (state.musicActive) {
+        const tr = TRACKS[state.trackIdx];
+        $('fusionTrackTitle').textContent = tr.title;
+        $('fusionMusicBadge').className = `w-5 h-5 rounded-full bg-gradient-to-br ${tr.dotClass} border border-white/25 flex items-center justify-center text-white shrink-0`;
+        $('btnFusionPlay').innerHTML = playPauseSvgHtml(state.musicPlaying, 'w-[22px] h-[22px]', 'f_fl');
+      }
+
       $('timePillContent').classList.toggle('hidden', pillMode !== 'time');
       $('timePillContent').classList.toggle('flex', pillMode === 'time');
       $('clipPillContent').classList.toggle('hidden', pillMode !== 'clipboard');
@@ -2168,19 +3013,19 @@
         updatePillLyric(rawLyric);
         $('trackTitle').textContent = track.title;
         $('trackArtist').textContent = track.artist;
-        $('albumArt').className = `vinyl-disc w-24 h-24 bg-gradient-to-br ${track.artClass} border border-white/15 shadow-lg flex items-center justify-center shrink-0 relative overflow-hidden`;
-        $('albumArt').querySelector('span').textContent = track.badge;
-        $('pillAlbumDot').className = `w-5 h-5 rounded-md bg-gradient-to-br ${track.dotClass} border border-white/20 flex items-center justify-center text-[9px] font-bold text-white shrink-0`;
+        $('albumArt').className = `vinyl-disc w-24 h-24 bg-gradient-to-br ${track.dotClass} border border-white/25 flex items-center justify-center shrink-0 relative overflow-hidden`;
+        $('pillAlbumDot').className = `w-5 h-5 rounded-md bg-gradient-to-br ${track.dotClass} border border-white/20 flex items-center justify-center text-white shrink-0`;
+        $('sharedAlbumProxy').className = `shared-album-proxy bg-gradient-to-br ${track.dotClass} border border-white/25`;
         leftEl.style.borderColor = track.glowColor;
         meshEl.style.setProperty('--ambient-c1', track.meshC1);
         meshEl.style.setProperty('--ambient-c2', track.meshC2);
         meshEl.classList.toggle('active', state.musicPlaying);
         syncVinylSpin();
         $('lyricLine').textContent = track.lyrics[state.lyricIdx % track.lyrics.length];
-        $('btnPlayPause').innerHTML = state.musicPlaying ? '<svg class="w-6 h-6" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_bg" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#0284c7"/></linearGradient><linearGradient id="fl_hi" x1="16" y1="2" x2="16" y2="16" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="rgba(255,255,255,0.45)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="9" fill="url(#fl_bg)"/><rect x="2.5" y="2.5" width="27" height="27" rx="8.5" stroke="url(#fl_hi)"/><rect x="10.5" y="9" width="4" height="14" rx="2" fill="#ffffff"/><rect x="17.5" y="9" width="4" height="14" rx="2" fill="#ffffff"/></svg>' : '<svg class="w-6 h-6" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_bg_p" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#0284c7"/></linearGradient><linearGradient id="fl_hi_p" x1="16" y1="2" x2="16" y2="16" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="rgba(255,255,255,0.45)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="9" fill="url(#fl_bg_p)"/><rect x="2.5" y="2.5" width="27" height="27" rx="8.5" stroke="url(#fl_hi_p)"/><path d="M12.2 9.6c0-1 1.1-1.6 2-1.1l9.2 5.9c.8.5.8 1.7 0 2.2l-9.2 5.9c-.9.5-2-.1-2-1.1V9.6z" fill="#ffffff"/></svg>';
+        $('btnPlayPause').innerHTML = playPauseSvgHtml(state.musicPlaying, 'w-6 h-6', 'fl');
         document.querySelectorAll('.eq-bar').forEach((b) => b.classList.toggle('paused', !state.musicPlaying));
       } else {
-        leftEl.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+        leftEl.style.borderColor = '';
         meshEl.classList.remove('active');
         syncVinylSpin();
       }
@@ -2197,20 +3042,15 @@
       }
 
       proxyEl.classList.toggle('fault-pulse', state.nodeTimeout);
-      const dot = $('capsuleDot');
-      if (state.nodeTimeout || !isConnected) {
-        dot.className = 'w-2.5 h-2.5 rounded-full bg-rose-400 shrink-0';
-        $('trayStatus').innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span>${state.nodeTimeout ? '节点超时' : 'v2rayN 未代理'}`;
-        $('trayStatus').className = 'flex items-center gap-1.5 text-rose-300';
-      } else if (state.routingMode === 'direct') {
-        dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0';
-        $('trayStatus').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span>v2rayN 直连';
-        $('trayStatus').className = 'flex items-center gap-1.5 text-amber-300';
-      } else {
-        dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 dot-pulse shrink-0';
-        $('trayStatus').innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span>v2rayN 已连接';
-        $('trayStatus').className = 'flex items-center gap-1.5 text-emerald-300';
+      if (state.nodeTimeout) {
+        leftEl.style.borderColor = 'rgba(251, 113, 133, 0.58)';
+        leftEl.style.boxShadow = '0 22px 54px rgba(2, 6, 23, 0.46), 0 0 20px rgba(244, 63, 94, 0.24), inset 0 1.5px 1px rgba(255, 255, 255, 0.52)';
+      } else if (!state.musicActive) {
+        leftEl.style.boxShadow = '';
       }
+      $('capsuleDot').className = pv.dotClass;
+      $('trayStatus').innerHTML = pv.trayHtml;
+      $('trayStatus').className = pv.trayClass;
 
       document.querySelectorAll('.scene-btn').forEach((b) => {
         const active = b.dataset.scene === state.scene;
@@ -2250,6 +3090,7 @@
       });
 
       renderChart();
+      if (state.fusedMode) renderFusionExpanded();
     }
 
     function renderChart() {
@@ -2287,37 +3128,134 @@
     }
 
     $('expandableHeader').addEventListener('click', (e) => {
-      if (e.target.closest('button')) return;
+      if (e.target.closest('button') || dragGesture.moved) return;
       setOpenMode(state.openMode === 'proxy' ? 'none' : 'proxy');
     });
-    // Right-click on collapsed Proxy pill -> blind toggle System Proxy without expanding
-    proxyEl.addEventListener('contextmenu', (e) => {
-      if (state.openMode === 'proxy') return;
-      e.preventDefault();
-      e.stopPropagation();
-      state.sysProxy = !state.sysProxy;
-      render();
-      triggerJellySwitch($('sysProxyTrack'));
-      proxyEl.classList.remove('sonar-ripple');
-      void proxyEl.offsetWidth;
-      proxyEl.classList.add('sonar-ripple');
-      showToast(state.sysProxy ? '盲操切换：系统代理已开启' : '盲操切换：系统代理已关闭');
-    });
-    $('btnCollapse').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('none'); });
 
-    leftPillBar.addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('left'); });
-    $('leftMiniPill').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('left'); });
-    $('btnCloseMusic').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('none'); });
-    $('btnCloseTime').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('none'); });
-    leftEl.addEventListener('click', (e) => {
-      if (state.openMode === 'left' && !e.target.closest('.music-ctrl-btn') && !e.target.closest('.music-seek-bar') && !e.target.closest('.ltab-wrap') && !e.target.closest('#clipPanel') && !e.target.closest('#shelfPanel')) {
-        setOpenMode('none');
+    leftPillBar.addEventListener('click', (e) => {
+      if (e.target.closest('#btnQuickClip') || dragGesture.moved) return;
+      e.stopPropagation();
+      setOpenMode('left');
+    });
+
+    function startIslandDrag(source, clientX) {
+      if (state.dockRight || state.openMode !== 'none') return;
+      dragGesture.active = true;
+      dragGesture.source = source;
+      dragGesture.startX = clientX;
+      dragGesture.lastX = clientX;
+      dragGesture.lastT = performance.now();
+      dragGesture.vx = 0;
+      dragGesture.dx = 0;
+      dragGesture.moved = false;
+      ensureDragPhysLoop();
+    }
+
+    leftPillBar.addEventListener('mousedown', (e) => {
+      if (e.button !== 0 || e.target.closest('#btnQuickClip')) return;
+      startIslandDrag('left', e.clientX);
+    });
+    proxyEl.addEventListener('mousedown', (e) => {
+      if (e.button !== 0 || state.openMode !== 'none' || state.fusedMode) return;
+      startIslandDrag('proxy', e.clientX);
+    });
+    fusedEl.addEventListener('mousedown', (e) => {
+      if (e.button !== 0 || e.target.closest('button') || state.fusionExpanded) return;
+      startIslandDrag('fusion-split', e.clientX);
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!dragGesture.active) return;
+      const now = performance.now();
+      const dt = Math.max(4, now - dragGesture.lastT) / 1000;
+      const instVx = (e.clientX - dragGesture.lastX) / dt;
+      dragGesture.vx = dragGesture.vx * 0.6 + instVx * 0.4;
+      dragGesture.lastX = e.clientX;
+      dragGesture.lastT = now;
+
+      const rawDx = e.clientX - dragGesture.startX;
+      if (Math.abs(rawDx) > 7) {
+        dragGesture.moved = true;
+        $('dragTearHint').textContent = dragGesture.source === 'fusion-split'
+          ? '继续向外拉拽即可撕裂回双岛'
+          : '继续拉近即可融合为控制条';
+        $('dragTearHint').classList.add('show');
+      }
+      if (!dragGesture.moved) return;
+
+      dragGesture.dx = rawDx;
+      if (dragGesture.source === 'left') {
+        dragPhys.left.target = softRubber(rawDx, 46);
+        if (rawDx >= 44 || (rawDx >= 28 && dragGesture.vx > 360)) {
+          dragGesture.active = false;
+          dragGesture.source = null;
+          $('dragTearHint').classList.remove('show');
+          setFusedMode(true, dragGesture.vx);
+          showToast('双岛碰撞吸合，已融合为超级控制条');
+          setTimeout(() => { dragGesture.moved = false; }, 60);
+        }
+      } else if (dragGesture.source === 'proxy') {
+        dragPhys.proxy.target = softRubber(rawDx, 46);
+        if (rawDx <= -44 || (rawDx <= -28 && dragGesture.vx < -360)) {
+          dragGesture.active = false;
+          dragGesture.source = null;
+          $('dragTearHint').classList.remove('show');
+          setFusedMode(true, dragGesture.vx);
+          showToast('双岛碰撞吸合，已融合为超级控制条');
+          setTimeout(() => { dragGesture.moved = false; }, 60);
+        }
+      } else if (dragGesture.source === 'fusion-split') {
+        dragPhys.split.target = softRubber(rawDx, 68);
+        if (Math.abs(rawDx) >= 58 || (Math.abs(rawDx) >= 38 && Math.abs(dragGesture.vx) > 460)) {
+          dragGesture.active = false;
+          dragGesture.source = null;
+          $('dragTearHint').classList.remove('show');
+          const dir = rawDx >= 0 ? 1 : -1;
+          // Transfer tear momentum directly to splitting islands for springy rebound!
+          dragPhys.left.v = -240 * dir;
+          dragPhys.proxy.v = 240 * dir;
+          setFusedMode(false, dragGesture.vx);
+          showToast('已弹射分裂回双岛');
+          setTimeout(() => { dragGesture.moved = false; }, 60);
+        }
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (!dragGesture.active) return;
+      const { source, dx, vx, moved } = dragGesture;
+      dragGesture.active = false;
+      dragGesture.source = null;
+      $('dragTearHint').classList.remove('show');
+
+      if (moved) {
+        if (source === 'left') {
+          dragPhys.left.v += vx * 0.35;
+          dragPhys.left.target = 0;
+          if (dx > 18) triggerElasticBump(8);
+        } else if (source === 'proxy') {
+          dragPhys.proxy.v += vx * 0.35;
+          dragPhys.proxy.target = 0;
+          if (dx < -18) triggerElasticBump(-8);
+        } else if (source === 'fusion-split') {
+          dragPhys.split.v += vx * 0.3;
+          dragPhys.split.target = 0;
+        }
+        ensureDragPhysLoop();
+        setTimeout(() => { dragGesture.moved = false; }, 60);
+      } else {
+        dragPhys.left.target = 0;
+        dragPhys.proxy.target = 0;
+        dragPhys.split.target = 0;
+        ensureDragPhysLoop();
       }
     });
 
     document.addEventListener('click', (e) => {
-      if (state.openMode !== 'none' && !e.target.closest('#islandAnchor') && !e.target.closest('#demoCard')) {
-        setOpenMode('none');
+      if (!e.target || !document.contains(e.target)) return;
+      if (!e.target.closest('#islandAnchor') && !e.target.closest('#demoCard')) {
+        if (state.openMode !== 'none') setOpenMode('none');
+        if (state.fusionExpanded) setFusionExpanded(false);
       }
     });
 
@@ -2330,6 +3268,54 @@
       setLeftTab('clipboard');
       setOpenMode('left');
     });
+
+    $('btnCloseMusic').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('none'); });
+    $('btnCloseTime').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('none'); });
+    $('leftMiniPill').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('left'); });
+    leftEl.addEventListener('click', (e) => {
+      if (!e.target || !document.contains(e.target)) return;
+      if (state.openMode === 'left' && !e.target.closest('.music-ctrl-btn') && !e.target.closest('.ltab-wrap') && !e.target.closest('#clipPanel') && !e.target.closest('#shelfPanel') && !e.target.closest('#musicSeekBar')) {
+        setOpenMode('none');
+      }
+    });
+
+    proxyEl.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleProxyMaster('右岛快捷切换：');
+    });
+
+    $('btnCollapse').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('none'); });
+
+    document.querySelectorAll('.wp-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const wp = btn.dataset.wp;
+        const desk = document.querySelector('.win-desktop');
+        desk.classList.remove('wp-bright', 'wp-cyber');
+        if (wp === 'bright') desk.classList.add('wp-bright');
+        if (wp === 'cyber') desk.classList.add('wp-cyber');
+        document.querySelectorAll('.wp-btn').forEach((b) => {
+          const active = b.dataset.wp === wp;
+          b.className = `wp-btn px-2.5 py-1 rounded-lg ${active ? 'bg-white/16 text-white font-medium' : 'bg-white/6 text-slate-300 hover:text-white'}`;
+        });
+      });
+    });
+
+    let idleDimTimer = null;
+    function wakeTopIslands() {
+      const anchor = $('islandAnchor');
+      anchor.classList.remove('idle-dim');
+      clearTimeout(idleDimTimer);
+      idleDimTimer = setTimeout(() => {
+        if (state.openMode === 'none' && !state.fusedMode && !state.nodeTimeout && !dragGesture.active) {
+          anchor.classList.add('idle-dim');
+        }
+      }, 3000);
+    }
+    document.addEventListener('mousemove', (e) => {
+      if (e.clientY <= 72) wakeTopIslands();
+    });
+    wakeTopIslands();
 
     $('clipSearch').addEventListener('input', (e) => {
       state.clipQuery = e.target.value;
@@ -2426,16 +3412,87 @@
       setFusedMode(false);
     });
 
-    $('btnPlayPause').addEventListener('click', (e) => { e.stopPropagation(); state.musicPlaying = !state.musicPlaying; render(); });
+    $('btnFusionPlay').addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.musicPlaying = !state.musicPlaying;
+      render();
+      showToast(state.musicPlaying ? '超级控制条：继续播放' : '超级控制条：已暂停');
+    });
+    $('btnFusionPrev').addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.trackIdx = (state.trackIdx - 1 + TRACKS.length) % TRACKS.length;
+      state.lyricIdx = 0;
+      render();
+      triggerTrackTransition(-1);
+      showToast(`已切至上一首：${TRACKS[state.trackIdx].title}`);
+    });
+    $('btnFusionNext').addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.trackIdx = (state.trackIdx + 1) % TRACKS.length;
+      state.lyricIdx = 0;
+      render();
+      triggerTrackTransition(1);
+      showToast(`已切至下一首：${TRACKS[state.trackIdx].title}`);
+    });
+    $('btnFusionProxyToggle').addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleProxyMaster('合岛快捷切换：');
+    });
 
-    // Interactive Music Progress Bar Scrubbing
+    $('btnCollapseFusion').addEventListener('click', (e) => {
+      e.stopPropagation();
+      setFusionExpanded(false);
+    });
+
+    fusedEl.addEventListener('click', (e) => {
+      if (dragGesture.moved || !state.fusedMode) return;
+      if (e.target.closest('button') || e.target.closest('#fusionExpandedBody')) return;
+      e.stopPropagation();
+      setFusionExpanded(!state.fusionExpanded);
+    });
+
+    $('btnFusionToLeftFull').addEventListener('click', (e) => {
+      e.stopPropagation();
+      setOpenMode('left');
+    });
+    $('btnFusionToProxyFull').addEventListener('click', (e) => {
+      e.stopPropagation();
+      setOpenMode('proxy');
+    });
+    $('btnFusionExpSys').addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.sysProxy = !state.sysProxy;
+      render();
+      triggerJellySwitch($('sysProxyTrack'));
+    });
+    $('btnFusionExpTun').addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.tunMode = !state.tunMode;
+      render();
+      triggerJellySwitch($('tunTrack'));
+    });
+    document.querySelectorAll('.fusion-seg-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        state.routingMode = btn.dataset.fmode;
+        render();
+      });
+    });
+
+    $('btnPlayPause').addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.musicPlaying = !state.musicPlaying;
+      render();
+    });
+
     const seekBar = $('musicSeekBar');
-    const applySeekClientX = (clientX) => {
+    function applySeekClientX(clientX) {
       const rect = seekBar.getBoundingClientRect();
+      if (rect.width <= 0) return;
       const pct = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
       state.musicPct = pct;
       $('musicProgress').style.width = `${pct.toFixed(1)}%`;
-    };
+    }
     seekBar.addEventListener('mousedown', (e) => {
       e.stopPropagation();
       isSeekingMusic = true;
@@ -2454,7 +3511,8 @@
     });
     function triggerTrackTransition(dir) {
       const cls = dir > 0 ? 'track-next-in' : 'track-prev-in';
-      [$('albumArt'), $('trackTitle'), $('trackArtist'), $('lyricLine')].forEach((el) => {
+      [$('albumArt'), $('trackTitle'), $('trackArtist'), $('lyricLine'), $('fusionExpVinyl'), $('fusionExpTrackTitle'), $('fusionExpTrackArtist'), $('fusionExpLyric')].forEach((el) => {
+        if (!el) return;
         el.classList.remove('track-next-in', 'track-prev-in', 'lyric-swap-in');
         void el.offsetWidth;
         el.classList.add(cls);
@@ -2552,18 +3610,6 @@
       });
     });
 
-    $('btnCopyPs').addEventListener('click', () => {
-      copyText('$env:HTTP_PROXY="http://127.0.0.1:10809"; $env:HTTPS_PROXY="http://127.0.0.1:10809"', 'PowerShell 代理变量');
-    });
-
-    $('btnCopyBash').addEventListener('click', () => {
-      copyText('export ALL_PROXY=socks5://127.0.0.1:10808', 'Bash ALL_PROXY 变量');
-    });
-
-    $('btnOpenMain').addEventListener('click', () => {
-      showToast('已发送信号唤起 v2rayN 主窗口');
-    });
-
     setInterval(() => {
       const active = state.sysProxy || state.tunMode;
       const down = active && state.routingMode !== 'direct' ? +(0.9 + Math.random() * 1.9).toFixed(2) : +(0.02 + Math.random() * 0.08).toFixed(2);
@@ -2618,6 +3664,8 @@
         const full = track.lyrics[state.lyricIdx % track.lyrics.length];
         $('lyricLine').textContent = full;
         triggerLyricSwap($('lyricLine'));
+        $('fusionExpLyric').textContent = full;
+        if (state.fusionExpanded) triggerLyricSwap($('fusionExpLyric'));
         updatePillLyric(full.replace(/♪/g, '').trim());
       }
     }, 4500);
@@ -2630,13 +3678,14 @@
       const wd = weekdays[now.getDay()];
       $('clockText').textContent = hm;
       $('pillTimeClock').textContent = hm;
+      $('fusionClockText').textContent = hm;
+      $('fusionDateText').textContent = `${now.getMonth() + 1}/${now.getDate()} ${wd}`;
       $('leftMiniText').textContent = state.musicActive ? '♪' : hm;
-      $('fusionClock').textContent = hm;
       $('pillTimeDate').textContent = `${now.getMonth() + 1}/${now.getDate()} ${wd}`;
       $('expandedClock').textContent = hms;
       $('expandedDate').textContent = `${now.getMonth() + 1}月${now.getDate()}日 · ${wd}`;
-      const activeNode = state.nodes.find((n) => n.id === state.activeNodeId) || state.nodes[0];
-      $('fusionNodeText').textContent = `${activeNode.name.split('·')[0].trim()} · ${activeNode.ping || '--'}ms`;
+      $('fusionExpClockText').textContent = hms;
+      $('fusionExpDateText').textContent = `${now.getMonth() + 1}月${now.getDate()}日 · ${wd}`;
     }
     updateClock();
     setInterval(updateClock, 1000);
@@ -2654,29 +3703,29 @@
       });
     });
 
-    function triggerLeftRubber(impulseY) {
-      leftRubber.v += impulseY * 14;
-      if (!leftRubber.rafId) {
-        leftRubber.lastTime = 0;
+    function triggerVerticalRubber(rubberState, impulseY) {
+      rubberState.v = Math.max(-180, Math.min(180, rubberState.v + impulseY * 14));
+      if (!rubberState.rafId) {
+        rubberState.lastTime = 0;
         const stepRubber = (now) => {
-          if (!leftRubber.lastTime) leftRubber.lastTime = now;
-          const dt = Math.min(0.032, Math.max(0.008, (now - leftRubber.lastTime) / 1000));
-          leftRubber.lastTime = now;
-          const force = -340 * leftRubber.y;
-          const accel = force - 19 * leftRubber.v;
-          leftRubber.v += accel * dt;
-          leftRubber.y += leftRubber.v * dt;
+          if (!rubberState.lastTime) rubberState.lastTime = now;
+          const dt = Math.min(0.032, Math.max(0.008, (now - rubberState.lastTime) / 1000));
+          rubberState.lastTime = now;
+          const force = -340 * rubberState.y;
+          const accel = force - 19 * rubberState.v;
+          rubberState.v += accel * dt;
+          rubberState.y += rubberState.v * dt;
           renderIslands();
-          if (Math.abs(leftRubber.y) < 0.12 && Math.abs(leftRubber.v) < 1.0) {
-            leftRubber.y = 0;
-            leftRubber.v = 0;
-            leftRubber.rafId = null;
+          if (Math.abs(rubberState.y) < 0.12 && Math.abs(rubberState.v) < 1.0) {
+            rubberState.y = 0;
+            rubberState.v = 0;
+            rubberState.rafId = null;
             renderIslands();
             return;
           }
-          leftRubber.rafId = requestAnimationFrame(stepRubber);
+          rubberState.rafId = requestAnimationFrame(stepRubber);
         };
-        leftRubber.rafId = requestAnimationFrame(stepRubber);
+        rubberState.rafId = requestAnimationFrame(stepRubber);
       }
     }
 
@@ -2706,14 +3755,17 @@
     attachRubberScroll($('shelfGrid'));
 
     let lastWheelAt = 0;
-    leftPillBar.addEventListener('wheel', (e) => {
-      if (state.openMode !== 'none') return;
+    function cyclePillModeByWheel(e, isFusion) {
       e.preventDefault();
       const now = performance.now();
       const dir = e.deltaY > 0 ? 1 : -1;
-      triggerLeftRubber(dir * 5.5);
       if (now - lastWheelAt < 240) return;
       lastWheelAt = now;
+
+      // Only apply subtle vertical bounce to compact pill; keep expanded island shell rock-steady
+      if (!isFusion || !state.fusionExpanded) {
+        triggerVerticalRubber(isFusion ? fusionRubber : leftRubber, dir * 2.6);
+      }
 
       const modes = ['heatmap', 'clipboard', 'shelf', 'music'];
       const curMode = state.musicActive ? 'music' : state.leftTab;
@@ -2727,10 +3779,41 @@
       render();
       syncLeftHeight(true);
 
-      const targetPill = next === 'music' ? $('musicPillContent') : next === 'shelf' ? $('shelfPillContent') : next === 'clipboard' ? $('clipPillContent') : $('timePillContent');
+      const targetPill = isFusion
+        ? (next === 'music' ? $('fusionMusicGroup') : next === 'shelf' ? $('fusionShelfGroup') : next === 'clipboard' ? $('fusionClipGroup') : $('fusionTimeGroup'))
+        : (next === 'music' ? $('musicPillContent') : next === 'shelf' ? $('shelfPillContent') : next === 'clipboard' ? $('clipPillContent') : $('timePillContent'));
+      const animClass = dir > 0 ? 'pill-enter-down' : 'pill-enter-up';
       targetPill.classList.remove('pill-enter-down', 'pill-enter-up');
       void targetPill.offsetWidth;
-      targetPill.classList.add(dir > 0 ? 'pill-enter-down' : 'pill-enter-up');
+      targetPill.classList.add(animClass);
+
+      if (isFusion && state.fusionExpanded) {
+        const expPane = next === 'music'
+          ? $('fusionExpMusicPane')
+          : next === 'shelf'
+            ? $('fusionExpShelfPane')
+            : next === 'clipboard'
+              ? $('fusionExpClipPane')
+              : $('fusionExpTimePane');
+        expPane.classList.remove('pill-enter-down', 'pill-enter-up');
+        void expPane.offsetWidth;
+        expPane.classList.add(animClass);
+      }
+    }
+
+    leftPillBar.addEventListener('wheel', (e) => {
+      if (state.openMode !== 'none' || state.fusedMode) return;
+      cyclePillModeByWheel(e, false);
+    }, { passive: false });
+
+    $('fusionLeftZone').addEventListener('wheel', (e) => {
+      if (!state.fusedMode) return;
+      cyclePillModeByWheel(e, true);
+    }, { passive: false });
+
+    $('fusionExpLeftCard').addEventListener('wheel', (e) => {
+      if (!state.fusedMode || !state.fusionExpanded) return;
+      cyclePillModeByWheel(e, true);
     }, { passive: false });
 
     function openImportConfirm(nodeObj) {
@@ -2845,7 +3928,6 @@
           }
         });
 
-        // 0.5s Hover Preview Popover for .txt & config snippets in Workbench
         let shelfPopTimer = null;
         card.addEventListener('mouseenter', () => {
           if (!item.content && item.kind !== 'txt') return;
@@ -2865,7 +3947,6 @@
           $('clipPopover').classList.remove('show');
         });
 
-        // Drag-out Restore from Workbench back to Desktop
         card.addEventListener('dragstart', (e) => {
           clearTimeout(shelfPopTimer);
           $('clipPopover').classList.remove('show');
@@ -3006,21 +4087,25 @@
       }
     });
 
-    // Global Keyboard Shortcuts (Toggle Open <-> Close on repeat press)
     window.addEventListener('keydown', (e) => {
       const isInputFocused = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
 
-      if (e.key === 'Escape' && state.openMode !== 'none') {
+      if (e.key === 'Escape' && (state.openMode !== 'none' || state.fusionExpanded)) {
         e.preventDefault();
         if (isInputFocused) e.target.blur();
-        setOpenMode('none');
+        if (state.fusionExpanded) setFusionExpanded(false);
+        if (state.openMode !== 'none') setOpenMode('none');
         return;
       }
 
       if (e.altKey && e.code === 'Space') {
         e.preventDefault();
         if (isInputFocused) e.target.blur();
-        setOpenMode(state.openMode === 'none' ? 'left' : 'none');
+        if (state.fusedMode) {
+          setFusionExpanded(!state.fusionExpanded);
+        } else {
+          setOpenMode(state.openMode === 'none' ? 'left' : 'none');
+        }
         return;
       }
 
