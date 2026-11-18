@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>v2rayN Island — 活力图与辅助粘贴板全套流体动效</title>
+  <title>island-demo — 双岛液态流体组件预览</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -57,7 +57,6 @@
       transition: left 0.45s var(--smooth-ease), transform 0.38s var(--spring-ease);
     }
 
-    /* Fullscreen Peeking Bar: tucks up leaving a 4px glowing top edge, slides down on top hover */
     .island-anchor.peeking {
       transform: translateX(-50%) translateY(-50px);
     }
@@ -82,7 +81,6 @@
       pointer-events: auto;
     }
 
-    /* Clipboard Long-Text Hover Popover */
     .clip-popover {
       position: fixed;
       top: 274px;
@@ -105,7 +103,6 @@
       transform: translateX(-50%) translateY(0) scale(1);
     }
 
-    /* Safe Import Confirmation Pill */
     .import-confirm {
       position: absolute;
       top: 48px;
@@ -137,8 +134,8 @@
       left: 0;
       border-radius: 20px;
       background: var(--glass-bg);
-      backdrop-filter: blur(36px) saturate(190%);
-      -webkit-backdrop-filter: blur(36px) saturate(190%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--glass-border);
       box-shadow:
         0 20px 52px rgba(0, 0, 0, 0.62),
@@ -148,6 +145,9 @@
       will-change: width, height, border-radius, transform, opacity;
       transition: border-color 0.35s ease, box-shadow 0.35s ease;
     }
+
+    #leftIsland { transform-origin: 22% 14%; }
+    #proxyIsland { transform-origin: 78% 14%; }
 
     .morph-island::before {
       content: '';
@@ -164,7 +164,14 @@
       pointer-events: none;
     }
 
-    /* Cursor-following cold-white specular border refraction (Halo Specular Border) */
+    .morph-island.is-animating {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      background: rgba(14, 18, 26, 0.94);
+    }
+    .morph-island.is-animating::after {
+      display: none;
+    }
     .morph-island::after {
       content: '';
       position: absolute;
@@ -268,10 +275,9 @@
     .left-expanded-inner {
       position: relative;
       z-index: 10;
-      width: 100%;
+      width: min(416px, calc(100vw - 24px));
     }
 
-    /* Shared Liquid-Glass Sliding Tab Indicator for 活力图 <-> 辅助粘贴板 */
     .ltab-wrap {
       position: relative;
       display: grid;
@@ -314,7 +320,6 @@
       font-weight: 600;
     }
 
-    /* Directional Blur-Morph stage for Heatmap <-> Clipboard */
     .ltab-stage {
       position: relative;
       width: 100%;
@@ -356,7 +361,6 @@
       pointer-events: none;
     }
 
-    /* GitHub Activity Heatmap cells + column wave stagger */
     .gh-grid {
       display: grid;
       grid-template-columns: repeat(22, minmax(0, 1fr));
@@ -394,7 +398,6 @@
     .gh-3 { background: #26a641; }
     .gh-4 { background: #39d353; }
 
-    /* Elastic tooltip transition on heatmap hover */
     .gh-tip {
       transition: transform 0.24s var(--spring-ease), color 0.18s ease;
       transform-origin: left center;
@@ -404,7 +407,6 @@
       color: #a7f3d0;
     }
 
-    /* Clipboard list item animations: stagger enter, new highlight, check pop */
     @keyframes clipStaggerIn {
       0% { opacity: 0; transform: translateY(10px) scale(0.97); filter: blur(4px); }
       100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
@@ -478,26 +480,24 @@
 
     .stagger-item {
       opacity: 0;
-      transform: translateY(10px) scale(0.98);
-      filter: blur(6px);
+      transform: translateY(8px);
       pointer-events: none;
-      transition: opacity 0.12s ease, transform 0.16s ease, filter 0.12s ease;
+      transition: opacity 0.11s ease, transform 0.14s ease;
     }
 
     #proxyIsland.expanded .stagger-item {
       opacity: 1;
-      transform: translateY(0) scale(1);
-      filter: blur(0);
+      transform: translateY(0);
       pointer-events: auto;
-      transition: opacity 0.28s ease, transform 0.44s var(--smooth-ease), filter 0.32s ease;
+      transition: opacity 0.22s ease, transform 0.30s var(--smooth-ease);
     }
 
-    #proxyIsland.expanded .stagger-1 { transition-delay: 0.08s; }
-    #proxyIsland.expanded .stagger-2 { transition-delay: 0.13s; }
-    #proxyIsland.expanded .stagger-3 { transition-delay: 0.18s; }
-    #proxyIsland.expanded .stagger-4 { transition-delay: 0.23s; }
-    #proxyIsland.expanded .stagger-5 { transition-delay: 0.28s; }
-    #proxyIsland.expanded .stagger-6 { transition-delay: 0.33s; }
+    #proxyIsland.expanded .stagger-1 { transition-delay: 0.04s; }
+    #proxyIsland.expanded .stagger-2 { transition-delay: 0.07s; }
+    #proxyIsland.expanded .stagger-3 { transition-delay: 0.10s; }
+    #proxyIsland.expanded .stagger-4 { transition-delay: 0.13s; }
+    #proxyIsland.expanded .stagger-5 { transition-delay: 0.16s; }
+    #proxyIsland.expanded .stagger-6 { transition-delay: 0.19s; }
 
     .hud-island {
       position: absolute;
@@ -532,6 +532,21 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 14px;
       transition: background 0.22s ease, border-color 0.22s ease, box-shadow 0.26s ease, transform 0.14s var(--smooth-ease);
+    }
+
+    #clipSearch {
+      user-select: text;
+      -webkit-user-select: text;
+      background: rgba(7, 11, 19, 0.78);
+      color: #f8fafc;
+      caret-color: #38bdf8;
+    }
+    #clipSearch::placeholder {
+      color: #64748b;
+    }
+    #clipSearch:focus {
+      background: rgba(5, 8, 15, 0.92);
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.22);
     }
 
     .glass-tile:hover { background: var(--glass-card-hover); border-color: rgba(255, 255, 255, 0.16); }
@@ -573,6 +588,139 @@
     }
     .switch-track.on-blue .switch-thumb,
     .switch-track.on-emerald .switch-thumb { transform: translateX(16px); }
+
+    @keyframes thumbJelly {
+      0% { transform: scaleX(1) scaleY(1); }
+      35% { transform: scaleX(1.42) scaleY(0.76); }
+      70% { transform: scaleX(0.88) scaleY(1.12); }
+      100% { transform: scaleX(1) scaleY(1); }
+    }
+    .switch-track.jelly .switch-thumb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: inherit;
+      animation: thumbJelly 0.36s var(--spring-ease);
+    }
+
+    @keyframes sonarPing {
+      0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.72); }
+      70% { box-shadow: 0 0 0 9px rgba(52, 211, 153, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+    }
+    .sonar-ripple {
+      animation: sonarPing 0.58s var(--smooth-ease);
+    }
+
+    @keyframes vortexSuck {
+      0% { opacity: 0.95; transform: translate(-50%, -50%) scale(1.6) rotate(0deg); }
+      65% { opacity: 0.75; transform: translate(-50%, -50%) scale(0.45) rotate(140deg); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.05) rotate(240deg); }
+    }
+    .drop-vortex {
+      position: absolute;
+      width: 68px;
+      height: 68px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.65) 0%, rgba(99, 102, 241, 0.25) 55%, transparent 75%);
+      border: 1.5px dashed rgba(125, 211, 252, 0.85);
+      pointer-events: none;
+      z-index: 50;
+      animation: vortexSuck 0.46s var(--smooth-ease) forwards;
+    }
+
+    @keyframes shelfBounceIn {
+      0% { opacity: 0; transform: scale(0.42) translateY(-10px); filter: blur(4px); }
+      62% { opacity: 1; transform: scale(1.06) translateY(1px); filter: blur(0); }
+      100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+    }
+    .shelf-bounce-in {
+      animation: shelfBounceIn 0.42s var(--spring-ease) both;
+    }
+
+    /* Vinyl Disc Inertial Spin & Interactive Seek Bar */
+    .vinyl-disc {
+      border-radius: 999px !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55), inset 0 0 0 2px rgba(255, 255, 255, 0.14);
+      will-change: transform;
+    }
+    .vinyl-disc::before {
+      content: '';
+      position: absolute;
+      inset: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      pointer-events: none;
+    }
+    .vinyl-disc::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: #0b0f18;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      pointer-events: none;
+    }
+    .music-seek-bar {
+      position: relative;
+      height: 14px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    .music-seek-track {
+      position: relative;
+      width: 100%;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      transition: height 0.18s ease;
+    }
+    .music-seek-bar:hover .music-seek-track,
+    .music-seek-bar.dragging .music-seek-track {
+      height: 7px;
+    }
+    .music-seek-thumb {
+      position: absolute;
+      right: -5px;
+      top: 50%;
+      transform: translateY(-50%) scale(0.75);
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      background: #ffffff;
+      box-shadow: 0 0 8px rgba(52, 211, 153, 0.8);
+      opacity: 0;
+      transition: opacity 0.16s ease, transform 0.2s var(--spring-ease);
+    }
+    .music-seek-bar:hover .music-seek-thumb,
+    .music-seek-bar.dragging .music-seek-thumb {
+      opacity: 1;
+      transform: translateY(-50%) scale(1);
+    }
+
+    .music-ambient-mesh {
+      position: absolute;
+      inset: -16px;
+      background:
+        radial-gradient(160px circle at 24% 45%, var(--ambient-c1, rgba(244, 63, 94, 0.34)), transparent 70%),
+        radial-gradient(190px circle at 78% 60%, var(--ambient-c2, rgba(251, 146, 60, 0.22)), transparent 72%);
+      filter: blur(18px);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+      transition: opacity 0.45s ease, background 0.55s ease;
+    }
+    .music-ambient-mesh.active {
+      opacity: 1;
+      animation: ambientBreathe 4.2s ease-in-out infinite;
+    }
+    @keyframes ambientBreathe {
+      0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.88; }
+      50% { transform: scale(1.08) translate(6px, -4px); opacity: 1; }
+    }
 
     .seg-wrap {
       position: relative;
@@ -673,6 +821,49 @@
       animation: faultPulse 1.8s ease-in-out infinite;
     }
 
+    .metaball-bridge {
+      position: absolute;
+      top: 6px;
+      left: 0;
+      height: 28px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(52, 211, 153, 0.35), rgba(56, 189, 248, 0.45));
+      filter: blur(5px);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 12;
+      will-change: transform, width, opacity;
+    }
+
+    .morph-island.fusing {
+      border-color: rgba(56, 189, 248, 0.55) !important;
+      box-shadow:
+        0 20px 52px rgba(0, 0, 0, 0.65),
+        0 0 28px rgba(56, 189, 248, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.32) !important;
+    }
+
+    .fusion-pill-content {
+      position: absolute;
+      inset: 0;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.95);
+      filter: blur(4px);
+      transition: opacity 0.25s ease, transform 0.36s var(--spring-ease), filter 0.25s ease;
+    }
+    .fusion-pill-content.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+      filter: blur(0);
+    }
+
     .win-taskbar {
       height: 46px;
       background: rgba(14, 18, 26, 0.72);
@@ -684,9 +875,33 @@
 <body>
   <div class="win-desktop">
     <div id="islandAnchor" class="island-anchor">
-      <!-- Left Island: Time + Heatmap / Auxiliary Clipboard OR Music -->
+      <!-- Liquid Metaball Bridge between Left and Right Islands -->
+      <div id="metaballBridge" class="metaball-bridge"></div>
+
+      <!-- Left Island: Time + Heatmap / Auxiliary Clipboard / Workbench OR Music -->
       <div id="leftIsland" class="morph-island" role="region" aria-label="时间与音乐灵动岛">
         <div class="grain-overlay"></div>
+        <div id="musicAmbientMesh" class="music-ambient-mesh"></div>
+
+        <!-- Super-Island Fused Content -->
+        <div id="fusionPillContent" class="fusion-pill-content">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 dot-pulse shrink-0"></span>
+            <span id="fusionClock" class="mono text-xs font-semibold text-white">08:03</span>
+            <span class="text-white/25">|</span>
+            <span id="fusionNodeText" class="text-xs font-medium text-sky-200 truncate">HK-01 · 38ms</span>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span id="fusionStatusBadge" class="mono text-[10px] px-2 py-0.5 rounded-full bg-sky-500/20 border border-sky-400/35 text-sky-200">⚡ 双岛液态融合中</span>
+            <button id="btnSplitFusion" type="button" class="px-2 py-0.5 rounded-full bg-white/12 hover:bg-white/22 text-[10px] text-white transition">分裂回弹</button>
+          </div>
+        </div>
+
+        <!-- Compact Mini Pill (shown when Right Proxy Island is expanded) -->
+        <div id="leftMiniPill" class="absolute inset-0 px-2.5 flex items-center justify-center gap-1.5 opacity-0 pointer-events-none transition-opacity duration-200 cursor-pointer" title="点击切回左侧岛屿">
+          <span id="leftMiniDot" class="w-2 h-2 rounded-full bg-sky-400 shrink-0"></span>
+          <span id="leftMiniText" class="mono text-[11px] font-semibold text-white truncate">08:03</span>
+        </div>
 
         <!-- Collapsed Left Pill (222x40) -->
         <div id="leftPillBar" class="left-pill-bar">
@@ -719,7 +934,7 @@
               <span class="w-5 h-5 rounded-md bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-200 shrink-0"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg></span>
               <span class="text-xs font-semibold text-slate-100 truncate">辅助粘贴板</span>
             </span>
-            <span id="clipPillCount" class="mono text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 text-slate-300 shrink-0">3 条</span>
+            <span id="clipPillCount" class="mono text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 text-slate-300 shrink-0">4 条</span>
           </div>
 
           <div id="musicPillContent" class="hidden items-center justify-between w-full gap-2">
@@ -744,7 +959,6 @@
                 <div id="expandedDate" class="text-[11px] text-slate-400 truncate">11月17日 · 周二</div>
               </div>
               <div class="flex items-center gap-1.5 shrink-0">
-                <!-- Shared Liquid-Glass Sliding Tab Switcher -->
                 <div class="ltab-wrap">
                   <div id="ltabIndicator" class="ltab-indicator"></div>
                   <button type="button" data-ltab="heatmap" class="ltab-btn active">活力图</button>
@@ -755,9 +969,7 @@
               </div>
             </div>
 
-            <!-- Directional Blur-Morph Tab Stage -->
             <div class="ltab-stage">
-              <!-- Pane 1: GitHub Heatmap with Matrix Trail & Column Wave -->
               <div id="ghTile" class="ltab-pane pane-heatmap-active glass-tile p-2.5 flex flex-col gap-2 overflow-hidden">
                 <canvas id="matrixTrailCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
                 <div id="ghGrid" class="gh-grid relative z-10"></div>
@@ -774,17 +986,15 @@
                   </span>
                 </div>
               </div>
-
-              <!-- Pane 2: Auxiliary Clipboard with FLIP + Stagger + Checkmark -->
+              <!-- Pane 2: Auxiliary Clipboard -->
               <div id="clipPanel" class="ltab-pane pane-clip-exit flex flex-col gap-2">
                 <div class="flex items-center gap-1.5">
-                  <input id="clipSearch" type="text" placeholder="搜索剪贴板历史..." class="flex-1 bg-white/6 border border-white/10 rounded-xl px-2.5 py-1 text-xs text-slate-100 placeholder-slate-400 outline-none focus:border-sky-400/50" />
+                  <input id="clipSearch" type="text" placeholder="搜索剪贴板历史..." class="flex-1 border border-white/15 rounded-xl px-2.5 py-1 text-xs outline-none focus:border-sky-400/70 transition" />
                   <button id="btnClearClips" type="button" class="px-2 py-1 rounded-xl bg-white/6 hover:bg-rose-500/20 border border-white/10 text-[11px] text-slate-300 hover:text-rose-200 transition">清空</button>
                 </div>
                 <div id="clipList" class="node-scroll h-[152px] overflow-y-auto pr-1 flex flex-col gap-1.5"></div>
               </div>
 
-              <!-- Pane 3: Workbench / Stash Shelf (Dropzone for files, folders, shortcuts, txt) -->
               <div id="shelfPanel" class="ltab-pane pane-clip-exit flex flex-col gap-2">
                 <div class="flex items-center justify-between gap-2 text-[11px]">
                   <span class="text-slate-400 truncate">拖入文件 / 文件夹 / 快捷方式 / .txt 至此</span>
@@ -797,8 +1007,8 @@
 
           <!-- Expanded Music Card -->
           <div id="musicCardContent" class="hidden p-4 items-center gap-4 h-[146px]">
-            <div id="albumArt" class="w-24 h-24 rounded-2xl bg-gradient-to-br from-rose-500/45 via-red-700/35 to-stone-900 border border-white/15 shadow-lg flex items-center justify-center shrink-0 relative overflow-hidden transition-all duration-300">
-              <span class="text-xs font-bold tracking-widest text-white/90 uppercase">OCEAN</span>
+            <div id="albumArt" class="vinyl-disc w-24 h-24 bg-gradient-to-br from-rose-500/45 via-red-700/35 to-stone-900 border border-white/15 shadow-lg flex items-center justify-center shrink-0 relative overflow-hidden">
+              <span class="text-[10px] font-bold tracking-widest text-white/90 uppercase -translate-y-4">OCEAN</span>
             </div>
 
             <div class="flex-1 min-w-0 flex flex-col justify-between gap-2">
@@ -814,8 +1024,12 @@
 
               <div id="lyricLine" class="text-[11px] text-emerald-200/85 truncate italic">♪ 最闪亮的星，照亮你的眼睛 ♪</div>
 
-              <div class="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
-                <div id="musicProgress" class="h-full rounded-full bg-emerald-400 transition-all duration-300" style="width: 42%"></div>
+              <div id="musicSeekBar" class="music-seek-bar" title="点击或拖动进度条切进度">
+                <div class="music-seek-track">
+                  <div id="musicProgress" class="relative h-full rounded-full bg-emerald-400" style="width: 42%">
+                    <span class="music-seek-thumb"></span>
+                  </div>
+                </div>
               </div>
 
               <div class="flex items-center justify-between px-1">
@@ -834,7 +1048,7 @@
       <div id="proxyIsland" class="morph-island" role="region" aria-label="v2rayN 灵动岛">
         <div class="island-inner">
           <div id="expandableHeader" class="expandable-header">
-            <div class="flex items-center justify-between gap-2 w-full min-w-0 pr-0 transition-all" id="proxyHeaderLeft">
+            <div class="flex items-center justify-between gap-2 w-full min-w-0 pr-0" id="proxyHeaderLeft">
               <span class="flex items-center gap-2 min-w-0">
                 <span id="capsuleDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 dot-pulse shrink-0"></span>
                 <span id="capsuleNode" class="text-xs font-semibold tracking-tight text-slate-100 truncate">HK-01</span>
@@ -862,79 +1076,81 @@
             </div>
           </div>
 
-          <div class="stagger-item stagger-1 flex flex-col gap-2">
-            <div class="grid grid-cols-3 gap-1.5">
-              <button type="button" data-scene="dev" class="scene-btn glass-tile py-1.5 px-2 text-[11px] font-medium text-sky-200 border-sky-400/35 bg-sky-500/15 flex items-center justify-center gap-1"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span>开发分流</span></button>
-              <button type="button" data-scene="game" class="scene-btn glass-tile py-1.5 px-2 text-[11px] font-medium text-slate-300 flex items-center justify-center gap-1"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><rect width="20" height="12" x="2" y="6" rx="2"/></svg><span>游戏 TUN</span></button>
-              <button type="button" data-scene="ai" class="scene-btn glass-tile py-1.5 px-2 text-[11px] font-medium text-slate-300 flex items-center justify-center gap-1"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>AI 全球</span></button>
-            </div>
-            <div class="glass-tile px-3 py-1.5 flex items-center justify-between text-[11px]">
-              <span id="exitIpText" class="mono text-slate-300 truncate">103.42.18.xx · 香港</span>
-              <span id="aiUnlockBadges" class="flex items-center gap-1.5 shrink-0 mono text-[10px]">
-                <span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-400/20">Gemini ✓</span>
-                <span class="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-400/20">GPT ✕</span>
-              </span>
-            </div>
-          </div>
-
-          <div class="stagger-item stagger-2 grid grid-cols-2 gap-2.5">
-            <button id="btnSysProxy" type="button" class="glass-tile active-blue p-2.5 text-left flex items-center justify-between">
-              <div>
-                <div class="text-xs font-semibold text-white">系统代理</div>
-                <div id="sysProxySub" class="text-[11px] text-sky-200/80 mt-0.5 mono">127.0.0.1:10809</div>
+          <div class="proxy-body-fixed flex flex-col gap-2.5" style="width: min(428px, calc(100vw - 52px));">
+            <div class="stagger-item stagger-1 flex flex-col gap-2">
+              <div class="grid grid-cols-3 gap-1.5">
+                <button type="button" data-scene="dev" class="scene-btn glass-tile py-1.5 px-2 text-[11px] font-medium text-sky-200 border-sky-400/35 bg-sky-500/15 flex items-center justify-center gap-1"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span>开发分流</span></button>
+                <button type="button" data-scene="game" class="scene-btn glass-tile py-1.5 px-2 text-[11px] font-medium text-slate-300 flex items-center justify-center gap-1"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><rect width="20" height="12" x="2" y="6" rx="2"/></svg><span>游戏 TUN</span></button>
+                <button type="button" data-scene="ai" class="scene-btn glass-tile py-1.5 px-2 text-[11px] font-medium text-slate-300 flex items-center justify-center gap-1"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>AI 全球</span></button>
               </div>
-              <span id="sysProxyTrack" class="switch-track on-blue">
-                <span class="switch-thumb"></span>
-              </span>
-            </button>
-
-            <button id="btnTunMode" type="button" class="glass-tile p-2.5 text-left flex items-center justify-between">
-              <div>
-                <div class="text-xs font-semibold text-white">TUN 模式</div>
-                <div id="tunSub" class="text-[11px] text-slate-400 mt-0.5">sing-box 虚拟网卡</div>
-              </div>
-              <span id="tunTrack" class="switch-track">
-                <span class="switch-thumb"></span>
-              </span>
-            </button>
-          </div>
-
-          <div class="stagger-item stagger-3 seg-wrap">
-            <div id="segIndicator" class="seg-indicator"></div>
-            <button type="button" data-mode="rule" class="seg-btn active">规则绕过 (Rule)</button>
-            <button type="button" data-mode="global" class="seg-btn">全局 (Global)</button>
-            <button type="button" data-mode="direct" class="seg-btn">直连 (Direct)</button>
-          </div>
-
-          <div class="stagger-item stagger-4 flex flex-col gap-1.5">
-            <div class="flex items-center justify-between px-0.5">
-              <span class="text-[11px] font-medium text-slate-400">快捷节点切换</span>
-              <span id="activeNodeMeta" class="text-[11px] mono text-slate-400">VLESS · Reality</span>
-            </div>
-            <div id="nodeList" class="node-scroll max-h-36 overflow-y-auto pr-1 flex flex-col gap-1.5"></div>
-          </div>
-
-          <div class="stagger-item stagger-5 glass-tile px-3 py-1.5 flex items-center justify-between gap-3">
-            <div class="flex flex-col gap-0.5 shrink-0">
-              <div class="text-[10px] text-slate-400">实时吞吐</div>
-              <div class="flex items-center gap-2.5 mono text-xs">
-                <span class="text-sky-300 font-medium">↓ <span id="panelDown">1.84 MB/s</span></span>
-                <span class="text-emerald-300 font-medium">↑ <span id="panelUp">240 KB/s</span></span>
+              <div class="glass-tile px-3 py-1.5 flex items-center justify-between text-[11px]">
+                <span id="exitIpText" class="mono text-slate-300 truncate">103.42.18.xx · 香港</span>
+                <span id="aiUnlockBadges" class="flex items-center gap-1.5 shrink-0 mono text-[10px]">
+                  <span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-400/20">Gemini ✓</span>
+                  <span class="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-400/20">GPT ✕</span>
+                </span>
               </div>
             </div>
-            <svg id="trafficChart" class="w-44 h-8 shrink-0" viewBox="0 0 160 36" preserveAspectRatio="none"></svg>
-          </div>
 
-          <div class="stagger-item stagger-6 grid grid-cols-3 gap-2">
-            <button id="btnCopyPs" type="button" class="glass-tile py-1.5 px-2 text-[11px] font-medium text-slate-200 hover:text-white flex items-center justify-center gap-1">
-              <span>复制 PS 代理</span>
-            </button>
-            <button id="btnCopyBash" type="button" class="glass-tile py-1.5 px-2 text-[11px] font-medium text-slate-200 hover:text-white flex items-center justify-center gap-1">
-              <span>复制 Bash 代理</span>
-            </button>
-            <button id="btnOpenMain" type="button" class="glass-tile py-1.5 px-2 text-[11px] font-medium text-sky-300 hover:text-sky-200 flex items-center justify-center gap-1">
-              <span>唤起 v2rayN</span>
-            </button>
+            <div class="stagger-item stagger-2 grid grid-cols-2 gap-2.5">
+              <button id="btnSysProxy" type="button" class="glass-tile active-blue p-2.5 text-left flex items-center justify-between">
+                <div>
+                  <div class="text-xs font-semibold text-white">系统代理</div>
+                  <div id="sysProxySub" class="text-[11px] text-sky-200/80 mt-0.5 mono">127.0.0.1:10809</div>
+                </div>
+                <span id="sysProxyTrack" class="switch-track on-blue">
+                  <span class="switch-thumb"></span>
+                </span>
+              </button>
+
+              <button id="btnTunMode" type="button" class="glass-tile p-2.5 text-left flex items-center justify-between">
+                <div>
+                  <div class="text-xs font-semibold text-white">TUN 模式</div>
+                  <div id="tunSub" class="text-[11px] text-slate-400 mt-0.5">sing-box 虚拟网卡</div>
+                </div>
+                <span id="tunTrack" class="switch-track">
+                  <span class="switch-thumb"></span>
+                </span>
+              </button>
+            </div>
+
+            <div class="stagger-item stagger-3 seg-wrap">
+              <div id="segIndicator" class="seg-indicator"></div>
+              <button type="button" data-mode="rule" class="seg-btn active">规则绕过 (Rule)</button>
+              <button type="button" data-mode="global" class="seg-btn">全局 (Global)</button>
+              <button type="button" data-mode="direct" class="seg-btn">直连 (Direct)</button>
+            </div>
+
+            <div class="stagger-item stagger-4 flex flex-col gap-1.5">
+              <div class="flex items-center justify-between px-0.5">
+                <span class="text-[11px] font-medium text-slate-400">快捷节点切换</span>
+                <span id="activeNodeMeta" class="text-[11px] mono text-slate-400">VLESS · Reality</span>
+              </div>
+              <div id="nodeList" class="node-scroll max-h-36 overflow-y-auto pr-1 flex flex-col gap-1.5"></div>
+            </div>
+
+            <div class="stagger-item stagger-5 glass-tile px-3 py-1.5 flex items-center justify-between gap-3">
+              <div class="flex flex-col gap-0.5 shrink-0">
+                <div class="text-[10px] text-slate-400">实时吞吐</div>
+                <div class="flex items-center gap-2.5 mono text-xs">
+                  <span class="text-sky-300 font-medium">↓ <span id="panelDown">1.84 MB/s</span></span>
+                  <span class="text-emerald-300 font-medium">↑ <span id="panelUp">240 KB/s</span></span>
+                </div>
+              </div>
+              <svg id="trafficChart" class="w-44 h-8 shrink-0" viewBox="0 0 160 36" preserveAspectRatio="none"></svg>
+            </div>
+
+            <div class="stagger-item stagger-6 grid grid-cols-3 gap-2">
+              <button id="btnCopyPs" type="button" class="glass-tile py-1.5 px-2 text-[11px] font-medium text-slate-200 hover:text-white flex items-center justify-center gap-1">
+                <span>复制 PS 代理</span>
+              </button>
+              <button id="btnCopyBash" type="button" class="glass-tile py-1.5 px-2 text-[11px] font-medium text-slate-200 hover:text-white flex items-center justify-center gap-1">
+                <span>复制 Bash 代理</span>
+              </button>
+              <button id="btnOpenMain" type="button" class="glass-tile py-1.5 px-2 text-[11px] font-medium text-sky-300 hover:text-sky-200 flex items-center justify-center gap-1">
+                <span>唤起 v2rayN</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -966,14 +1182,17 @@
       <div id="demoCard" class="max-w-xl w-full glass-tile p-6 text-center backdrop-blur-xl bg-slate-900/45 border-white/10">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/8 border border-white/10 text-xs text-slate-300 mb-3">
           <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span>活力图波浪入场 · 共享标签滑块 · 粘贴板 FLIP 重排</span>
+          <span>双岛物理触感层 · 橡皮筋阻尼 · 磁吸张力 · 双向共存</span>
         </div>
-        <h1 class="text-lg font-semibold text-white tracking-tight">已升级左侧岛屿「活力图 ↔ 辅助粘贴板」全套过渡动画</h1>
+        <h1 class="text-lg font-semibold text-white tracking-tight">已修复语法冲突并完整启用三层物理手感细节</h1>
         <p class="text-xs text-slate-400 mt-2 leading-relaxed">
-          切换标签时共享液态玻璃滑块弹簧滑移，内容区做方向性 Blur-Morph 交叉切换并同步弹簧平滑过渡高度；活力图按列波浪入场，粘贴板支持 FLIP 置顶重排、新条目高光呼吸与复制/导入对勾反馈。
+          鼠标靠近顶部胶囊边缘可体验水滴表面张力磁吸鼓起；在胶囊或列表边界快速滑动可体验橡皮筋阻尼回弹；展开任一岛屿均保持双岛共存与液态桥接。
         </p>
 
         <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
+          <button id="btnToggleFusion" type="button" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-indigo-500/25 hover:bg-indigo-500/35 border border-indigo-400/40 text-indigo-100 transition">
+            液态融合 / 分裂：<span id="fusionSimLabel">分离</span>
+          </button>
           <button id="btnToggleMusicSim" type="button" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-emerald-500/25 hover:bg-emerald-500/35 border border-emerald-400/40 text-emerald-100 transition">
             模拟音乐：<span id="musicSimLabel">关</span>
           </button>
@@ -994,7 +1213,6 @@
           </button>
         </div>
 
-        <!-- Draggable Test Items for Workbench Shelf -->
         <div class="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center justify-center gap-2 text-[11px]">
           <span class="text-slate-400">按住拖入顶部左岛：</span>
           <div draggable="true" data-drag-kind="folder" data-drag-name="Projects" data-drag-sub="~/Projects" class="demo-drag-chip cursor-grab active:cursor-grabbing px-2.5 py-1 rounded-lg bg-sky-500/15 border border-sky-400/30 text-sky-200 flex items-center gap-1.5">
@@ -1018,13 +1236,22 @@
           <button type="button" data-spring="snappy" class="spring-btn px-2.5 py-1 rounded-lg bg-white/6 text-slate-400 hover:text-slate-200">极速干脆</button>
           <button id="btnToggleDock" type="button" class="px-2.5 py-1 rounded-lg bg-white/6 text-slate-300 hover:text-white ml-2">切换位置：居中 / 右上角</button>
         </div>
+
+        <div class="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center justify-center gap-2 text-[11px] text-slate-400">
+          <span>快捷键直达：</span>
+          <span class="px-2 py-0.5 rounded bg-white/8 border border-white/12 mono text-slate-200">Alt + Space</span><span>唤起/收起</span>
+          <span class="px-2 py-0.5 rounded bg-white/8 border border-white/12 mono text-slate-200">Alt + V</span><span>粘贴板</span>
+          <span class="px-2 py-0.5 rounded bg-white/8 border border-white/12 mono text-slate-200">Alt + W</span><span>工作栏</span>
+          <span class="px-2 py-0.5 rounded bg-white/8 border border-white/12 mono text-slate-200">Alt + P</span><span>一键测速</span>
+          <span class="px-2 py-0.5 rounded bg-white/8 border border-white/12 mono text-slate-200">右键右岛</span><span>盲操代理开关</span>
+        </div>
       </div>
     </main>
 
     <footer class="win-taskbar px-4 flex items-center justify-between text-xs text-slate-300">
       <div class="flex items-center gap-2 opacity-75">
         <span class="w-4 h-4 rounded bg-sky-500/30 border border-sky-400/40 inline-block"></span>
-        <span class="text-[11px]">Windows 11 Desktop</span>
+        <span class="text-[11px]">Linux Wayland / Niri Desktop</span>
       </div>
       <div class="flex items-center gap-3 mono text-[11px]">
         <span id="trayStatus" class="flex items-center gap-1.5 text-emerald-300">
@@ -1062,6 +1289,8 @@
         artClass: 'from-rose-500/45 via-red-700/35 to-stone-900',
         dotClass: 'from-rose-500/60 to-amber-600/60',
         glowColor: 'rgba(244, 63, 94, 0.35)',
+        meshC1: 'rgba(244, 63, 94, 0.38)',
+        meshC2: 'rgba(251, 146, 60, 0.24)',
         lyrics: ['♪ 最闪亮的星，照亮你的眼睛 ♪', '♪ 我愿为你付出所有的温柔 ♪', '♪ 穿过人海拥抱你的身影 ♪']
       },
       {
@@ -1071,6 +1300,8 @@
         artClass: 'from-indigo-500/50 via-sky-600/35 to-slate-900',
         dotClass: 'from-indigo-500/60 to-sky-500/60',
         glowColor: 'rgba(99, 102, 241, 0.38)',
+        meshC1: 'rgba(99, 102, 241, 0.42)',
+        meshC2: 'rgba(56, 189, 248, 0.28)',
         lyrics: ['♪ Waiting in a car, waiting for a ride in the dark ♪', '♪ The city is my church, it wraps me in its blinding twilight ♪']
       },
       {
@@ -1080,18 +1311,21 @@
         artClass: 'from-emerald-500/45 via-teal-600/35 to-slate-900',
         dotClass: 'from-emerald-500/60 to-teal-500/60',
         glowColor: 'rgba(16, 185, 129, 0.36)',
+        meshC1: 'rgba(16, 185, 129, 0.38)',
+        meshC2: 'rgba(45, 212, 191, 0.26)',
         lyrics: ['♪ [纯音乐 · Synthwave 氛围共鸣中] ♪']
       }
     ];
 
     const state = {
-      openMode: 'none', // 'none' | 'proxy' | 'left'
-      leftTab: 'heatmap', // 'heatmap' | 'clipboard' | 'shelf'
+      openMode: 'none',
+      leftTab: 'heatmap',
+      lastNewShelfId: null,
       shelf: [
-        { id: 's1', kind: 'folder', name: 'Island-proxy', sub: '~/Projects/Island-proxy', pinned: true },
+        { id: 's1', kind: 'folder', name: 'island-demo', sub: '~/Projects/island-demo', pinned: true },
         { id: 's2', kind: 'app', name: 'v2rayN.desktop', sub: '应用快捷方式', pinned: true },
-        { id: 's3', kind: 'txt', name: 'clash_rules.txt', sub: '4.6 KB · 规则草稿', pinned: false, content: 'DOMAIN-SUFFIX,github.com,PROXY\nDOMAIN-SUFFIX,anthropic.com,PROXY' },
-        { id: 's4', kind: 'file', name: 'config.yaml', sub: '18 KB · 配置文件', pinned: false }
+        { id: 's3', kind: 'txt', name: 'clash_rules.txt', sub: '4.6 KB · 规则草稿', pinned: false, content: 'DOMAIN-SUFFIX,github.com,PROXY\nDOMAIN-SUFFIX,anthropic.com,PROXY\nDOMAIN-SUFFIX,googleapis.com,PROXY\nIP-CIDR,127.0.0.0/8,DIRECT' },
+        { id: 's4', kind: 'file', name: 'config.yaml', sub: '18 KB · 配置文件', pinned: false, content: 'port: 10809\nsocks-port: 10808\nmode: rule\nlog-level: info\nallow-lan: false' }
       ],
       clipQuery: '',
       lastNewClipId: null,
@@ -1099,11 +1333,21 @@
       clips: [
         { id: 'c1', type: 'node', tag: 'vless://', pinned: true, time: '刚刚', text: 'vless://a9c4e2-reality@jp-02.example.com:443#JP-02' },
         { id: 'c_img1', type: 'image', tag: '图片', pinned: false, time: '1分钟前', text: '桌面截图 1920×1080 · 428 KB', meta: '1920×1080 · PNG · 428 KB', imgSrc: "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 270'%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%230f172a'/%3E%3Cstop offset='100%25' stop-color='%231e293b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='480' height='270' fill='url(%23g1)'/%3E%3Crect x='24' y='24' width='432' height='222' rx='14' fill='%230b1120' stroke='%2338bdf8' stroke-opacity='0.35'/%3E%3Ccircle cx='52' cy='48' r='6' fill='%23f43f5e'/%3E%3Ccircle cx='72' cy='48' r='6' fill='%23fbbf24'/%3E%3Ccircle cx='92' cy='48' r='6' fill='%2334d399'/%3E%3Crect x='48' y='78' width='180' height='14' rx='4' fill='%2338bdf8' fill-opacity='0.45'/%3E%3Crect x='48' y='106' width='320' height='10' rx='4' fill='%2394a3b8' fill-opacity='0.3'/%3E%3Crect x='48' y='128' width='260' height='10' rx='4' fill='%2394a3b8' fill-opacity='0.25'/%3E%3Crect x='48' y='162' width='384' height='60' rx='10' fill='%2310b981' fill-opacity='0.15' stroke='%2334d399' stroke-opacity='0.4'/%3E%3Ctext x='240' y='198' fill='%23a7f3d0' font-family='monospace' font-size='15' text-anchor='middle'%3E1920 x 1080 Screen Capture%3C/text%3E%3C/svg%3E" },
-        { id: 'c2', type: 'code', tag: 'PS', pinned: false, time: '2分钟前', text: '$env:HTTP_PROXY="http://127.0.0.1:10809"' },
-        { id: 'c3', type: 'text', tag: '文本', pinned: false, time: '10分钟前', text: 'D:/Projects/Island-proxy' }
+        { id: 'c2', type: 'code', tag: 'CLI', pinned: false, time: '2分钟前', text: 'export ALL_PROXY=socks5://127.0.0.1:10808' },
+        { id: 'c3', type: 'text', tag: '文本', pinned: false, time: '10分钟前', text: '~/Projects/island-demo' }
+      ],
+      clipQuery: '',
+      lastNewClipId: null,
+      clipStaggerPending: false,
+      clips: [
+        { id: 'c1', type: 'node', tag: 'vless://', pinned: true, time: '刚刚', text: 'vless://a9c4e2-reality@jp-02.example.com:443#JP-02' },
+        { id: 'c_img1', type: 'image', tag: '图片', pinned: false, time: '1分钟前', text: '桌面截图 1920×1080 · 428 KB', meta: '1920×1080 · PNG · 428 KB', imgSrc: "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 270'%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%230f172a'/%3E%3Cstop offset='100%25' stop-color='%231e293b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='480' height='270' fill='url(%23g1)'/%3E%3Crect x='24' y='24' width='432' height='222' rx='14' fill='%230b1120' stroke='%2338bdf8' stroke-opacity='0.35'/%3E%3Ccircle cx='52' cy='48' r='6' fill='%23f43f5e'/%3E%3Ccircle cx='72' cy='48' r='6' fill='%23fbbf24'/%3E%3Ccircle cx='92' cy='48' r='6' fill='%2334d399'/%3E%3Crect x='48' y='78' width='180' height='14' rx='4' fill='%2338bdf8' fill-opacity='0.45'/%3E%3Crect x='48' y='106' width='320' height='10' rx='4' fill='%2394a3b8' fill-opacity='0.3'/%3E%3Crect x='48' y='128' width='260' height='10' rx='4' fill='%2394a3b8' fill-opacity='0.25'/%3E%3Crect x='48' y='162' width='384' height='60' rx='10' fill='%2310b981' fill-opacity='0.15' stroke='%2334d399' stroke-opacity='0.4'/%3E%3Ctext x='240' y='198' fill='%23a7f3d0' font-family='monospace' font-size='15' text-anchor='middle'%3E1920 x 1080 Screen Capture%3C/text%3E%3C/svg%3E" },
+        { id: 'c2', type: 'code', tag: 'CLI', pinned: false, time: '2分钟前', text: 'export ALL_PROXY=socks5://127.0.0.1:10808' },
+        { id: 'c3', type: 'text', tag: '文本', pinned: false, time: '10分钟前', text: '~/Projects/Island-proxy' }
       ],
       musicActive: false,
       musicPlaying: true,
+      fusedMode: false,
       trackIdx: 0,
       lyricIdx: 0,
       musicPct: 42,
@@ -1137,10 +1381,37 @@
     const hudEl = $('hudIsland');
     const nodeDomMap = new Map();
 
-    const proxySpring = { p: 0, v: 0, target: 0, rafId: null, lastTime: 0, speed: 0.72 };
+    let cachedWinW = window.innerWidth;
+    const proxySpring = { p: 0, v: 0, target: 0, rafId: null, lastTime: 0, speed: 0.85 };
     const leftSpring = { p: 0, v: 0, target: 0, rafId: null, lastTime: 0, speed: 1.0 };
-    // Smooth height spring for Left Island tab switching (216 <-> 248)
+    const fusionSpring = { p: 0, v: 0, target: 0, rafId: null, lastTime: 0, speed: 0.9 };
+    const bumpSpring = { x: 0, v: 0, rafId: null, lastTime: 0 };
+    const leftRubber = { y: 0, v: 0, rafId: null, lastTime: 0 };
     const leftHeightSpring = { p: 216, v: 0, target: 216, rafId: null, lastTime: 0 };
+    const vinylSpin = { angle: 0, vel: 0, rafId: null, lastTime: 0 };
+    let isSeekingMusic = false;
+
+    function syncVinylSpin() {
+      if (vinylSpin.rafId) return;
+      vinylSpin.lastTime = 0;
+      const stepVinyl = (now) => {
+        if (!vinylSpin.lastTime) vinylSpin.lastTime = now;
+        const dt = Math.min(0.05, Math.max(0.008, (now - vinylSpin.lastTime) / 1000));
+        vinylSpin.lastTime = now;
+        const targetVel = (state.musicActive && state.musicPlaying) ? 28 : 0; // deg/s
+        vinylSpin.vel += (targetVel - vinylSpin.vel) * Math.min(1, dt * 3.2);
+        vinylSpin.angle = (vinylSpin.angle + vinylSpin.vel * dt) % 360;
+        const art = $('albumArt');
+        if (art) art.style.transform = `rotate(${vinylSpin.angle.toFixed(2)}deg)`;
+        if (targetVel === 0 && Math.abs(vinylSpin.vel) < 0.08) {
+          vinylSpin.vel = 0;
+          vinylSpin.rafId = null;
+          return;
+        }
+        vinylSpin.rafId = requestAnimationFrame(stepVinyl);
+      };
+      vinylSpin.rafId = requestAnimationFrame(stepVinyl);
+    }
 
     function getLeftExpandedHeightTarget() {
       if (state.musicActive) return 146;
@@ -1196,7 +1467,7 @@
       });
 
       const tick = (now) => {
-        if (state.openMode !== 'left' || state.musicActive || state.leftTab !== 'heatmap') {
+        if (state.openMode !== 'left' || state.musicActive || state.leftTab !== 'heatmap' || leftSpring.rafId !== null) {
           matrixTrail.rafId = null;
           return;
         }
@@ -1292,65 +1563,103 @@
     function renderIslands() {
       const lp = leftSpring.p;
       const pp = proxySpring.p;
+      const fp = fusionSpring.p;
+      const bump = bumpSpring.x;
 
-      const lwCollapsed = 222;
-      const lwExpanded = Math.min(416, window.innerWidth - 24);
+      const lwMini = 78;
+      const lwCollapsed = 222 - (222 - lwMini) * pp;
+      const lwExpanded = Math.min(416, cachedWinW - 24);
+      const lwFused = Math.min(372, cachedWinW - 24);
       const lhExpanded = leftHeightSpring.p;
-      const lw = lwCollapsed + (lwExpanded - lwCollapsed) * lp;
-      const lh = 40 + (lhExpanded - 40) * lp;
-      const lr = 20 + (24 - 20) * lp;
-      const lxCenter = state.dockRight ? -lw / 2 : -66 * (1 - lp);
-      const leftPos = lxCenter - lw / 2;
 
-      const leftOpacity = Math.max(0, 1 - pp * 2.5);
+      let lw = lwCollapsed + (lwExpanded - lwCollapsed) * lp;
+      lw = lw + (lwFused - lw) * fp;
+      const lh = (40 + (lhExpanded - 40) * lp) * (1 - fp) + 42 * fp;
+      const lr = 20 + (24 - 20) * lp * (1 - fp);
+
+      const pwMini = 78;
+      const pwCollapsed = 118 - (118 - pwMini) * lp;
+      const pwExpanded = Math.min(456, cachedWinW - 24);
+      const pw = (pwCollapsed + (pwExpanded - pwCollapsed) * pp) * (1 - fp * 0.45);
+      const ph = 40 + (522 - 40) * pp * (1 - fp);
+      const pr = 20 + (24 - 20) * pp * (1 - fp);
+
+      const magnetPull = fp > 0 && fp < 1 ? Math.sin(fp * Math.PI) * 14 : 0;
+
+      let lxCenter, pxCenter;
+      if (state.dockRight) {
+        lxCenter = -lw / 2;
+        pxCenter = -pw / 2;
+      } else {
+        const expandedProxyCenter = Math.min((cachedWinW / 2) - (pw / 2) - 8, 42);
+        const leftBesideExpandedProxy = Math.max(-(cachedWinW / 2) + (lw / 2) + 8, expandedProxyCenter - (pw / 2) - (lw / 2) - 8);
+
+        const lxBase = (-66 * (1 - lp) + magnetPull) * (1 - pp) + leftBesideExpandedProxy * pp;
+        lxCenter = lxBase * (1 - fp);
+
+        const restX = 118;
+        const besideLeftX = Math.min((cachedWinW / 2) - (pw / 2) - 10, (lw / 2) + (pw / 2) + 8);
+        const collapsedX = restX + (besideLeftX - restX) * lp + bump - magnetPull * 1.4;
+        pxCenter = (collapsedX * (1 - pp) + expandedProxyCenter * pp) * (1 - fp);
+      }
+
+      const leftPos = lxCenter - lw / 2;
+      const proxyLeft = pxCenter - pw / 2;
+
+      const leftOpacity = (state.dockRight ? Math.max(0, 1 - pp * 2.5) : 1);
       leftEl.style.width = `${lw.toFixed(2)}px`;
       leftEl.style.height = `${lh.toFixed(2)}px`;
       leftEl.style.borderRadius = `${lr.toFixed(2)}px`;
       leftEl.style.opacity = leftOpacity.toFixed(3);
       leftEl.style.pointerEvents = leftOpacity > 0.2 ? 'auto' : 'none';
-      leftEl.style.transform = `translate3d(${leftPos.toFixed(2)}px, 0, 0)`;
-      leftEl.style.zIndex = lp >= pp ? '20' : '10';
+      leftEl.style.transform = `translate3d(${leftPos.toFixed(2)}px, ${leftRubber.y.toFixed(2)}px, 0)`;
+      leftEl.style.zIndex = (lp >= pp || fp > 0.1) ? '20' : '15';
+      leftEl.classList.toggle('fusing', fp > 0.15);
 
-      const pillFade = Math.max(0, 1 - lp * 3.5);
+      const pillFade = Math.max(0, 1 - lp * 3.5) * Math.max(0, 1 - fp * 2.6) * Math.max(0, 1 - pp * 3.2);
       leftPillBar.style.opacity = pillFade.toFixed(3);
-      leftPillBar.style.pointerEvents = lp < 0.15 ? 'auto' : 'none';
+      leftPillBar.style.pointerEvents = (lp < 0.15 && fp < 0.15 && pp < 0.2) ? 'auto' : 'none';
 
-      const cardFade = Math.max(0, Math.min(1, (lp - 0.18) / 0.82));
+      const cardFade = Math.max(0, Math.min(1, (lp - 0.18) / 0.82)) * (1 - fp);
       leftExpandedInner.style.opacity = cardFade.toFixed(3);
-      leftExpandedInner.style.filter = cardFade < 0.98 ? `blur(${((1 - cardFade) * 7).toFixed(1)}px)` : 'none';
-      leftExpandedInner.style.pointerEvents = lp > 0.5 ? 'auto' : 'none';
+      leftExpandedInner.style.pointerEvents = (lp > 0.5 && fp < 0.2) ? 'auto' : 'none';
 
-      // When Left Island is open, Proxy shrinks to a 78px mini status-dot + ping pill beside it (never vanishes!)
-      const pwMini = 78;
-      const pwCollapsed = 118 - (118 - pwMini) * lp;
-      const pwExpanded = Math.min(456, window.innerWidth - 24);
-      const pw = pwCollapsed + (pwExpanded - pwCollapsed) * pp;
-      const ph = 40 + (522 - 40) * pp;
-      const pr = 20 + (24 - 20) * pp;
+      const leftMini = $('leftMiniPill');
+      const miniFade = Math.max(0, Math.min(1, (pp - 0.35) / 0.55)) * (1 - fp);
+      leftMini.style.opacity = miniFade.toFixed(3);
+      leftMini.style.pointerEvents = pp > 0.5 ? 'auto' : 'none';
 
-      let pxCenter;
-      if (state.dockRight) {
-        pxCenter = -pw / 2;
-      } else {
-        const restX = 118;
-        const besideLeftX = Math.min((window.innerWidth / 2) - (pw / 2) - 10, (lw / 2) + (pw / 2) + 8);
-        const collapsedX = restX + (besideLeftX - restX) * lp;
-        pxCenter = collapsedX * (1 - pp);
-      }
-      const proxyLeft = pxCenter - pw / 2;
+      const fusionContent = $('fusionPillContent');
+      fusionContent.classList.toggle('active', fp > 0.55);
 
-      // In dockRight mode fade out when left covers it; in center mode keep visible as mini status pill
-      const proxyOpacity = state.dockRight ? Math.max(0, 1 - lp * 2.5) : 1;
+      const proxyOpacity = (state.dockRight ? Math.max(0, 1 - lp * 2.5) : 1) * Math.max(0, 1 - fp * 1.65);
       proxyEl.style.width = `${pw.toFixed(2)}px`;
       proxyEl.style.height = `${ph.toFixed(2)}px`;
       proxyEl.style.borderRadius = `${pr.toFixed(2)}px`;
       proxyEl.style.opacity = proxyOpacity.toFixed(3);
-      proxyEl.style.pointerEvents = proxyOpacity > 0.2 ? 'auto' : 'none';
+      proxyEl.style.pointerEvents = proxyOpacity > 0.25 ? 'auto' : 'none';
       proxyEl.style.transform = `translate3d(${proxyLeft.toFixed(2)}px, 0, 0)`;
+      proxyEl.classList.toggle('is-animating', proxySpring.rafId !== null);
+      leftEl.classList.toggle('is-animating', leftSpring.rafId !== null || fusionSpring.rafId !== null);
       proxyEl.style.zIndex = pp > lp ? '20' : '15';
       $('capsuleNode').style.display = (lp > 0.35 && pp < 0.2) ? 'none' : 'inline';
 
-      $('capsuleDownWrap').style.display = pp < 0.15 ? 'none' : 'inline';
+      const bridge = $('metaballBridge');
+      const leftRightEdge = leftPos + lw;
+      const gap = proxyLeft - leftRightEdge;
+      const activeStretch = (gap > -12 && gap < 36 && (lp > 0.04 || pp > 0.04 || fp > 0.02 || Math.abs(bump) > 0.5) && !state.dockRight);
+      if (activeStretch && proxyOpacity > 0.15) {
+        const bridgeLeft = leftRightEdge - 8;
+        const bridgeW = Math.max(16, gap + 16);
+        const stretchFactor = Math.max(0, 1 - Math.max(0, gap) / 36);
+        bridge.style.opacity = (stretchFactor * 0.85).toFixed(3);
+        bridge.style.width = `${bridgeW.toFixed(1)}px`;
+        bridge.style.transform = `translate3d(${bridgeLeft.toFixed(1)}px, 0, 0) scaleY(${(0.75 + stretchFactor * 0.35).toFixed(2)})`;
+      } else {
+        bridge.style.opacity = '0';
+      }
+
+      $('capsuleDownWrap').style.display = 'none';
     }
 
     function stepSpring(sp, now) {
@@ -1383,6 +1692,9 @@
         sp.rafId = null;
         sp.lastTime = 0;
         renderIslands();
+        if (sp === leftSpring && state.openMode === 'left' && !state.musicActive && state.leftTab === 'heatmap' && matrixTrail.start) {
+          matrixTrail.start();
+        }
         return;
       }
       sp.rafId = requestAnimationFrame((t) => stepSpring(sp, t));
@@ -1396,7 +1708,6 @@
       const dt = Math.min(0.032, rawDt);
       sp.lastTime = now;
 
-      // Critically damped height spring for smooth tab resize
       const stiffness = 240;
       const damping = 2 * Math.sqrt(stiffness) * 1.03;
       const force = -stiffness * (sp.p - sp.target);
@@ -1440,14 +1751,66 @@
       }
     }
 
+    function triggerElasticBump(impulse = 16) {
+      bumpSpring.v += impulse * 12;
+      if (!bumpSpring.rafId) {
+        bumpSpring.lastTime = 0;
+        const stepBump = (now) => {
+          if (!bumpSpring.lastTime) bumpSpring.lastTime = now;
+          const dt = Math.min(0.032, Math.max(0.008, (now - bumpSpring.lastTime) / 1000));
+          bumpSpring.lastTime = now;
+          const force = -290 * bumpSpring.x;
+          const accel = force - 17 * bumpSpring.v;
+          bumpSpring.v += accel * dt;
+          bumpSpring.x += bumpSpring.v * dt;
+          renderIslands();
+          if (Math.abs(bumpSpring.x) < 0.15 && Math.abs(bumpSpring.v) < 1.2) {
+            bumpSpring.x = 0;
+            bumpSpring.v = 0;
+            bumpSpring.rafId = null;
+            renderIslands();
+            return;
+          }
+          bumpSpring.rafId = requestAnimationFrame(stepBump);
+        };
+        bumpSpring.rafId = requestAnimationFrame(stepBump);
+      }
+    }
+
+    function setFusedMode(fused) {
+      state.fusedMode = fused;
+      $('fusionSimLabel').textContent = fused ? '已融合' : '分离';
+      if (fused) {
+        state.openMode = 'none';
+        proxyEl.classList.remove('expanded');
+        leftEl.classList.remove('expanded');
+        kickSpring(proxySpring, 0);
+        kickSpring(leftSpring, 0);
+      } else {
+        triggerElasticBump(18);
+      }
+      kickSpring(fusionSpring, fused ? 1 : 0);
+    }
+
     function setOpenMode(mode) {
+      if (mode !== 'none' && state.fusedMode) {
+        state.fusedMode = false;
+        $('fusionSimLabel').textContent = '分离';
+        kickSpring(fusionSpring, 0);
+      }
       const wasLeftClosed = state.openMode !== 'left';
+      const wasProxyClosed = state.openMode !== 'proxy';
       state.openMode = mode;
+      if (mode === 'left' && wasLeftClosed && !state.dockRight) {
+        triggerElasticBump(14);
+      } else if (mode === 'proxy' && wasProxyClosed && !state.dockRight) {
+        triggerElasticBump(-10);
+      }
       if (mode !== 'none') { hudEl.classList.remove('show'); $('importConfirm').classList.remove('show'); }
       $('clipPopover').classList.remove('show');
       proxyEl.classList.toggle('expanded', mode === 'proxy');
       leftEl.classList.toggle('expanded', mode === 'left');
-      $('proxyHeaderLeft').style.paddingRight = mode === 'proxy' ? '122px' : '0px';
+      $('proxyHeaderLeft').style.paddingRight = mode === 'proxy' ? '142px' : '0px';
       kickSpring(proxySpring, mode === 'proxy' ? 1 : 0);
       kickSpring(leftSpring, mode === 'left' ? 1 : 0);
 
@@ -1458,9 +1821,10 @@
           if (matrixTrail.start) matrixTrail.start();
         } else if (wasLeftClosed) {
           state.clipStaggerPending = true;
-          renderClips();
+          renderClips(false);
         }
       }
+      render();
     }
 
     let hudTimer = null;
@@ -1529,7 +1893,6 @@
 
     function renderClips(useFlip = false) {
       const list = $('clipList');
-      // FLIP Step 1: Record old top positions by data-clip-id
       const firstTops = new Map();
       if (useFlip) {
         list.querySelectorAll('.clip-item[data-clip-id]').forEach((el) => {
@@ -1666,7 +2029,6 @@
       state.clipStaggerPending = false;
       state.lastNewClipId = null;
 
-      // FLIP Step 2-4: Invert & Play
       if (useFlip && firstTops.size > 0) {
         list.querySelectorAll('.clip-item[data-clip-id]').forEach((el) => {
           const oldTop = firstTops.get(el.dataset.clipId);
@@ -1709,7 +2071,7 @@
       } else if (tab === 'clipboard') {
         state.clipStaggerPending = true;
         renderClips(false);
-    renderShelf();
+        renderShelf();
       } else if (tab === 'shelf') {
         renderShelf();
       }
@@ -1799,21 +2161,28 @@
       $('musicCardContent').classList.toggle('hidden', !state.musicActive);
       $('musicCardContent').classList.toggle('flex', state.musicActive);
 
+      const meshEl = $('musicAmbientMesh');
       if (state.musicActive) {
         const track = TRACKS[state.trackIdx];
         const rawLyric = track.lyrics[state.lyricIdx % track.lyrics.length].replace(/♪/g, '').trim();
         updatePillLyric(rawLyric);
         $('trackTitle').textContent = track.title;
         $('trackArtist').textContent = track.artist;
-        $('albumArt').className = `w-24 h-24 rounded-2xl bg-gradient-to-br ${track.artClass} border border-white/15 shadow-lg flex items-center justify-center shrink-0 relative overflow-hidden transition-all duration-300`;
+        $('albumArt').className = `vinyl-disc w-24 h-24 bg-gradient-to-br ${track.artClass} border border-white/15 shadow-lg flex items-center justify-center shrink-0 relative overflow-hidden`;
         $('albumArt').querySelector('span').textContent = track.badge;
         $('pillAlbumDot').className = `w-5 h-5 rounded-md bg-gradient-to-br ${track.dotClass} border border-white/20 flex items-center justify-center text-[9px] font-bold text-white shrink-0`;
         leftEl.style.borderColor = track.glowColor;
+        meshEl.style.setProperty('--ambient-c1', track.meshC1);
+        meshEl.style.setProperty('--ambient-c2', track.meshC2);
+        meshEl.classList.toggle('active', state.musicPlaying);
+        syncVinylSpin();
         $('lyricLine').textContent = track.lyrics[state.lyricIdx % track.lyrics.length];
         $('btnPlayPause').innerHTML = state.musicPlaying ? '<svg class="w-6 h-6" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_bg" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#0284c7"/></linearGradient><linearGradient id="fl_hi" x1="16" y1="2" x2="16" y2="16" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="rgba(255,255,255,0.45)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="9" fill="url(#fl_bg)"/><rect x="2.5" y="2.5" width="27" height="27" rx="8.5" stroke="url(#fl_hi)"/><rect x="10.5" y="9" width="4" height="14" rx="2" fill="#ffffff"/><rect x="17.5" y="9" width="4" height="14" rx="2" fill="#ffffff"/></svg>' : '<svg class="w-6 h-6" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_bg_p" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#0284c7"/></linearGradient><linearGradient id="fl_hi_p" x1="16" y1="2" x2="16" y2="16" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="rgba(255,255,255,0.45)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="9" fill="url(#fl_bg_p)"/><rect x="2.5" y="2.5" width="27" height="27" rx="8.5" stroke="url(#fl_hi_p)"/><path d="M12.2 9.6c0-1 1.1-1.6 2-1.1l9.2 5.9c.8.5.8 1.7 0 2.2l-9.2 5.9c-.9.5-2-.1-2-1.1V9.6z" fill="#ffffff"/></svg>';
         document.querySelectorAll('.eq-bar').forEach((b) => b.classList.toggle('paused', !state.musicPlaying));
       } else {
         leftEl.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+        meshEl.classList.remove('active');
+        syncVinylSpin();
       }
 
       if (!isConnected || state.routingMode === 'direct') {
@@ -1874,9 +2243,9 @@
         refs.badge.className = `mono text-[11px] px-2 py-0.5 rounded-full border shrink-0 transition-colors duration-200 ${pingBadgeClass(node.ping)}`;
         refs.badge.textContent = node.ping ? `${node.ping}ms` : '测速中';
         if (popNodeId === node.id) {
-          refs.badge.classList.remove('ping-pop');
+          refs.badge.classList.remove('ping-pop', 'sonar-ripple');
           void refs.badge.offsetWidth;
-          refs.badge.classList.add('ping-pop');
+          refs.badge.classList.add('ping-pop', 'sonar-ripple');
         }
       });
 
@@ -1921,13 +2290,27 @@
       if (e.target.closest('button')) return;
       setOpenMode(state.openMode === 'proxy' ? 'none' : 'proxy');
     });
+    // Right-click on collapsed Proxy pill -> blind toggle System Proxy without expanding
+    proxyEl.addEventListener('contextmenu', (e) => {
+      if (state.openMode === 'proxy') return;
+      e.preventDefault();
+      e.stopPropagation();
+      state.sysProxy = !state.sysProxy;
+      render();
+      triggerJellySwitch($('sysProxyTrack'));
+      proxyEl.classList.remove('sonar-ripple');
+      void proxyEl.offsetWidth;
+      proxyEl.classList.add('sonar-ripple');
+      showToast(state.sysProxy ? '盲操切换：系统代理已开启' : '盲操切换：系统代理已关闭');
+    });
     $('btnCollapse').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('none'); });
 
     leftPillBar.addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('left'); });
+    $('leftMiniPill').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('left'); });
     $('btnCloseMusic').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('none'); });
     $('btnCloseTime').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('none'); });
     leftEl.addEventListener('click', (e) => {
-      if (state.openMode === 'left' && !e.target.closest('.music-ctrl-btn') && !e.target.closest('.ltab-wrap') && !e.target.closest('#clipPanel') && !e.target.closest('#shelfPanel')) {
+      if (state.openMode === 'left' && !e.target.closest('.music-ctrl-btn') && !e.target.closest('.music-seek-bar') && !e.target.closest('.ltab-wrap') && !e.target.closest('#clipPanel') && !e.target.closest('#shelfPanel')) {
         setOpenMode('none');
       }
     });
@@ -2034,7 +2417,41 @@
       syncLeftHeight(state.openMode !== 'left');
     });
 
+    $('btnToggleFusion').addEventListener('click', () => {
+      setFusedMode(!state.fusedMode);
+    });
+
+    $('btnSplitFusion').addEventListener('click', (e) => {
+      e.stopPropagation();
+      setFusedMode(false);
+    });
+
     $('btnPlayPause').addEventListener('click', (e) => { e.stopPropagation(); state.musicPlaying = !state.musicPlaying; render(); });
+
+    // Interactive Music Progress Bar Scrubbing
+    const seekBar = $('musicSeekBar');
+    const applySeekClientX = (clientX) => {
+      const rect = seekBar.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+      state.musicPct = pct;
+      $('musicProgress').style.width = `${pct.toFixed(1)}%`;
+    };
+    seekBar.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+      isSeekingMusic = true;
+      seekBar.classList.add('dragging');
+      applySeekClientX(e.clientX);
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!isSeekingMusic) return;
+      applySeekClientX(e.clientX);
+    });
+    window.addEventListener('mouseup', () => {
+      if (!isSeekingMusic) return;
+      isSeekingMusic = false;
+      seekBar.classList.remove('dragging');
+      showToast(`已定位播放进度：${Math.round(state.musicPct)}%`);
+    });
     function triggerTrackTransition(dir) {
       const cls = dir > 0 ? 'track-next-in' : 'track-prev-in';
       [$('albumArt'), $('trackTitle'), $('trackArtist'), $('lyricLine')].forEach((el) => {
@@ -2084,15 +2501,23 @@
       });
     });
 
+    function triggerJellySwitch(trackEl) {
+      trackEl.classList.remove('jelly');
+      void trackEl.offsetWidth;
+      trackEl.classList.add('jelly');
+    }
+
     $('btnSysProxy').addEventListener('click', () => {
       state.sysProxy = !state.sysProxy;
       render();
-      showToast(state.sysProxy ? '已开启 Windows 系统代理 (127.0.0.1:10809)' : '已清除 Windows 系统代理');
+      triggerJellySwitch($('sysProxyTrack'));
+      showToast(state.sysProxy ? '已开启系统代理 (127.0.0.1:10809)' : '已清除系统代理');
     });
 
     $('btnTunMode').addEventListener('click', () => {
       state.tunMode = !state.tunMode;
       render();
+      triggerJellySwitch($('tunTrack'));
       showToast(state.tunMode ? '已启用 sing-box TUN 虚拟网卡' : '已关闭 TUN 模式');
     });
 
@@ -2153,11 +2578,11 @@
       $('panelDown').textContent = down >= 1 ? `${down.toFixed(2)} MB/s` : `${Math.round(down * 1024)} KB/s`;
       $('panelUp').textContent = up >= 1 ? `${up.toFixed(2)} MB/s` : `${Math.round(up * 1024)} KB/s`;
 
-      if (state.musicActive && state.musicPlaying) {
+      if (state.musicActive && state.musicPlaying && !isSeekingMusic) {
         state.musicPct = (state.musicPct + 1.2) % 100;
         $('musicProgress').style.width = `${state.musicPct.toFixed(1)}%`;
       }
-      renderChart();
+      if (!proxySpring.rafId && !leftSpring.rafId) renderChart();
     }, 1500);
 
     let lastPillLyric = '';
@@ -2205,16 +2630,18 @@
       const wd = weekdays[now.getDay()];
       $('clockText').textContent = hm;
       $('pillTimeClock').textContent = hm;
+      $('leftMiniText').textContent = state.musicActive ? '♪' : hm;
+      $('fusionClock').textContent = hm;
       $('pillTimeDate').textContent = `${now.getMonth() + 1}/${now.getDate()} ${wd}`;
       $('expandedClock').textContent = hms;
       $('expandedDate').textContent = `${now.getMonth() + 1}月${now.getDate()}日 · ${wd}`;
+      const activeNode = state.nodes.find((n) => n.id === state.activeNodeId) || state.nodes[0];
+      $('fusionNodeText').textContent = `${activeNode.name.split('·')[0].trim()} · ${activeNode.ping || '--'}ms`;
     }
     updateClock();
     setInterval(updateClock, 1000);
-    window.addEventListener('resize', renderIslands);
+    window.addEventListener('resize', () => { cachedWinW = window.innerWidth; renderIslands(); });
 
-
-    // Cursor-following Halo Specular Border on all .morph-island containers
     document.querySelectorAll('.morph-island').forEach((island) => {
       island.addEventListener('mousemove', (e) => {
         const rect = island.getBoundingClientRect();
@@ -2227,19 +2654,69 @@
       });
     });
 
+    function triggerLeftRubber(impulseY) {
+      leftRubber.v += impulseY * 14;
+      if (!leftRubber.rafId) {
+        leftRubber.lastTime = 0;
+        const stepRubber = (now) => {
+          if (!leftRubber.lastTime) leftRubber.lastTime = now;
+          const dt = Math.min(0.032, Math.max(0.008, (now - leftRubber.lastTime) / 1000));
+          leftRubber.lastTime = now;
+          const force = -340 * leftRubber.y;
+          const accel = force - 19 * leftRubber.v;
+          leftRubber.v += accel * dt;
+          leftRubber.y += leftRubber.v * dt;
+          renderIslands();
+          if (Math.abs(leftRubber.y) < 0.12 && Math.abs(leftRubber.v) < 1.0) {
+            leftRubber.y = 0;
+            leftRubber.v = 0;
+            leftRubber.rafId = null;
+            renderIslands();
+            return;
+          }
+          leftRubber.rafId = requestAnimationFrame(stepRubber);
+        };
+        leftRubber.rafId = requestAnimationFrame(stepRubber);
+      }
+    }
 
-    // Hover + Scroll Wheel Switch on Left pill ONLY (with directional blur-slide animation); Proxy wheel disabled
+    function attachRubberScroll(el) {
+      if (!el) return;
+      let rbY = 0;
+      let rbTimer = null;
+      el.addEventListener('wheel', (e) => {
+        const atTop = el.scrollTop <= 0 && e.deltaY < 0;
+        const atBottom = Math.ceil(el.scrollTop + el.clientHeight) >= el.scrollHeight && e.deltaY > 0;
+        if (atTop || atBottom) {
+          const dir = atTop ? 1 : -1;
+          rbY = Math.max(-7, Math.min(7, rbY + dir * Math.min(4, Math.abs(e.deltaY) * 0.05)));
+          el.style.transition = 'none';
+          el.style.transform = `translateY(${rbY.toFixed(1)}px)`;
+          clearTimeout(rbTimer);
+          rbTimer = setTimeout(() => {
+            rbY = 0;
+            el.style.transition = 'transform 0.36s var(--spring-ease)';
+            el.style.transform = 'translateY(0)';
+          }, 90);
+        }
+      }, { passive: true });
+    }
+    attachRubberScroll($('nodeList'));
+    attachRubberScroll($('clipList'));
+    attachRubberScroll($('shelfGrid'));
+
     let lastWheelAt = 0;
     leftPillBar.addEventListener('wheel', (e) => {
       if (state.openMode !== 'none') return;
       e.preventDefault();
       const now = performance.now();
+      const dir = e.deltaY > 0 ? 1 : -1;
+      triggerLeftRubber(dir * 5.5);
       if (now - lastWheelAt < 240) return;
       lastWheelAt = now;
 
       const modes = ['heatmap', 'clipboard', 'shelf', 'music'];
       const curMode = state.musicActive ? 'music' : state.leftTab;
-      const dir = e.deltaY > 0 ? 1 : -1;
       const next = modes[(modes.indexOf(curMode) + dir + modes.length) % modes.length];
       if (next === 'music') {
         state.musicActive = true;
@@ -2255,7 +2732,6 @@
       void targetPill.offsetWidth;
       targetPill.classList.add(dir > 0 ? 'pill-enter-down' : 'pill-enter-up');
     }, { passive: false });
-
 
     function openImportConfirm(nodeObj) {
       state.pendingImportNode = nodeObj;
@@ -2289,7 +2765,6 @@
     $('btnImportAddOnly').addEventListener('click', (e) => { e.stopPropagation(); commitImport(false); });
     $('btnImportAndSwitch').addEventListener('click', (e) => { e.stopPropagation(); commitImport(true); });
 
-    // Fullscreen Peeking Bar logic
     function syncPeekState(hoveringTop) {
       const anchor = $('islandAnchor');
       const strip = $('peekStrip');
@@ -2321,7 +2796,6 @@
     });
     $('peekStrip').addEventListener('mouseenter', () => syncPeekState(true));
 
-
     function shelfIconSvg(kind) {
       if (kind === 'folder') return '<svg class="w-4 h-4 text-sky-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>';
       if (kind === 'app') return '<svg class="w-4 h-4 text-indigo-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="3"/><path d="m9 8 6 4-6 4Z"/></svg>';
@@ -2341,8 +2815,9 @@
       sorted.forEach((item, idx) => {
         const card = document.createElement('div');
         card.draggable = true;
-        card.className = 'clip-item stagger-enter glass-tile p-2 flex items-center justify-between gap-2 cursor-grab active:cursor-grabbing';
-        card.style.setProperty('--clip-idx', String(idx));
+        const isBounceNew = state.lastNewShelfId === item.id;
+        card.className = `clip-item ${isBounceNew ? 'shelf-bounce-in' : 'stagger-enter'} glass-tile p-2 flex items-center justify-between gap-2 cursor-grab active:cursor-grabbing`;
+        if (!isBounceNew) card.style.setProperty('--clip-idx', String(idx));
         card.innerHTML = `
           <div class="flex items-center gap-2 min-w-0 flex-1">
             <span class="w-7 h-7 rounded-lg bg-white/8 border border-white/10 flex items-center justify-center shrink-0">${shelfIconSvg(item.kind)}</span>
@@ -2370,6 +2845,44 @@
           }
         });
 
+        // 0.5s Hover Preview Popover for .txt & config snippets in Workbench
+        let shelfPopTimer = null;
+        card.addEventListener('mouseenter', () => {
+          if (!item.content && item.kind !== 'txt') return;
+          clearTimeout(shelfPopTimer);
+          shelfPopTimer = setTimeout(() => {
+            if (state.openMode !== 'left' || state.leftTab !== 'shelf') return;
+            $('clipPopTag').textContent = `${item.name} · 只读预览`;
+            $('clipPopMeta').textContent = '拖出岛外可还原至桌面';
+            $('clipPopImg').classList.add('hidden');
+            $('clipPopBody').textContent = item.content || `# ${item.name}\n暂存备忘片段 (${item.sub})`;
+            $('clipPopBody').classList.remove('hidden');
+            $('clipPopover').classList.add('show');
+          }, 500);
+        });
+        card.addEventListener('mouseleave', () => {
+          clearTimeout(shelfPopTimer);
+          $('clipPopover').classList.remove('show');
+        });
+
+        // Drag-out Restore from Workbench back to Desktop
+        card.addEventListener('dragstart', (e) => {
+          clearTimeout(shelfPopTimer);
+          $('clipPopover').classList.remove('show');
+          e.dataTransfer.setData('text/plain', item.content || item.sub || item.name);
+          e.dataTransfer.setData('application/x-island-restore', item.id);
+        });
+        card.addEventListener('dragend', (e) => {
+          const rect = leftEl.getBoundingClientRect();
+          const outside = e.clientX < rect.left - 16 || e.clientX > rect.right + 16 || e.clientY > rect.bottom + 16;
+          if (outside && e.clientX > 0 && e.clientY > 0) {
+            state.shelf = state.shelf.filter((x) => x.id !== item.id);
+            renderShelf();
+            render();
+            showToast(`已从工作栏拖出还原：${item.name}`);
+          }
+        });
+
         card.querySelector('.shelf-pin').addEventListener('click', (e) => {
           e.stopPropagation();
           item.pinned = !item.pinned;
@@ -2386,6 +2899,17 @@
 
         grid.appendChild(card);
       });
+      state.lastNewShelfId = null;
+    }
+
+    function spawnDropVortex(clientX, clientY) {
+      const rect = leftEl.getBoundingClientRect();
+      const v = document.createElement('div');
+      v.className = 'drop-vortex';
+      v.style.left = `${Math.max(24, Math.min(rect.width - 24, clientX - rect.left))}px`;
+      v.style.top = `${Math.max(24, Math.min(rect.height - 24, clientY - rect.top))}px`;
+      leftEl.appendChild(v);
+      setTimeout(() => v.remove(), 500);
     }
 
     $('btnClearShelf').addEventListener('click', () => {
@@ -2395,7 +2919,6 @@
       showToast('已清理未固定的临时暂存项');
     });
 
-    // Demo draggable chips -> drag into #leftIsland
     document.querySelectorAll('.demo-drag-chip').forEach((chip) => {
       chip.addEventListener('dragstart', (e) => {
         e.dataTransfer.setData('application/x-island-item', JSON.stringify({
@@ -2406,7 +2929,6 @@
       });
     });
 
-    // Drag-to-Wake & Dropzone on #leftIsland (supports real OS files + demo items + text)
     let dragLeaveTimer = null;
     leftEl.addEventListener('dragover', (e) => {
       e.preventDefault();
@@ -2428,12 +2950,15 @@
       e.preventDefault();
       clearTimeout(dragLeaveTimer);
       leftEl.classList.remove('drop-active');
+      spawnDropVortex(e.clientX, e.clientY);
 
       const custom = e.dataTransfer.getData('application/x-island-item');
       if (custom) {
         try {
           const obj = JSON.parse(custom);
-          state.shelf.unshift({ id: 's_' + Date.now(), pinned: false, ...obj });
+          const newId = 's_' + Date.now();
+          state.lastNewShelfId = newId;
+          state.shelf.unshift({ id: newId, pinned: false, ...obj });
           renderShelf();
           render();
           showToast(`已暂存至工作栏：${obj.name}`);
@@ -2447,8 +2972,10 @@
           const ext = (f.name.split('.').pop() || '').toLowerCase();
           const kind = ext === 'desktop' ? 'app' : (ext === 'txt' || ext === 'md') ? 'txt' : (!f.type && f.size === 0) ? 'folder' : 'file';
           const kb = Math.max(1, Math.round(f.size / 1024));
+          const newId = 's_' + Date.now() + '_' + idx;
+          if (idx === 0) state.lastNewShelfId = newId;
           state.shelf.unshift({
-            id: 's_' + Date.now() + '_' + idx,
+            id: newId,
             kind,
             name: f.name,
             sub: kind === 'folder' ? '本地目录' : `${kb} KB`,
@@ -2463,11 +2990,14 @@
 
       const txt = e.dataTransfer.getData('text/plain');
       if (txt) {
+        const newId = 's_' + Date.now();
+        state.lastNewShelfId = newId;
         state.shelf.unshift({
-          id: 's_' + Date.now(),
+          id: newId,
           kind: 'txt',
           name: txt.slice(0, 18) + (txt.length > 18 ? '...' : ''),
           sub: `${txt.length} 字符 · 文本片段`,
+          content: txt,
           pinned: false
         });
         renderShelf();
@@ -2476,10 +3006,67 @@
       }
     });
 
+    // Global Keyboard Shortcuts (Toggle Open <-> Close on repeat press)
+    window.addEventListener('keydown', (e) => {
+      const isInputFocused = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
+
+      if (e.key === 'Escape' && state.openMode !== 'none') {
+        e.preventDefault();
+        if (isInputFocused) e.target.blur();
+        setOpenMode('none');
+        return;
+      }
+
+      if (e.altKey && e.code === 'Space') {
+        e.preventDefault();
+        if (isInputFocused) e.target.blur();
+        setOpenMode(state.openMode === 'none' ? 'left' : 'none');
+        return;
+      }
+
+      if (e.altKey && e.key.toLowerCase() === 'v') {
+        e.preventDefault();
+        if (state.openMode === 'left' && !state.musicActive && state.leftTab === 'clipboard') {
+          if (isInputFocused) e.target.blur();
+          setOpenMode('none');
+        } else {
+          state.musicActive = false;
+          setLeftTab('clipboard');
+          setOpenMode('left');
+          setTimeout(() => $('clipSearch')?.focus(), 120);
+        }
+        return;
+      }
+
+      if (e.altKey && e.key.toLowerCase() === 'w') {
+        e.preventDefault();
+        if (state.openMode === 'left' && !state.musicActive && state.leftTab === 'shelf') {
+          setOpenMode('none');
+        } else {
+          state.musicActive = false;
+          setLeftTab('shelf');
+          setOpenMode('left');
+        }
+        return;
+      }
+
+      if (e.altKey && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        if (state.openMode === 'proxy') {
+          setOpenMode('none');
+        } else {
+          setOpenMode('proxy');
+          $('btnPingAll').click();
+        }
+        return;
+      }
+    });
+
     initMatrixTrail();
     buildHeatmap();
     rebuildNodeList();
     renderClips(false);
+    renderShelf();
     renderIslands();
     render();
   </script>
