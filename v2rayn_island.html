@@ -1,0 +1,2487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>v2rayN Island — 活力图与辅助粘贴板全套流体动效</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --glass-bg: rgba(14, 18, 26, 0.82);
+      --glass-card: rgba(255, 255, 255, 0.055);
+      --glass-card-hover: rgba(255, 255, 255, 0.095);
+      --glass-border: rgba(255, 255, 255, 0.15);
+      --glass-highlight: rgba(255, 255, 255, 0.28);
+      --spring-ease: cubic-bezier(0.32, 1.18, 0.45, 1);
+      --smooth-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    * { box-sizing: border-box; user-select: none; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #070a10;
+      color: #f3f6fc;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    .win-desktop {
+      position: relative;
+      min-height: 100vh;
+      width: 100%;
+      background:
+        radial-gradient(1100px 620px at 50% -10%, rgba(56, 139, 253, 0.16), transparent 65%),
+        radial-gradient(700px 500px at 85% 75%, rgba(16, 185, 129, 0.10), transparent 60%),
+        radial-gradient(650px 450px at 15% 80%, rgba(99, 102, 241, 0.12), transparent 60%),
+        linear-gradient(180deg, #090d16 0%, #0d1320 55%, #070a10 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .island-anchor {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%) translateY(0);
+      z-index: 50;
+      width: 0;
+      height: 0;
+      transition: left 0.45s var(--smooth-ease), transform 0.38s var(--spring-ease);
+    }
+
+    /* Fullscreen Peeking Bar: tucks up leaving a 4px glowing top edge, slides down on top hover */
+    .island-anchor.peeking {
+      transform: translateX(-50%) translateY(-50px);
+    }
+
+    .peek-strip {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 148px;
+      height: 5px;
+      border-radius: 0 0 999px 999px;
+      background: linear-gradient(90deg, rgba(52, 211, 153, 0.55), rgba(56, 189, 248, 0.75), rgba(52, 211, 153, 0.55));
+      box-shadow: 0 2px 12px rgba(56, 189, 248, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 45;
+    }
+    .peek-strip.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Clipboard Long-Text Hover Popover */
+    .clip-popover {
+      position: fixed;
+      top: 274px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-6px) scale(0.96);
+      width: min(416px, calc(100vw - 24px));
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(14, 18, 26, 0.94);
+      backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.65);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.24s var(--spring-ease);
+      z-index: 55;
+    }
+    .clip-popover.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    /* Safe Import Confirmation Pill */
+    .import-confirm {
+      position: absolute;
+      top: 48px;
+      left: 0;
+      transform: translateX(-50%) translateY(-8px) scale(0.94);
+      width: min(390px, calc(100vw - 24px));
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(15, 20, 30, 0.94);
+      backdrop-filter: blur(30px) saturate(185%);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.68), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.34s var(--spring-ease);
+      z-index: 35;
+    }
+    .import-confirm.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    .island-anchor.dock-right { left: calc(100% - 236px); }
+
+    .morph-island {
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: 20px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(36px) saturate(190%);
+      -webkit-backdrop-filter: blur(36px) saturate(190%);
+      border: 1px solid var(--glass-border);
+      box-shadow:
+        0 20px 52px rgba(0, 0, 0, 0.62),
+        0 4px 14px rgba(0, 0, 0, 0.36),
+        inset 0 1px 0 var(--glass-highlight);
+      overflow: hidden;
+      will-change: width, height, border-radius, transform, opacity;
+      transition: border-color 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    .morph-island::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.12) 0%,
+        rgba(255, 255, 255, 0.02) 38%,
+        transparent 62%,
+        rgba(255, 255, 255, 0.04) 100%
+      );
+      pointer-events: none;
+    }
+
+    /* Cursor-following cold-white specular border refraction (Halo Specular Border) */
+    .morph-island::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: radial-gradient(
+        180px circle at var(--mx, -200px) var(--my, -200px),
+        rgba(255, 255, 255, 0.52),
+        rgba(255, 255, 255, 0.14) 38%,
+        transparent 68%
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      opacity: var(--halo-op, 0);
+      transition: opacity 0.25s ease;
+      pointer-events: none;
+      z-index: 40;
+    }
+
+    .grain-overlay {
+      position: absolute;
+      inset: 0;
+      opacity: 0.18;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    .left-pill-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    @keyframes pillSlideDown {
+      0% { opacity: 0; transform: translateY(12px) scale(0.96); filter: blur(4px); }
+      100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+    @keyframes pillSlideUp {
+      0% { opacity: 0; transform: translateY(-12px) scale(0.96); filter: blur(4px); }
+      100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+    .pill-enter-down { animation: pillSlideDown 0.28s var(--spring-ease) both; }
+    .pill-enter-up { animation: pillSlideUp 0.28s var(--spring-ease) both; }
+
+    .lyric-pill-viewport {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 6px, #000 calc(100% - 8px), transparent 100%);
+      mask-image: linear-gradient(90deg, transparent 0%, #000 6px, #000 calc(100% - 8px), transparent 100%);
+    }
+    .lyric-pill-track {
+      display: inline-block;
+      white-space: nowrap;
+      will-change: transform;
+    }
+    @keyframes pillLyricScroll {
+      0%, 16% { transform: translateX(0); }
+      72%, 86% { transform: translateX(var(--lyric-shift, 0px)); }
+      100% { transform: translateX(0); }
+    }
+    .lyric-pill-track.scrolling {
+      animation: pillLyricScroll var(--lyric-dur, 6s) ease-in-out infinite;
+    }
+    .lyric-pill-track.paused {
+      animation-play-state: paused;
+    }
+
+    @keyframes lyricSwapIn {
+      0% { opacity: 0; transform: translateX(18px); filter: blur(4px); }
+      100% { opacity: 1; transform: translateX(0); filter: blur(0); }
+    }
+    .lyric-swap-in {
+      animation: lyricSwapIn 0.34s var(--spring-ease) both;
+    }
+
+    @keyframes trackNextIn {
+      0% { opacity: 0; transform: translateX(16px) scale(0.92); filter: blur(5px); }
+      100% { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
+    }
+    @keyframes trackPrevIn {
+      0% { opacity: 0; transform: translateX(-16px) scale(0.92); filter: blur(5px); }
+      100% { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
+    }
+    .track-next-in { animation: trackNextIn 0.36s var(--spring-ease) both; }
+    .track-prev-in { animation: trackPrevIn 0.36s var(--spring-ease) both; }
+
+    .left-expanded-inner {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+    }
+
+    /* Shared Liquid-Glass Sliding Tab Indicator for 活力图 <-> 辅助粘贴板 */
+    .ltab-wrap {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 2px;
+      background: rgba(255, 255, 255, 0.055);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 10px;
+      width: 194px;
+    }
+    .ltab-indicator {
+      position: absolute;
+      top: 2px;
+      bottom: 2px;
+      left: 2px;
+      width: calc((100% - 4px) / 3);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      transition: transform 0.36s var(--spring-ease);
+      pointer-events: none;
+    }
+    .morph-island.drop-active {
+      border-color: rgba(56, 189, 248, 0.85) !important;
+      box-shadow: 0 20px 52px rgba(0, 0, 0, 0.65), 0 0 24px rgba(56, 189, 248, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+    }
+    .ltab-btn {
+      position: relative;
+      z-index: 1;
+      padding: 3px 0;
+      font-size: 11px;
+      font-weight: 500;
+      color: #94a3b8;
+      text-align: center;
+      transition: color 0.2s ease;
+    }
+    .ltab-btn.active {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* Directional Blur-Morph stage for Heatmap <-> Clipboard */
+    .ltab-stage {
+      position: relative;
+      width: 100%;
+      height: 158px;
+    }
+    .ltab-pane {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      transition:
+        opacity 0.26s ease,
+        transform 0.38s var(--smooth-ease),
+        filter 0.28s ease;
+      will-change: opacity, transform, filter;
+    }
+    .ltab-pane.pane-heatmap-active {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      filter: blur(0);
+      pointer-events: auto;
+    }
+    .ltab-pane.pane-heatmap-exit {
+      opacity: 0;
+      transform: translateX(-18px) scale(0.96);
+      filter: blur(6px);
+      pointer-events: none;
+    }
+    .ltab-pane.pane-clip-active {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      filter: blur(0);
+      pointer-events: auto;
+    }
+    .ltab-pane.pane-clip-exit {
+      opacity: 0;
+      transform: translateX(18px) scale(0.96);
+      filter: blur(6px);
+      pointer-events: none;
+    }
+
+    /* GitHub Activity Heatmap cells + column wave stagger */
+    .gh-grid {
+      display: grid;
+      grid-template-columns: repeat(22, minmax(0, 1fr));
+      gap: 3px;
+    }
+    .gh-col {
+      display: grid;
+      grid-template-rows: repeat(7, 11px);
+      gap: 3px;
+    }
+    .gh-cell {
+      width: 100%;
+      height: 11px;
+      border-radius: 2.5px;
+      transition: transform 0.18s var(--spring-ease), outline 0.15s ease, opacity 0.22s ease;
+    }
+    .gh-cell:hover {
+      transform: scale(1.26);
+      outline: 1px solid rgba(255, 255, 255, 0.55);
+    }
+
+    @keyframes ghWaveIn {
+      0% { opacity: 0; transform: scale(0.45); }
+      70% { opacity: 1; transform: scale(1.08); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .gh-grid.wave-animate .gh-col .gh-cell {
+      animation: ghWaveIn 0.34s var(--spring-ease) both;
+      animation-delay: calc(var(--col-idx, 0) * 12ms);
+    }
+
+    .gh-0 { background: rgba(255, 255, 255, 0.06); }
+    .gh-1 { background: #0e4429; }
+    .gh-2 { background: #006d32; }
+    .gh-3 { background: #26a641; }
+    .gh-4 { background: #39d353; }
+
+    /* Elastic tooltip transition on heatmap hover */
+    .gh-tip {
+      transition: transform 0.24s var(--spring-ease), color 0.18s ease;
+      transform-origin: left center;
+    }
+    .gh-tip.pop {
+      transform: translateX(3px) scale(1.03);
+      color: #a7f3d0;
+    }
+
+    /* Clipboard list item animations: stagger enter, new highlight, check pop */
+    @keyframes clipStaggerIn {
+      0% { opacity: 0; transform: translateY(10px) scale(0.97); filter: blur(4px); }
+      100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+    .clip-item {
+      transition: transform 0.34s var(--spring-ease), background 0.22s ease, border-color 0.22s ease;
+      will-change: transform;
+    }
+    .clip-item.stagger-enter {
+      animation: clipStaggerIn 0.32s var(--smooth-ease) both;
+      animation-delay: calc(var(--clip-idx, 0) * 22ms);
+    }
+
+    @keyframes clipNewGlow {
+      0% { opacity: 0; transform: translateY(-10px) scale(0.95); border-color: rgba(56, 189, 248, 0.7); box-shadow: 0 0 18px rgba(56, 189, 248, 0.32); }
+      45% { opacity: 1; transform: translateY(0) scale(1.01); border-color: rgba(52, 211, 153, 0.65); box-shadow: 0 0 14px rgba(52, 211, 153, 0.26); }
+      100% { opacity: 1; transform: translateY(0) scale(1); border-color: rgba(255, 255, 255, 0.08); box-shadow: none; }
+    }
+    .clip-item.new-glow {
+      animation: clipNewGlow 0.95s var(--smooth-ease) both;
+    }
+
+    @keyframes checkPop {
+      0% { transform: scale(0.82); }
+      60% { transform: scale(1.14); }
+      100% { transform: scale(1); }
+    }
+    .check-pop {
+      animation: checkPop 0.28s var(--spring-ease);
+    }
+
+    .island-inner {
+      width: 100%;
+      padding: 8px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .expandable-header {
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .header-extra {
+      position: absolute;
+      right: 14px;
+      top: 8px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      transform: translateX(6px) scale(0.92);
+      filter: blur(4px);
+      pointer-events: none;
+      transition: opacity 0.12s ease, transform 0.22s var(--smooth-ease), filter 0.16s ease;
+    }
+
+    #proxyIsland.expanded .header-extra {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      filter: blur(0);
+      pointer-events: auto;
+      transition: opacity 0.24s ease 0.08s, transform 0.36s var(--smooth-ease) 0.08s, filter 0.28s ease 0.08s;
+    }
+
+    .stagger-item {
+      opacity: 0;
+      transform: translateY(10px) scale(0.98);
+      filter: blur(6px);
+      pointer-events: none;
+      transition: opacity 0.12s ease, transform 0.16s ease, filter 0.12s ease;
+    }
+
+    #proxyIsland.expanded .stagger-item {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+      pointer-events: auto;
+      transition: opacity 0.28s ease, transform 0.44s var(--smooth-ease), filter 0.32s ease;
+    }
+
+    #proxyIsland.expanded .stagger-1 { transition-delay: 0.08s; }
+    #proxyIsland.expanded .stagger-2 { transition-delay: 0.13s; }
+    #proxyIsland.expanded .stagger-3 { transition-delay: 0.18s; }
+    #proxyIsland.expanded .stagger-4 { transition-delay: 0.23s; }
+    #proxyIsland.expanded .stagger-5 { transition-delay: 0.28s; }
+    #proxyIsland.expanded .stagger-6 { transition-delay: 0.33s; }
+
+    .hud-island {
+      position: absolute;
+      top: 48px;
+      left: 0;
+      transform: translateX(-50%) translateY(-8px) scale(0.92);
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(16, 20, 29, 0.90);
+      backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.38s var(--spring-ease);
+      z-index: 30;
+    }
+
+    .hud-island.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    .glass-tile {
+      background: var(--glass-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      transition: background 0.22s ease, border-color 0.22s ease, box-shadow 0.26s ease, transform 0.14s var(--smooth-ease);
+    }
+
+    .glass-tile:hover { background: var(--glass-card-hover); border-color: rgba(255, 255, 255, 0.16); }
+    .glass-tile:active { transform: scale(0.982); }
+
+    .glass-tile.active-blue {
+      background: rgba(56, 139, 253, 0.18);
+      border-color: rgba(96, 165, 250, 0.45);
+      box-shadow: inset 0 1px 0 rgba(191, 219, 254, 0.22), 0 0 18px rgba(56, 139, 253, 0.12);
+    }
+
+    .glass-tile.active-emerald {
+      background: rgba(16, 185, 129, 0.17);
+      border-color: rgba(52, 211, 153, 0.42);
+      box-shadow: inset 0 1px 0 rgba(167, 243, 208, 0.20), 0 0 18px rgba(16, 185, 129, 0.12);
+    }
+
+    .switch-track {
+      position: relative;
+      width: 38px;
+      height: 22px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.15);
+      transition: background 0.28s ease;
+      flex-shrink: 0;
+    }
+    .switch-track.on-blue { background: #38bdf8; }
+    .switch-track.on-emerald { background: #34d399; }
+    .switch-thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+      transition: transform 0.34s var(--spring-ease);
+    }
+    .switch-track.on-blue .switch-thumb,
+    .switch-track.on-emerald .switch-thumb { transform: translateX(16px); }
+
+    .seg-wrap {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 4px;
+      background: var(--glass-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+    }
+    .seg-indicator {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      left: 4px;
+      width: calc((100% - 8px) / 3);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: transform 0.38s var(--spring-ease);
+      pointer-events: none;
+    }
+    .seg-btn {
+      position: relative;
+      z-index: 1;
+      padding: 5px 0;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: #94a3b8;
+      transition: color 0.2s ease;
+    }
+    .seg-btn.active { color: #ffffff; font-weight: 600; }
+
+    .node-scroll::-webkit-scrollbar { width: 4px; }
+    .node-scroll::-webkit-scrollbar-track { background: transparent; }
+    .node-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.16); border-radius: 99px; }
+
+    .node-row {
+      width: 100%;
+      padding: 7px 11px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      text-align: left;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: background 0.22s ease, border-color 0.22s ease, transform 0.14s var(--smooth-ease);
+    }
+    .node-row:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.14); }
+    .node-row:active { transform: scale(0.982); }
+    .node-row.active {
+      background: rgba(56, 139, 253, 0.17);
+      border-color: rgba(96, 165, 250, 0.45);
+      box-shadow: inset 0 1px 0 rgba(191, 219, 254, 0.2);
+    }
+
+    @keyframes eqBar {
+      0%, 100% { transform: scaleY(0.35); }
+      50% { transform: scaleY(1); }
+    }
+    .eq-bar {
+      width: 2.5px;
+      height: 12px;
+      border-radius: 99px;
+      background: #34d399;
+      transform-origin: bottom;
+      animation: eqBar 0.8s ease-in-out infinite;
+    }
+    .eq-bar.paused { animation-play-state: paused; transform: scaleY(0.35); }
+
+    @keyframes pingPop {
+      0% { transform: scale(0.78); opacity: 0.4; }
+      65% { transform: scale(1.08); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .ping-pop { animation: pingPop 0.32s var(--spring-ease); }
+
+    @keyframes pulseDot {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55); }
+      50% { box-shadow: 0 0 0 5px rgba(52, 211, 153, 0); }
+    }
+    .dot-pulse { animation: pulseDot 2.2s infinite; }
+
+    @keyframes faultPulse {
+      0%, 100% {
+        border-color: rgba(244, 63, 94, 0.55);
+        box-shadow: 0 20px 52px rgba(0, 0, 0, 0.62), 0 0 0 0 rgba(244, 63, 94, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      }
+      50% {
+        border-color: rgba(244, 63, 94, 0.92);
+        box-shadow: 0 20px 52px rgba(0, 0, 0, 0.62), 0 0 18px 2px rgba(244, 63, 94, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      }
+    }
+    #proxyIsland.fault-pulse {
+      animation: faultPulse 1.8s ease-in-out infinite;
+    }
+
+    .win-taskbar {
+      height: 46px;
+      background: rgba(14, 18, 26, 0.72);
+      backdrop-filter: blur(24px) saturate(160%);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+<body>
+  <div class="win-desktop">
+    <div id="islandAnchor" class="island-anchor">
+      <!-- Left Island: Time + Heatmap / Auxiliary Clipboard OR Music -->
+      <div id="leftIsland" class="morph-island" role="region" aria-label="时间与音乐灵动岛">
+        <div class="grain-overlay"></div>
+
+        <!-- Collapsed Left Pill (222x40) -->
+        <div id="leftPillBar" class="left-pill-bar">
+          <div id="timePillContent" class="flex items-center justify-between w-full gap-2">
+            <span class="flex items-center gap-2 min-w-0">
+              <span id="pillTimeClock" class="mono text-xs font-semibold text-white">08:03</span>
+              <span id="pillTimeDate" class="text-[11px] text-slate-400 truncate">11/17 周二</span>
+            </span>
+            <span class="flex items-center gap-1.5 shrink-0">
+              <span id="btnQuickClip" role="button" tabindex="0" title="打开辅助粘贴板" class="w-6 h-5 rounded-md bg-white/8 hover:bg-white/16 text-slate-300 hover:text-white flex items-center justify-center transition"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg></span>
+              <span class="flex items-center gap-0.5" title="今日活跃度">
+                <span class="w-1.5 h-1.5 rounded-[2px] gh-1"></span>
+                <span class="w-1.5 h-1.5 rounded-[2px] gh-2"></span>
+                <span class="w-1.5 h-1.5 rounded-[2px] gh-3"></span>
+                <span class="w-1.5 h-1.5 rounded-[2px] gh-4"></span>
+              </span>
+            </span>
+          </div>
+
+          <div id="shelfPillContent" class="hidden items-center justify-between w-full gap-2">
+            <span class="flex items-center gap-2 min-w-0">
+              <span class="w-5 h-5 rounded-md bg-indigo-500/25 border border-indigo-400/35 flex items-center justify-center text-indigo-200 shrink-0"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
+              <span class="text-xs font-semibold text-slate-100 truncate">工作栏</span>
+            </span>
+            <span id="shelfPillCount" class="mono text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 text-slate-300 shrink-0">4 项</span>
+          </div>
+
+          <div id="clipPillContent" class="hidden items-center justify-between w-full gap-2">
+            <span class="flex items-center gap-2 min-w-0">
+              <span class="w-5 h-5 rounded-md bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-200 shrink-0"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg></span>
+              <span class="text-xs font-semibold text-slate-100 truncate">辅助粘贴板</span>
+            </span>
+            <span id="clipPillCount" class="mono text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 text-slate-300 shrink-0">3 条</span>
+          </div>
+
+          <div id="musicPillContent" class="hidden items-center justify-between w-full gap-2">
+            <span id="pillAlbumDot" class="w-5 h-5 rounded-md bg-gradient-to-br from-rose-500/60 to-amber-600/60 border border-white/20 flex items-center justify-center text-white shrink-0"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
+            <div id="pillLyricViewport" class="lyric-pill-viewport">
+              <span id="pillTrack" class="lyric-pill-track text-xs font-medium text-slate-100">最闪亮的星，照亮你的眼睛</span>
+            </div>
+            <span class="flex items-end gap-0.5 h-3 shrink-0">
+              <span class="eq-bar" style="animation-delay:0s"></span>
+              <span class="eq-bar" style="animation-delay:0.22s"></span>
+              <span class="eq-bar" style="animation-delay:0.42s"></span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Expanded Left Content -->
+        <div id="leftExpandedInner" class="left-expanded-inner">
+          <div id="timeCardContent" class="p-3.5 flex flex-col gap-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-baseline gap-2 min-w-0">
+                <div id="expandedClock" class="mono text-xl font-bold text-white tracking-tight leading-none">08:03:29</div>
+                <div id="expandedDate" class="text-[11px] text-slate-400 truncate">11月17日 · 周二</div>
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <!-- Shared Liquid-Glass Sliding Tab Switcher -->
+                <div class="ltab-wrap">
+                  <div id="ltabIndicator" class="ltab-indicator"></div>
+                  <button type="button" data-ltab="heatmap" class="ltab-btn active">活力图</button>
+                  <button type="button" data-ltab="clipboard" class="ltab-btn">粘贴板</button>
+                  <button type="button" data-ltab="shelf" class="ltab-btn">工作栏</button>
+                </div>
+                <button id="btnCloseTime" type="button" title="收起" class="w-6 h-6 rounded-lg bg-white/8 hover:bg-white/15 border border-white/10 text-slate-300 flex items-center justify-center transition"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></button>
+              </div>
+            </div>
+
+            <!-- Directional Blur-Morph Tab Stage -->
+            <div class="ltab-stage">
+              <!-- Pane 1: GitHub Heatmap with Matrix Trail & Column Wave -->
+              <div id="ghTile" class="ltab-pane pane-heatmap-active glass-tile p-2.5 flex flex-col gap-2 overflow-hidden">
+                <canvas id="matrixTrailCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+                <div id="ghGrid" class="gh-grid relative z-10"></div>
+                <div class="flex items-center justify-between text-[10px] text-slate-400 relative z-10">
+                  <span id="ghHoverTip" class="gh-tip mono truncate">近22周 · 418 次活跃</span>
+                  <span class="flex items-center gap-1 shrink-0">
+                    <span>少</span>
+                    <span class="w-2 h-2 rounded-[2px] gh-0 inline-block"></span>
+                    <span class="w-2 h-2 rounded-[2px] gh-1 inline-block"></span>
+                    <span class="w-2 h-2 rounded-[2px] gh-2 inline-block"></span>
+                    <span class="w-2 h-2 rounded-[2px] gh-3 inline-block"></span>
+                    <span class="w-2 h-2 rounded-[2px] gh-4 inline-block"></span>
+                    <span>多</span>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Pane 2: Auxiliary Clipboard with FLIP + Stagger + Checkmark -->
+              <div id="clipPanel" class="ltab-pane pane-clip-exit flex flex-col gap-2">
+                <div class="flex items-center gap-1.5">
+                  <input id="clipSearch" type="text" placeholder="搜索剪贴板历史..." class="flex-1 bg-white/6 border border-white/10 rounded-xl px-2.5 py-1 text-xs text-slate-100 placeholder-slate-400 outline-none focus:border-sky-400/50" />
+                  <button id="btnClearClips" type="button" class="px-2 py-1 rounded-xl bg-white/6 hover:bg-rose-500/20 border border-white/10 text-[11px] text-slate-300 hover:text-rose-200 transition">清空</button>
+                </div>
+                <div id="clipList" class="node-scroll h-[152px] overflow-y-auto pr-1 flex flex-col gap-1.5"></div>
+              </div>
+
+              <!-- Pane 3: Workbench / Stash Shelf (Dropzone for files, folders, shortcuts, txt) -->
+              <div id="shelfPanel" class="ltab-pane pane-clip-exit flex flex-col gap-2">
+                <div class="flex items-center justify-between gap-2 text-[11px]">
+                  <span class="text-slate-400 truncate">拖入文件 / 文件夹 / 快捷方式 / .txt 至此</span>
+                  <button id="btnClearShelf" type="button" class="px-2 py-0.5 rounded-lg bg-white/6 hover:bg-rose-500/20 border border-white/10 text-slate-300 hover:text-rose-200 shrink-0 transition">清理临时</button>
+                </div>
+                <div id="shelfGrid" class="node-scroll h-[154px] overflow-y-auto pr-1 grid grid-cols-2 gap-1.5 content-start"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Expanded Music Card -->
+          <div id="musicCardContent" class="hidden p-4 items-center gap-4 h-[146px]">
+            <div id="albumArt" class="w-24 h-24 rounded-2xl bg-gradient-to-br from-rose-500/45 via-red-700/35 to-stone-900 border border-white/15 shadow-lg flex items-center justify-center shrink-0 relative overflow-hidden transition-all duration-300">
+              <span class="text-xs font-bold tracking-widest text-white/90 uppercase">OCEAN</span>
+            </div>
+
+            <div class="flex-1 min-w-0 flex flex-col justify-between gap-2">
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <div id="trackTitle" class="text-[15px] font-semibold text-white truncate leading-tight">你的爱情</div>
+                  <div id="trackArtist" class="text-xs text-slate-400 truncate mt-0.5">逃跑计划</div>
+                </div>
+                <button id="btnCloseMusic" type="button" title="点击回缩" class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-200 text-[10px] font-medium shrink-0 hover:bg-emerald-500/30 transition">
+                  SPlayer-Next
+                </button>
+              </div>
+
+              <div id="lyricLine" class="text-[11px] text-emerald-200/85 truncate italic">♪ 最闪亮的星，照亮你的眼睛 ♪</div>
+
+              <div class="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+                <div id="musicProgress" class="h-full rounded-full bg-emerald-400 transition-all duration-300" style="width: 42%"></div>
+              </div>
+
+              <div class="flex items-center justify-between px-1">
+                <button id="btnShuffle" type="button" class="music-ctrl-btn w-7 h-7 rounded-lg hover:scale-110 active:scale-95 flex items-center justify-center transition" title="随机播放"><svg class="w-5 h-5" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_shuf" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#93c5fd"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.16)"/><path d="M8 21h4.2c1.2 0 2.3-.6 3-1.6l3.6-5.2c.7-1 1.8-1.6 3-1.6H24m0 0-2.5-2.5M24 12.6l-2.5 2.5" stroke="url(#fl_shuf)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 11h4.2c1.2 0 2.3.6 3 1.6l.8 1.2m3 4.3.8 1.1c.7 1 1.8 1.6 3 1.6H24m0 0-2.5-2.5M24 20.8l-2.5 2.5" stroke="url(#fl_shuf)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/></svg></button>
+                <button id="btnPrevTrack" type="button" class="music-ctrl-btn w-7 h-7 rounded-lg hover:scale-110 active:scale-95 flex items-center justify-center transition" title="上一首"><svg class="w-5 h-5" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_prev" x1="6" y1="6" x2="26" y2="26" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#f8fafc"/><stop offset="100%" stop-color="#94a3b8"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="8" fill="rgba(255,255,255,0.09)" stroke="rgba(255,255,255,0.18)"/><rect x="8.5" y="9" width="3" height="14" rx="1.5" fill="url(#fl_prev)"/><path d="M22.5 10.2c0-1.1-1.2-1.7-2.1-1.1l-7.2 5.3c-.7.5-.7 1.6 0 2.2l7.2 5.3c.9.6 2.1 0 2.1-1.1V10.2z" fill="url(#fl_prev)"/></svg></button>
+                <button id="btnPlayPause" type="button" class="music-ctrl-btn w-9 h-9 rounded-xl hover:scale-105 active:scale-95 flex items-center justify-center shadow-lg transition" title="播放 / 暂停"><svg class="w-6 h-6" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_bg" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#0284c7"/></linearGradient><linearGradient id="fl_hi" x1="16" y1="2" x2="16" y2="16" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="rgba(255,255,255,0.45)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="9" fill="url(#fl_bg)"/><rect x="2.5" y="2.5" width="27" height="27" rx="8.5" stroke="url(#fl_hi)"/><rect x="10.5" y="9" width="4" height="14" rx="2" fill="#ffffff"/><rect x="17.5" y="9" width="4" height="14" rx="2" fill="#ffffff"/></svg></button>
+                <button id="btnNextTrack" type="button" class="music-ctrl-btn w-7 h-7 rounded-lg hover:scale-110 active:scale-95 flex items-center justify-center transition" title="下一首"><svg class="w-5 h-5" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_next" x1="6" y1="6" x2="26" y2="26" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#f8fafc"/><stop offset="100%" stop-color="#94a3b8"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="8" fill="rgba(255,255,255,0.09)" stroke="rgba(255,255,255,0.18)"/><rect x="20.5" y="9" width="3" height="14" rx="1.5" fill="url(#fl_next)"/><path d="M9.5 10.2c0-1.1 1.2-1.7 2.1-1.1l7.2 5.3c.7.5.7 1.6 0 2.2l-7.2 5.3c-.9.6-2.1 0-2.1-1.1V10.2z" fill="url(#fl_next)"/></svg></button>
+                <button id="btnRepeat" type="button" class="music-ctrl-btn w-7 h-7 rounded-lg hover:scale-110 active:scale-95 flex items-center justify-center transition" title="循环模式"><svg class="w-5 h-5" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_rep" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#6ee7b7"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.16)"/><path d="M21 8.5l2.8 2.7L21 13.9M8.5 15.5v-1.3a3 3 0 0 1 3-3h12.2" stroke="url(#fl_rep)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 23.5l-2.8-2.7L11 18.1M23.5 16.5v1.3a3 3 0 0 1-3 3H8.3" stroke="url(#fl_rep)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Island: Proxy -->
+      <div id="proxyIsland" class="morph-island" role="region" aria-label="v2rayN 灵动岛">
+        <div class="island-inner">
+          <div id="expandableHeader" class="expandable-header">
+            <div class="flex items-center justify-between gap-2 w-full min-w-0 pr-0 transition-all" id="proxyHeaderLeft">
+              <span class="flex items-center gap-2 min-w-0">
+                <span id="capsuleDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 dot-pulse shrink-0"></span>
+                <span id="capsuleNode" class="text-xs font-semibold tracking-tight text-slate-100 truncate">HK-01</span>
+              </span>
+              <span class="flex items-center gap-1.5 shrink-0">
+                <span id="capsulePing" class="mono text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/20">38ms</span>
+                <span id="capsuleDownWrap" class="mono text-[10px] text-sky-300">↓<span id="capsuleDown">1.8M</span></span>
+              </span>
+            </div>
+
+            <div class="header-extra shrink-0">
+              <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-white/10 text-slate-300 mono">:10808</span>
+              <button id="btnPingAll" type="button" title="批量真连接测速" class="px-2 py-1 rounded-lg text-[11px] font-medium bg-white/8 hover:bg-white/15 border border-white/10 text-slate-200 transition flex items-center gap-1">
+                <svg id="pingSpinner" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                  <polyline points="21 3 21 9 15 9" />
+                </svg>
+                <span>测速</span>
+              </button>
+              <button id="btnCollapse" type="button" title="收起灵动岛" class="w-6 h-6 rounded-lg bg-white/8 hover:bg-white/15 border border-white/10 text-slate-300 flex items-center justify-center transition">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <polyline points="18 15 12 9 6 15" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="stagger-item stagger-1 flex flex-col gap-2">
+            <div class="grid grid-cols-3 gap-1.5">
+              <button type="button" data-scene="dev" class="scene-btn glass-tile py-1.5 px-2 text-[11px] font-medium text-sky-200 border-sky-400/35 bg-sky-500/15 flex items-center justify-center gap-1"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span>开发分流</span></button>
+              <button type="button" data-scene="game" class="scene-btn glass-tile py-1.5 px-2 text-[11px] font-medium text-slate-300 flex items-center justify-center gap-1"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><rect width="20" height="12" x="2" y="6" rx="2"/></svg><span>游戏 TUN</span></button>
+              <button type="button" data-scene="ai" class="scene-btn glass-tile py-1.5 px-2 text-[11px] font-medium text-slate-300 flex items-center justify-center gap-1"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>AI 全球</span></button>
+            </div>
+            <div class="glass-tile px-3 py-1.5 flex items-center justify-between text-[11px]">
+              <span id="exitIpText" class="mono text-slate-300 truncate">103.42.18.xx · 香港</span>
+              <span id="aiUnlockBadges" class="flex items-center gap-1.5 shrink-0 mono text-[10px]">
+                <span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-400/20">Gemini ✓</span>
+                <span class="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-400/20">GPT ✕</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="stagger-item stagger-2 grid grid-cols-2 gap-2.5">
+            <button id="btnSysProxy" type="button" class="glass-tile active-blue p-2.5 text-left flex items-center justify-between">
+              <div>
+                <div class="text-xs font-semibold text-white">系统代理</div>
+                <div id="sysProxySub" class="text-[11px] text-sky-200/80 mt-0.5 mono">127.0.0.1:10809</div>
+              </div>
+              <span id="sysProxyTrack" class="switch-track on-blue">
+                <span class="switch-thumb"></span>
+              </span>
+            </button>
+
+            <button id="btnTunMode" type="button" class="glass-tile p-2.5 text-left flex items-center justify-between">
+              <div>
+                <div class="text-xs font-semibold text-white">TUN 模式</div>
+                <div id="tunSub" class="text-[11px] text-slate-400 mt-0.5">sing-box 虚拟网卡</div>
+              </div>
+              <span id="tunTrack" class="switch-track">
+                <span class="switch-thumb"></span>
+              </span>
+            </button>
+          </div>
+
+          <div class="stagger-item stagger-3 seg-wrap">
+            <div id="segIndicator" class="seg-indicator"></div>
+            <button type="button" data-mode="rule" class="seg-btn active">规则绕过 (Rule)</button>
+            <button type="button" data-mode="global" class="seg-btn">全局 (Global)</button>
+            <button type="button" data-mode="direct" class="seg-btn">直连 (Direct)</button>
+          </div>
+
+          <div class="stagger-item stagger-4 flex flex-col gap-1.5">
+            <div class="flex items-center justify-between px-0.5">
+              <span class="text-[11px] font-medium text-slate-400">快捷节点切换</span>
+              <span id="activeNodeMeta" class="text-[11px] mono text-slate-400">VLESS · Reality</span>
+            </div>
+            <div id="nodeList" class="node-scroll max-h-36 overflow-y-auto pr-1 flex flex-col gap-1.5"></div>
+          </div>
+
+          <div class="stagger-item stagger-5 glass-tile px-3 py-1.5 flex items-center justify-between gap-3">
+            <div class="flex flex-col gap-0.5 shrink-0">
+              <div class="text-[10px] text-slate-400">实时吞吐</div>
+              <div class="flex items-center gap-2.5 mono text-xs">
+                <span class="text-sky-300 font-medium">↓ <span id="panelDown">1.84 MB/s</span></span>
+                <span class="text-emerald-300 font-medium">↑ <span id="panelUp">240 KB/s</span></span>
+              </div>
+            </div>
+            <svg id="trafficChart" class="w-44 h-8 shrink-0" viewBox="0 0 160 36" preserveAspectRatio="none"></svg>
+          </div>
+
+          <div class="stagger-item stagger-6 grid grid-cols-3 gap-2">
+            <button id="btnCopyPs" type="button" class="glass-tile py-1.5 px-2 text-[11px] font-medium text-slate-200 hover:text-white flex items-center justify-center gap-1">
+              <span>复制 PS 代理</span>
+            </button>
+            <button id="btnCopyBash" type="button" class="glass-tile py-1.5 px-2 text-[11px] font-medium text-slate-200 hover:text-white flex items-center justify-center gap-1">
+              <span>复制 Bash 代理</span>
+            </button>
+            <button id="btnOpenMain" type="button" class="glass-tile py-1.5 px-2 text-[11px] font-medium text-sky-300 hover:text-sky-200 flex items-center justify-center gap-1">
+              <span>唤起 v2rayN</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Safe Import Confirmation Card -->
+      <div id="importConfirm" class="import-confirm flex flex-col gap-2">
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-xs font-semibold text-white">确认导入节点</span>
+          <span id="importProtoBadge" class="mono text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-200 border border-sky-400/30">VLESS · Reality</span>
+        </div>
+        <div id="importNodePreview" class="mono text-[11px] text-slate-300 bg-black/35 rounded-lg px-2.5 py-1.5 truncate">KR-01 · 首尔新导入 (211.45.12.xx:443)</div>
+        <div class="flex items-center justify-end gap-1.5">
+          <button id="btnImportCancel" type="button" class="px-2.5 py-1 rounded-lg bg-white/8 hover:bg-white/15 text-[11px] text-slate-300 transition">取消</button>
+          <button id="btnImportAddOnly" type="button" class="px-2.5 py-1 rounded-lg bg-white/12 hover:bg-white/20 text-[11px] text-white transition">仅添加</button>
+          <button id="btnImportAndSwitch" type="button" class="px-2.5 py-1 rounded-lg bg-sky-500/30 hover:bg-sky-500/45 border border-sky-400/45 text-[11px] font-semibold text-white transition">导入并切换</button>
+        </div>
+      </div>
+
+      <!-- Transient HUD / Sniffer / Alert Pill -->
+      <div id="hudIsland" class="hud-island">
+        <span id="hudIcon" class="flex items-center justify-center text-sky-300"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg></span>
+        <span id="hudText" class="text-xs font-medium text-slate-100">检测到 vless:// 节点链接</span>
+        <button id="hudActionBtn" type="button" class="px-2 py-0.5 rounded-full bg-sky-500/25 border border-sky-400/40 text-sky-200 text-[11px] font-medium hover:bg-sky-500/35 transition">一键导入</button>
+      </div>
+    </div>
+
+    <!-- Center Demo Controls -->
+    <main class="flex-1 flex items-center justify-center px-4 pt-24 pb-10">
+      <div id="demoCard" class="max-w-xl w-full glass-tile p-6 text-center backdrop-blur-xl bg-slate-900/45 border-white/10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/8 border border-white/10 text-xs text-slate-300 mb-3">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>活力图波浪入场 · 共享标签滑块 · 粘贴板 FLIP 重排</span>
+        </div>
+        <h1 class="text-lg font-semibold text-white tracking-tight">已升级左侧岛屿「活力图 ↔ 辅助粘贴板」全套过渡动画</h1>
+        <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+          切换标签时共享液态玻璃滑块弹簧滑移，内容区做方向性 Blur-Morph 交叉切换并同步弹簧平滑过渡高度；活力图按列波浪入场，粘贴板支持 FLIP 置顶重排、新条目高光呼吸与复制/导入对勾反馈。
+        </p>
+
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
+          <button id="btnToggleMusicSim" type="button" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-emerald-500/25 hover:bg-emerald-500/35 border border-emerald-400/40 text-emerald-100 transition">
+            模拟音乐：<span id="musicSimLabel">关</span>
+          </button>
+          <button id="btnToggleExpandDemo" type="button" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-sky-500/25 hover:bg-sky-500/35 border border-sky-400/40 text-sky-100 transition">
+            展开 / 收起代理岛
+          </button>
+          <button id="btnSimSniff" type="button" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-white/8 hover:bg-white/15 border border-white/10 text-slate-200 transition">
+            模拟复制 vless:// 链接
+          </button>
+          <button id="btnSimTimeout" type="button" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-rose-500/20 hover:bg-rose-500/30 border border-rose-400/35 text-rose-200 transition">
+            模拟节点超时告警
+          </button>
+          <button id="btnSimClipPush" type="button" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-white/8 hover:bg-white/15 border border-white/10 text-slate-200 transition">
+            模拟写入剪贴板历史
+          </button>
+          <button id="btnTogglePeek" type="button" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-white/8 hover:bg-white/15 border border-white/10 text-slate-200 transition">
+            全屏贴边隐藏：<span id="peekLabel">关</span>
+          </button>
+        </div>
+
+        <!-- Draggable Test Items for Workbench Shelf -->
+        <div class="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center justify-center gap-2 text-[11px]">
+          <span class="text-slate-400">按住拖入顶部左岛：</span>
+          <div draggable="true" data-drag-kind="folder" data-drag-name="Projects" data-drag-sub="~/Projects" class="demo-drag-chip cursor-grab active:cursor-grabbing px-2.5 py-1 rounded-lg bg-sky-500/15 border border-sky-400/30 text-sky-200 flex items-center gap-1.5">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span>Projects 文件夹</span>
+          </div>
+          <div draggable="true" data-drag-kind="app" data-drag-name="Cursor.desktop" data-drag-sub="/usr/share/applications" class="demo-drag-chip cursor-grab active:cursor-grabbing px-2.5 py-1 rounded-lg bg-indigo-500/15 border border-indigo-400/30 text-indigo-200 flex items-center gap-1.5">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="3"/><path d="m9 8 6 4-6 4Z"/></svg>
+            <span>Cursor 快捷方式</span>
+          </div>
+          <div draggable="true" data-drag-kind="txt" data-drag-name="todo.txt" data-drag-sub="1.2 KB · 备忘录" class="demo-drag-chip cursor-grab active:cursor-grabbing px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-400/30 text-emerald-200 flex items-center gap-1.5">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>todo.txt</span>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-white/10 flex flex-wrap items-center justify-center gap-2 text-[11px]">
+          <span class="text-slate-400">弹簧曲线：</span>
+          <button type="button" data-spring="apple" class="spring-btn px-2.5 py-1 rounded-lg bg-white/16 text-white font-medium">Cult 柔弹</button>
+          <button type="button" data-spring="liquid" class="spring-btn px-2.5 py-1 rounded-lg bg-white/6 text-slate-400 hover:text-slate-200">液态丝滑</button>
+          <button type="button" data-spring="snappy" class="spring-btn px-2.5 py-1 rounded-lg bg-white/6 text-slate-400 hover:text-slate-200">极速干脆</button>
+          <button id="btnToggleDock" type="button" class="px-2.5 py-1 rounded-lg bg-white/6 text-slate-300 hover:text-white ml-2">切换位置：居中 / 右上角</button>
+        </div>
+      </div>
+    </main>
+
+    <footer class="win-taskbar px-4 flex items-center justify-between text-xs text-slate-300">
+      <div class="flex items-center gap-2 opacity-75">
+        <span class="w-4 h-4 rounded bg-sky-500/30 border border-sky-400/40 inline-block"></span>
+        <span class="text-[11px]">Windows 11 Desktop</span>
+      </div>
+      <div class="flex items-center gap-3 mono text-[11px]">
+        <span id="trayStatus" class="flex items-center gap-1.5 text-emerald-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          v2rayN 已就绪
+        </span>
+        <span id="clockText" class="text-slate-400">08:03</span>
+      </div>
+    </footer>
+
+    <div id="peekStrip" class="peek-strip" title="鼠标移至顶部唤出灵动岛"></div>
+    <div id="clipPopover" class="clip-popover">
+      <div class="flex items-center justify-between mb-1.5">
+        <span id="clipPopTag" class="mono text-[10px] text-sky-300">完整内容预览</span>
+        <span id="clipPopMeta" class="mono text-[10px] text-slate-400">点击条目即可复制</span>
+      </div>
+      <pre id="clipPopBody" class="mono text-[11px] text-slate-100 whitespace-pre-wrap break-all m-0 max-h-28 overflow-y-auto"></pre>
+      <img id="clipPopImg" alt="剪贴板图片预览" class="hidden w-full max-h-44 object-contain rounded-xl border border-white/12 bg-black/40" />
+    </div>
+    <div id="toast" class="fixed bottom-14 left-1/2 -translate-x-1/2 px-3.5 py-2 rounded-xl bg-slate-900/90 border border-white/15 text-xs text-slate-100 shadow-2xl opacity-0 pointer-events-none transition-all duration-200 z-50"></div>
+  </div>
+
+  <script>
+    const SPRING_PRESETS = {
+      apple: { stiffness: 215, damping: 21 },
+      liquid: { stiffness: 150, damping: 18 },
+      snappy: { stiffness: 320, damping: 28 }
+    };
+
+    const TRACKS = [
+      {
+        title: '你的爱情',
+        artist: '逃跑计划',
+        badge: 'OCEAN',
+        artClass: 'from-rose-500/45 via-red-700/35 to-stone-900',
+        dotClass: 'from-rose-500/60 to-amber-600/60',
+        glowColor: 'rgba(244, 63, 94, 0.35)',
+        lyrics: ['♪ 最闪亮的星，照亮你的眼睛 ♪', '♪ 我愿为你付出所有的温柔 ♪', '♪ 穿过人海拥抱你的身影 ♪']
+      },
+      {
+        title: 'Midnight City',
+        artist: "M83 · Hurry Up, We're Dreaming",
+        badge: 'M83',
+        artClass: 'from-indigo-500/50 via-sky-600/35 to-slate-900',
+        dotClass: 'from-indigo-500/60 to-sky-500/60',
+        glowColor: 'rgba(99, 102, 241, 0.38)',
+        lyrics: ['♪ Waiting in a car, waiting for a ride in the dark ♪', '♪ The city is my church, it wraps me in its blinding twilight ♪']
+      },
+      {
+        title: 'Resonance',
+        artist: 'HOME · Odyssey',
+        badge: 'HOME',
+        artClass: 'from-emerald-500/45 via-teal-600/35 to-slate-900',
+        dotClass: 'from-emerald-500/60 to-teal-500/60',
+        glowColor: 'rgba(16, 185, 129, 0.36)',
+        lyrics: ['♪ [纯音乐 · Synthwave 氛围共鸣中] ♪']
+      }
+    ];
+
+    const state = {
+      openMode: 'none', // 'none' | 'proxy' | 'left'
+      leftTab: 'heatmap', // 'heatmap' | 'clipboard' | 'shelf'
+      shelf: [
+        { id: 's1', kind: 'folder', name: 'Island-proxy', sub: '~/Projects/Island-proxy', pinned: true },
+        { id: 's2', kind: 'app', name: 'v2rayN.desktop', sub: '应用快捷方式', pinned: true },
+        { id: 's3', kind: 'txt', name: 'clash_rules.txt', sub: '4.6 KB · 规则草稿', pinned: false, content: 'DOMAIN-SUFFIX,github.com,PROXY\nDOMAIN-SUFFIX,anthropic.com,PROXY' },
+        { id: 's4', kind: 'file', name: 'config.yaml', sub: '18 KB · 配置文件', pinned: false }
+      ],
+      clipQuery: '',
+      lastNewClipId: null,
+      clipStaggerPending: false,
+      clips: [
+        { id: 'c1', type: 'node', tag: 'vless://', pinned: true, time: '刚刚', text: 'vless://a9c4e2-reality@jp-02.example.com:443#JP-02' },
+        { id: 'c_img1', type: 'image', tag: '图片', pinned: false, time: '1分钟前', text: '桌面截图 1920×1080 · 428 KB', meta: '1920×1080 · PNG · 428 KB', imgSrc: "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 270'%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%230f172a'/%3E%3Cstop offset='100%25' stop-color='%231e293b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='480' height='270' fill='url(%23g1)'/%3E%3Crect x='24' y='24' width='432' height='222' rx='14' fill='%230b1120' stroke='%2338bdf8' stroke-opacity='0.35'/%3E%3Ccircle cx='52' cy='48' r='6' fill='%23f43f5e'/%3E%3Ccircle cx='72' cy='48' r='6' fill='%23fbbf24'/%3E%3Ccircle cx='92' cy='48' r='6' fill='%2334d399'/%3E%3Crect x='48' y='78' width='180' height='14' rx='4' fill='%2338bdf8' fill-opacity='0.45'/%3E%3Crect x='48' y='106' width='320' height='10' rx='4' fill='%2394a3b8' fill-opacity='0.3'/%3E%3Crect x='48' y='128' width='260' height='10' rx='4' fill='%2394a3b8' fill-opacity='0.25'/%3E%3Crect x='48' y='162' width='384' height='60' rx='10' fill='%2310b981' fill-opacity='0.15' stroke='%2334d399' stroke-opacity='0.4'/%3E%3Ctext x='240' y='198' fill='%23a7f3d0' font-family='monospace' font-size='15' text-anchor='middle'%3E1920 x 1080 Screen Capture%3C/text%3E%3C/svg%3E" },
+        { id: 'c2', type: 'code', tag: 'PS', pinned: false, time: '2分钟前', text: '$env:HTTP_PROXY="http://127.0.0.1:10809"' },
+        { id: 'c3', type: 'text', tag: '文本', pinned: false, time: '10分钟前', text: 'D:/Projects/Island-proxy' }
+      ],
+      musicActive: false,
+      musicPlaying: true,
+      trackIdx: 0,
+      lyricIdx: 0,
+      musicPct: 42,
+      dockRight: false,
+      peekingMode: false,
+      pendingImportNode: null,
+      springPreset: 'apple',
+      scene: 'dev',
+      sysProxy: true,
+      tunMode: false,
+      routingMode: 'rule',
+      activeNodeId: 'hk-01',
+      nodeTimeout: false,
+      testing: false,
+      nodes: [
+        { id: 'hk-01', name: 'HK-01 · IPLC 专线', protocol: 'VLESS · Reality', ping: 38, ip: '103.42.18.xx · 香港', gpt: false, gemini: true },
+        { id: 'jp-02', name: 'JP-02 · 东京 BGP', protocol: 'VLESS · Reality', ping: 62, ip: '154.17.92.xx · 东京', gpt: true, gemini: true },
+        { id: 'sg-01', name: 'SG-01 · 新加坡低延迟', protocol: 'Trojan · TLS', ping: 54, ip: '45.128.41.xx · 新加坡', gpt: true, gemini: true },
+        { id: 'tw-01', name: 'TW-01 · 台北原生', protocol: 'VMess · WS', ping: 47, ip: '211.75.14.xx · 台北', gpt: true, gemini: true },
+        { id: 'us-01', name: 'US-01 · 洛杉矶 CN2 GIA', protocol: 'VLESS · Vision', ping: 148, ip: '64.201.88.xx · 洛杉矶', gpt: true, gemini: true }
+      ],
+      downHistory: [0.8, 1.2, 1.6, 1.1, 2.1, 1.9, 1.4, 2.3, 1.7, 1.84, 2.0, 1.85],
+      upHistory: [0.12, 0.18, 0.24, 0.19, 0.31, 0.22, 0.20, 0.28, 0.21, 0.24, 0.26, 0.24]
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const proxyEl = $('proxyIsland');
+    const leftEl = $('leftIsland');
+    const leftPillBar = $('leftPillBar');
+    const leftExpandedInner = $('leftExpandedInner');
+    const hudEl = $('hudIsland');
+    const nodeDomMap = new Map();
+
+    const proxySpring = { p: 0, v: 0, target: 0, rafId: null, lastTime: 0, speed: 0.72 };
+    const leftSpring = { p: 0, v: 0, target: 0, rafId: null, lastTime: 0, speed: 1.0 };
+    // Smooth height spring for Left Island tab switching (216 <-> 248)
+    const leftHeightSpring = { p: 216, v: 0, target: 216, rafId: null, lastTime: 0 };
+
+    function getLeftExpandedHeightTarget() {
+      if (state.musicActive) return 146;
+      return state.leftTab === 'shelf' ? 256 : state.leftTab === 'clipboard' ? 250 : 216;
+    }
+
+    const matrixTrail = {
+      canvas: null,
+      ctx: null,
+      w: 0,
+      h: 0,
+      drops: [],
+      trails: [],
+      chars: '01ABCDEF79$#*+',
+      rafId: null,
+      lastTime: 0
+    };
+
+    function initMatrixTrail() {
+      const tile = $('ghTile');
+      const canvas = $('matrixTrailCanvas');
+      matrixTrail.canvas = canvas;
+      matrixTrail.ctx = canvas.getContext('2d');
+
+      const resize = () => {
+        const rect = tile.getBoundingClientRect();
+        if (rect.width < 10 || rect.height < 10) return;
+        const dpr = window.devicePixelRatio || 1;
+        matrixTrail.w = rect.width;
+        matrixTrail.h = rect.height;
+        canvas.width = Math.floor(rect.width * dpr);
+        canvas.height = Math.floor(rect.height * dpr);
+        matrixTrail.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const cols = Math.max(12, Math.floor(rect.width / 16));
+        if (matrixTrail.drops.length !== cols) {
+          matrixTrail.drops = Array.from({ length: cols }, () => ({
+            y: Math.random() * rect.height,
+            speed: 18 + Math.random() * 24,
+            ch: matrixTrail.chars[Math.floor(Math.random() * matrixTrail.chars.length)]
+          }));
+        }
+      };
+
+      tile.addEventListener('mousemove', (e) => {
+        const rect = tile.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        matrixTrail.trails.push({
+          x, y,
+          born: performance.now(),
+          ch: matrixTrail.chars[Math.floor(Math.random() * matrixTrail.chars.length)]
+        });
+      });
+
+      const tick = (now) => {
+        if (state.openMode !== 'left' || state.musicActive || state.leftTab !== 'heatmap') {
+          matrixTrail.rafId = null;
+          return;
+        }
+        resize();
+        const ctx = matrixTrail.ctx;
+        const w = matrixTrail.w;
+        const h = matrixTrail.h;
+        if (w > 0 && h > 0) {
+          const dt = Math.min(0.05, (now - (matrixTrail.lastTime || now)) / 1000);
+          matrixTrail.lastTime = now;
+          ctx.clearRect(0, 0, w, h);
+          ctx.font = '10px "JetBrains Mono", monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          matrixTrail.drops.forEach((d, idx) => {
+            d.y += d.speed * dt;
+            if (d.y > h + 10) {
+              d.y = -8;
+              d.ch = matrixTrail.chars[Math.floor(Math.random() * matrixTrail.chars.length)];
+            }
+            const x = (idx + 0.5) * (w / matrixTrail.drops.length);
+            ctx.fillStyle = 'rgba(52, 211, 153, 0.14)';
+            ctx.fillText(d.ch, x, d.y);
+          });
+
+          const fadeMs = 900;
+          matrixTrail.trails = matrixTrail.trails.filter((t) => now - t.born < fadeMs);
+          matrixTrail.trails.forEach((t) => {
+            const life = 1 - (now - t.born) / fadeMs;
+            const rad = 14 * life + 3;
+            const grad = ctx.createRadialGradient(t.x, t.y, 0, t.x, t.y, rad);
+            grad.addColorStop(0, `rgba(57, 211, 83, ${(0.18 * life).toFixed(3)})`);
+            grad.addColorStop(1, 'rgba(57, 211, 83, 0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(t.x, t.y, rad, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = `rgba(167, 243, 208, ${(0.75 * life).toFixed(3)})`;
+            ctx.fillText(t.ch, t.x, t.y);
+          });
+        }
+        matrixTrail.rafId = requestAnimationFrame(tick);
+      };
+
+      matrixTrail.start = () => {
+        if (!matrixTrail.rafId) {
+          matrixTrail.lastTime = performance.now();
+          matrixTrail.rafId = requestAnimationFrame(tick);
+        }
+      };
+    }
+
+    function triggerHeatmapWave() {
+      const grid = $('ghGrid');
+      grid.classList.remove('wave-animate');
+      void grid.offsetWidth;
+      grid.classList.add('wave-animate');
+    }
+
+    function buildHeatmap() {
+      const grid = $('ghGrid');
+      grid.innerHTML = '';
+      const levels = [0, 1, 2, 1, 3, 4, 2, 0, 2, 3, 4, 3, 1, 2, 0, 1, 3, 4, 2, 3, 1];
+      const now = new Date();
+      for (let col = 0; col < 22; col++) {
+        const colEl = document.createElement('div');
+        colEl.className = 'gh-col';
+        colEl.style.setProperty('--col-idx', String(col));
+        for (let row = 0; row < 7; row++) {
+          const idx = (col * 7 + row);
+          const lvl = (col === 21 && row > now.getDay()) ? 0 : levels[(idx * 5 + col) % levels.length];
+          const cell = document.createElement('div');
+          cell.className = `gh-cell gh-${lvl}`;
+          const daysAgo = (21 - col) * 7 + (now.getDay() - row);
+          const d = new Date(now.getTime() - daysAgo * 86400000);
+          const count = lvl === 0 ? 0 : lvl * 3 + ((col + row) % 3);
+          const label = `${d.getMonth() + 1}月${d.getDate()}日 · ${count} 次活跃`;
+          cell.addEventListener('mouseenter', () => {
+            const tip = $('ghHoverTip');
+            tip.textContent = label;
+            tip.classList.remove('pop');
+            void tip.offsetWidth;
+            tip.classList.add('pop');
+          });
+          colEl.appendChild(cell);
+        }
+        grid.appendChild(colEl);
+      }
+    }
+
+    function renderIslands() {
+      const lp = leftSpring.p;
+      const pp = proxySpring.p;
+
+      const lwCollapsed = 222;
+      const lwExpanded = Math.min(416, window.innerWidth - 24);
+      const lhExpanded = leftHeightSpring.p;
+      const lw = lwCollapsed + (lwExpanded - lwCollapsed) * lp;
+      const lh = 40 + (lhExpanded - 40) * lp;
+      const lr = 20 + (24 - 20) * lp;
+      const lxCenter = state.dockRight ? -lw / 2 : -66 * (1 - lp);
+      const leftPos = lxCenter - lw / 2;
+
+      const leftOpacity = Math.max(0, 1 - pp * 2.5);
+      leftEl.style.width = `${lw.toFixed(2)}px`;
+      leftEl.style.height = `${lh.toFixed(2)}px`;
+      leftEl.style.borderRadius = `${lr.toFixed(2)}px`;
+      leftEl.style.opacity = leftOpacity.toFixed(3);
+      leftEl.style.pointerEvents = leftOpacity > 0.2 ? 'auto' : 'none';
+      leftEl.style.transform = `translate3d(${leftPos.toFixed(2)}px, 0, 0)`;
+      leftEl.style.zIndex = lp >= pp ? '20' : '10';
+
+      const pillFade = Math.max(0, 1 - lp * 3.5);
+      leftPillBar.style.opacity = pillFade.toFixed(3);
+      leftPillBar.style.pointerEvents = lp < 0.15 ? 'auto' : 'none';
+
+      const cardFade = Math.max(0, Math.min(1, (lp - 0.18) / 0.82));
+      leftExpandedInner.style.opacity = cardFade.toFixed(3);
+      leftExpandedInner.style.filter = cardFade < 0.98 ? `blur(${((1 - cardFade) * 7).toFixed(1)}px)` : 'none';
+      leftExpandedInner.style.pointerEvents = lp > 0.5 ? 'auto' : 'none';
+
+      // When Left Island is open, Proxy shrinks to a 78px mini status-dot + ping pill beside it (never vanishes!)
+      const pwMini = 78;
+      const pwCollapsed = 118 - (118 - pwMini) * lp;
+      const pwExpanded = Math.min(456, window.innerWidth - 24);
+      const pw = pwCollapsed + (pwExpanded - pwCollapsed) * pp;
+      const ph = 40 + (522 - 40) * pp;
+      const pr = 20 + (24 - 20) * pp;
+
+      let pxCenter;
+      if (state.dockRight) {
+        pxCenter = -pw / 2;
+      } else {
+        const restX = 118;
+        const besideLeftX = Math.min((window.innerWidth / 2) - (pw / 2) - 10, (lw / 2) + (pw / 2) + 8);
+        const collapsedX = restX + (besideLeftX - restX) * lp;
+        pxCenter = collapsedX * (1 - pp);
+      }
+      const proxyLeft = pxCenter - pw / 2;
+
+      // In dockRight mode fade out when left covers it; in center mode keep visible as mini status pill
+      const proxyOpacity = state.dockRight ? Math.max(0, 1 - lp * 2.5) : 1;
+      proxyEl.style.width = `${pw.toFixed(2)}px`;
+      proxyEl.style.height = `${ph.toFixed(2)}px`;
+      proxyEl.style.borderRadius = `${pr.toFixed(2)}px`;
+      proxyEl.style.opacity = proxyOpacity.toFixed(3);
+      proxyEl.style.pointerEvents = proxyOpacity > 0.2 ? 'auto' : 'none';
+      proxyEl.style.transform = `translate3d(${proxyLeft.toFixed(2)}px, 0, 0)`;
+      proxyEl.style.zIndex = pp > lp ? '20' : '15';
+      $('capsuleNode').style.display = (lp > 0.35 && pp < 0.2) ? 'none' : 'inline';
+
+      $('capsuleDownWrap').style.display = pp < 0.15 ? 'none' : 'inline';
+    }
+
+    function stepSpring(sp, now) {
+      if (!sp.lastTime) sp.lastTime = now;
+      let rawDt = (now - sp.lastTime) / 1000;
+      if (!Number.isFinite(rawDt) || rawDt <= 0) rawDt = 0.016;
+      const dt = Math.min(0.032, rawDt) * (sp.speed || 1);
+      sp.lastTime = now;
+
+      const base = SPRING_PRESETS[state.springPreset];
+      const stiffness = sp.target === 0 ? base.stiffness * 0.95 : base.stiffness;
+      const damping = sp.target === 0 ? Math.max(base.damping * 1.45, 2 * Math.sqrt(stiffness) * 1.04) : base.damping;
+
+      const force = -stiffness * (sp.p - sp.target);
+      const accel = force - damping * sp.v;
+      sp.v += accel * dt;
+      sp.p += sp.v * dt;
+
+      if (sp.target === 0 && sp.p < 0) { sp.p = 0; sp.v = 0; }
+
+      renderIslands();
+
+      const done =
+        (sp.target === 0 && sp.p <= 0.0015 && Math.abs(sp.v) < 0.02) ||
+        (Math.abs(sp.p - sp.target) < 0.0008 && Math.abs(sp.v) < 0.003);
+
+      if (done) {
+        sp.p = sp.target;
+        sp.v = 0;
+        sp.rafId = null;
+        sp.lastTime = 0;
+        renderIslands();
+        return;
+      }
+      sp.rafId = requestAnimationFrame((t) => stepSpring(sp, t));
+    }
+
+    function stepHeightSpring(now) {
+      const sp = leftHeightSpring;
+      if (!sp.lastTime) sp.lastTime = now;
+      let rawDt = (now - sp.lastTime) / 1000;
+      if (!Number.isFinite(rawDt) || rawDt <= 0) rawDt = 0.016;
+      const dt = Math.min(0.032, rawDt);
+      sp.lastTime = now;
+
+      // Critically damped height spring for smooth tab resize
+      const stiffness = 240;
+      const damping = 2 * Math.sqrt(stiffness) * 1.03;
+      const force = -stiffness * (sp.p - sp.target);
+      const accel = force - damping * sp.v;
+      sp.v += accel * dt;
+      sp.p += sp.v * dt;
+
+      renderIslands();
+
+      if (Math.abs(sp.p - sp.target) < 0.4 && Math.abs(sp.v) < 1.5) {
+        sp.p = sp.target;
+        sp.v = 0;
+        sp.rafId = null;
+        sp.lastTime = 0;
+        renderIslands();
+        return;
+      }
+      sp.rafId = requestAnimationFrame(stepHeightSpring);
+    }
+
+    function syncLeftHeight(immediate = false) {
+      const target = getLeftExpandedHeightTarget();
+      leftHeightSpring.target = target;
+      if (immediate) {
+        leftHeightSpring.p = target;
+        leftHeightSpring.v = 0;
+        renderIslands();
+        return;
+      }
+      if (!leftHeightSpring.rafId) {
+        leftHeightSpring.lastTime = 0;
+        leftHeightSpring.rafId = requestAnimationFrame(stepHeightSpring);
+      }
+    }
+
+    function kickSpring(sp, target) {
+      sp.target = target;
+      if (!sp.rafId) {
+        sp.lastTime = 0;
+        sp.rafId = requestAnimationFrame((t) => stepSpring(sp, t));
+      }
+    }
+
+    function setOpenMode(mode) {
+      const wasLeftClosed = state.openMode !== 'left';
+      state.openMode = mode;
+      if (mode !== 'none') { hudEl.classList.remove('show'); $('importConfirm').classList.remove('show'); }
+      $('clipPopover').classList.remove('show');
+      proxyEl.classList.toggle('expanded', mode === 'proxy');
+      leftEl.classList.toggle('expanded', mode === 'left');
+      $('proxyHeaderLeft').style.paddingRight = mode === 'proxy' ? '122px' : '0px';
+      kickSpring(proxySpring, mode === 'proxy' ? 1 : 0);
+      kickSpring(leftSpring, mode === 'left' ? 1 : 0);
+
+      if (mode === 'left' && !state.musicActive) {
+        syncLeftHeight(wasLeftClosed);
+        if (state.leftTab === 'heatmap') {
+          triggerHeatmapWave();
+          if (matrixTrail.start) matrixTrail.start();
+        } else if (wasLeftClosed) {
+          state.clipStaggerPending = true;
+          renderClips();
+        }
+      }
+    }
+
+    let hudTimer = null;
+    let hudActionFn = null;
+    function showHud({ icon, text, actionLabel = '', onAction = null, duration = 4000 }) {
+      $('hudIcon').innerHTML = icon;
+      $('hudText').textContent = text;
+      const btn = $('hudActionBtn');
+      hudActionFn = onAction;
+      if (actionLabel) {
+        btn.textContent = actionLabel;
+        btn.classList.remove('hidden');
+      } else {
+        btn.classList.add('hidden');
+      }
+      hudEl.classList.add('show');
+      clearTimeout(hudTimer);
+      hudTimer = setTimeout(() => hudEl.classList.remove('show'), duration);
+    }
+
+    $('hudActionBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (hudActionFn) hudActionFn();
+      hudEl.classList.remove('show');
+    });
+
+    let toastTimer = null;
+    function showToast(msg) {
+      const el = $('toast');
+      el.textContent = msg;
+      el.classList.remove('opacity-0');
+      el.classList.add('opacity-100');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        el.classList.remove('opacity-100');
+        el.classList.add('opacity-0');
+      }, 2200);
+    }
+
+    function copyText(text, label) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showToast(`已复制 ${label}`)).catch(() => fallbackCopy(text, label));
+      } else {
+        fallbackCopy(text, label);
+      }
+    }
+
+    function fallbackCopy(text, label) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); showToast(`已复制 ${label}`); } catch (e) { showToast('复制失败'); }
+      document.body.removeChild(ta);
+    }
+
+    function flashCheckFeedback(el, tempText) {
+      if (!el) return;
+      const orig = el.textContent;
+      el.textContent = tempText;
+      el.classList.remove('check-pop');
+      void el.offsetWidth;
+      el.classList.add('check-pop');
+      setTimeout(() => { el.textContent = orig; }, 1100);
+    }
+
+    function renderClips(useFlip = false) {
+      const list = $('clipList');
+      // FLIP Step 1: Record old top positions by data-clip-id
+      const firstTops = new Map();
+      if (useFlip) {
+        list.querySelectorAll('.clip-item[data-clip-id]').forEach((el) => {
+          firstTops.set(el.dataset.clipId, el.getBoundingClientRect().top);
+        });
+      }
+
+      const q = state.clipQuery.trim().toLowerCase();
+      const sorted = [...state.clips].sort((a, b) => Number(b.pinned) - Number(a.pinned));
+      const filtered = q ? sorted.filter((c) => c.text.toLowerCase().includes(q) || c.tag.toLowerCase().includes(q)) : sorted;
+
+      list.innerHTML = '';
+      if (!filtered.length) {
+        list.innerHTML = '<div class="text-center text-[11px] text-slate-400 py-6">暂无匹配的剪贴板记录</div>';
+        return;
+      }
+
+      filtered.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.dataset.clipId = item.id;
+        row.className = 'clip-item glass-tile px-2.5 py-2 flex items-center justify-between gap-2';
+        if (state.lastNewClipId === item.id) {
+          row.classList.add('new-glow');
+        } else if (state.clipStaggerPending) {
+          row.classList.add('stagger-enter');
+          row.style.setProperty('--clip-idx', String(idx));
+        }
+
+        const left = document.createElement('div');
+        left.className = 'min-w-0 flex-1 cursor-pointer flex items-center gap-2';
+        left.title = '点击复制';
+        if (item.type === 'image' && item.imgSrc) {
+          left.innerHTML = `
+            <img src="${item.imgSrc}" alt="缩略图" class="w-8 h-8 rounded-lg object-cover border border-white/15 shrink-0 bg-black/40" />
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5">
+                <span class="clip-tag mono text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 shrink-0">${item.tag}</span>
+                <span class="text-[10px] text-slate-400">${item.time}</span>
+              </div>
+              <div class="mono text-[11px] text-slate-100 truncate mt-0.5">${item.text}</div>
+            </div>
+          `;
+        } else {
+          left.innerHTML = `
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5">
+                <span class="clip-tag mono text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-sky-300 shrink-0">${item.tag}</span>
+                <span class="text-[10px] text-slate-400">${item.time}</span>
+              </div>
+              <div class="mono text-[11px] text-slate-100 truncate mt-0.5">${item.text}</div>
+            </div>
+          `;
+        }
+        left.addEventListener('click', () => {
+          copyText(item.text, item.type === 'image' ? '图片' : '剪贴板条目');
+          flashCheckFeedback(left.querySelector('.clip-tag'), '✓ 已复制');
+        });
+        let popTimer = null;
+        row.addEventListener('mouseenter', () => {
+          clearTimeout(popTimer);
+          popTimer = setTimeout(() => {
+            if (state.openMode !== 'left' || state.leftTab !== 'clipboard') return;
+            $('clipPopTag').textContent = `${item.tag} · ${item.time}`;
+            if (item.type === 'image' && item.imgSrc) {
+              $('clipPopMeta').textContent = item.meta || 'PNG 图片';
+              $('clipPopBody').classList.add('hidden');
+              $('clipPopImg').src = item.imgSrc;
+              $('clipPopImg').classList.remove('hidden');
+            } else {
+              $('clipPopMeta').textContent = '点击条目即可复制';
+              $('clipPopImg').classList.add('hidden');
+              $('clipPopBody').textContent = item.text;
+              $('clipPopBody').classList.remove('hidden');
+            }
+            $('clipPopover').classList.add('show');
+          }, 340);
+        });
+        row.addEventListener('mouseleave', () => {
+          clearTimeout(popTimer);
+          $('clipPopover').classList.remove('show');
+        });
+
+        const actions = document.createElement('div');
+        actions.className = 'flex items-center gap-1 shrink-0';
+
+        if (item.type === 'node') {
+          const imp = document.createElement('button');
+          imp.type = 'button';
+          imp.className = 'px-1.5 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-400/30 text-emerald-200 text-[10px] hover:bg-emerald-500/30 transition';
+          imp.textContent = '导入';
+          imp.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openImportConfirm({
+              id: 'kr-01',
+              name: 'KR-01 · 首尔新导入',
+              protocol: 'VLESS · Reality',
+              ping: 44,
+              ip: '211.45.12.xx · 首尔',
+              gpt: true,
+              gemini: true,
+              raw: item.text
+            });
+          });
+          actions.appendChild(imp);
+        }
+
+        const pin = document.createElement('button');
+        pin.type = 'button';
+        pin.className = `w-6 h-6 rounded-md text-[11px] flex items-center justify-center transition ${item.pinned ? 'bg-amber-500/25 text-amber-200' : 'bg-white/6 text-slate-400 hover:text-white'}`;
+        pin.innerHTML = '<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="17" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>';
+        pin.title = item.pinned ? '取消置顶' : '置顶';
+        pin.addEventListener('click', () => {
+          item.pinned = !item.pinned;
+          renderClips(true);
+        });
+        actions.appendChild(pin);
+
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'w-6 h-6 rounded-md text-[11px] bg-white/6 text-slate-400 hover:bg-rose-500/25 hover:text-rose-200 flex items-center justify-center transition';
+        del.innerHTML = '<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
+        del.title = '删除条目';
+        del.addEventListener('click', () => {
+          state.clips = state.clips.filter((c) => c.id !== item.id);
+          renderClips(true);
+        });
+        actions.appendChild(del);
+
+        row.appendChild(left);
+        row.appendChild(actions);
+        list.appendChild(row);
+      });
+
+      state.clipStaggerPending = false;
+      state.lastNewClipId = null;
+
+      // FLIP Step 2-4: Invert & Play
+      if (useFlip && firstTops.size > 0) {
+        list.querySelectorAll('.clip-item[data-clip-id]').forEach((el) => {
+          const oldTop = firstTops.get(el.dataset.clipId);
+          if (oldTop === undefined) return;
+          const dy = oldTop - el.getBoundingClientRect().top;
+          if (Math.abs(dy) < 1) return;
+          el.style.transition = 'none';
+          el.style.transform = `translateY(${dy}px)`;
+          void el.offsetWidth;
+          el.style.transition = 'transform 0.34s var(--spring-ease)';
+          el.style.transform = 'translateY(0)';
+        });
+      }
+    }
+
+    function setLeftTab(tab) {
+      state.leftTab = tab;
+      const tabIdx = tab === 'heatmap' ? 0 : tab === 'clipboard' ? 1 : 2;
+      $('ltabIndicator').style.transform = `translateX(${tabIdx * 100}%)`;
+      document.querySelectorAll('.ltab-btn').forEach((b) => {
+        b.classList.toggle('active', b.dataset.ltab === tab);
+      });
+
+      const gh = $('ghTile');
+      const cp = $('clipPanel');
+      const sp = $('shelfPanel');
+
+      gh.classList.toggle('pane-heatmap-active', tab === 'heatmap');
+      gh.classList.toggle('pane-heatmap-exit', tab !== 'heatmap');
+
+      cp.classList.toggle('pane-clip-active', tab === 'clipboard');
+      cp.classList.toggle('pane-clip-exit', tab !== 'clipboard');
+
+      sp.classList.toggle('pane-clip-active', tab === 'shelf');
+      sp.classList.toggle('pane-clip-exit', tab !== 'shelf');
+
+      if (tab === 'heatmap') {
+        triggerHeatmapWave();
+        if (state.openMode === 'left' && !state.musicActive && matrixTrail.start) matrixTrail.start();
+      } else if (tab === 'clipboard') {
+        state.clipStaggerPending = true;
+        renderClips(false);
+    renderShelf();
+      } else if (tab === 'shelf') {
+        renderShelf();
+      }
+      render();
+      syncLeftHeight(false);
+    }
+
+    function pingBadgeClass(ping) {
+      if (ping === null) return 'bg-white/10 text-slate-400 border-white/10';
+      if (ping < 80) return 'bg-emerald-500/15 text-emerald-300 border-emerald-400/25';
+      if (ping < 160) return 'bg-amber-500/15 text-amber-300 border-amber-400/25';
+      return 'bg-rose-500/15 text-rose-300 border-rose-400/25';
+    }
+
+    function rebuildNodeList() {
+      const listEl = $('nodeList');
+      listEl.innerHTML = '';
+      nodeDomMap.clear();
+      state.nodes.forEach((node) => {
+        const row = document.createElement('button');
+        row.type = 'button';
+        row.className = 'node-row';
+
+        const left = document.createElement('div');
+        left.className = 'flex items-center gap-2 min-w-0';
+        const dot = document.createElement('span');
+        dot.className = 'w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-200';
+        const info = document.createElement('div');
+        info.className = 'min-w-0';
+        const title = document.createElement('div');
+        title.className = 'text-xs font-medium text-slate-100 truncate';
+        title.textContent = node.name;
+        const proto = document.createElement('div');
+        proto.className = 'text-[10px] text-slate-400 mono truncate';
+        proto.textContent = node.protocol;
+        info.appendChild(title);
+        info.appendChild(proto);
+        left.appendChild(dot);
+        left.appendChild(info);
+
+        const badge = document.createElement('span');
+        badge.className = 'mono text-[11px] px-2 py-0.5 rounded-full border shrink-0 transition-colors duration-200';
+
+        row.appendChild(left);
+        row.appendChild(badge);
+        row.addEventListener('click', () => {
+          state.activeNodeId = node.id;
+          state.nodeTimeout = false;
+          render();
+          showToast(`已切换节点：${node.name}`);
+        });
+
+        listEl.appendChild(row);
+        nodeDomMap.set(node.id, { row, dot, badge });
+      });
+    }
+
+    function render(popNodeId = null) {
+      const activeNode = state.nodes.find((n) => n.id === state.activeNodeId) || state.nodes[0];
+      const isConnected = state.sysProxy || state.tunMode;
+
+      $('musicSimLabel').textContent = state.musicActive ? '开' : '关';
+      $('capsuleNode').textContent = activeNode.name.split('·')[0].trim();
+
+      if (state.nodeTimeout) {
+        $('capsulePing').textContent = '超时';
+        $('capsulePing').className = 'mono text-[10px] px-1.5 py-0.5 rounded-full border shrink-0 bg-rose-500/20 text-rose-300 border-rose-400/35';
+      } else {
+        $('capsulePing').textContent = activeNode.ping ? `${activeNode.ping}ms` : '--';
+        $('capsulePing').className = `mono text-[10px] px-1.5 py-0.5 rounded-full border shrink-0 ${pingBadgeClass(activeNode.ping)}`;
+      }
+
+      const pillMode = state.musicActive ? 'music' : (state.leftTab === 'shelf' ? 'shelf' : state.leftTab === 'clipboard' ? 'clipboard' : 'time');
+      $('timePillContent').classList.toggle('hidden', pillMode !== 'time');
+      $('timePillContent').classList.toggle('flex', pillMode === 'time');
+      $('clipPillContent').classList.toggle('hidden', pillMode !== 'clipboard');
+      $('clipPillContent').classList.toggle('flex', pillMode === 'clipboard');
+      $('shelfPillContent').classList.toggle('hidden', pillMode !== 'shelf');
+      $('shelfPillContent').classList.toggle('flex', pillMode === 'shelf');
+      $('musicPillContent').classList.toggle('hidden', pillMode !== 'music');
+      $('musicPillContent').classList.toggle('flex', pillMode === 'music');
+      $('clipPillCount').textContent = `${state.clips.length} 条`;
+      $('shelfPillCount').textContent = `${state.shelf.length} 项`;
+
+      $('timeCardContent').classList.toggle('hidden', state.musicActive);
+      $('timeCardContent').classList.toggle('flex', !state.musicActive);
+      $('musicCardContent').classList.toggle('hidden', !state.musicActive);
+      $('musicCardContent').classList.toggle('flex', state.musicActive);
+
+      if (state.musicActive) {
+        const track = TRACKS[state.trackIdx];
+        const rawLyric = track.lyrics[state.lyricIdx % track.lyrics.length].replace(/♪/g, '').trim();
+        updatePillLyric(rawLyric);
+        $('trackTitle').textContent = track.title;
+        $('trackArtist').textContent = track.artist;
+        $('albumArt').className = `w-24 h-24 rounded-2xl bg-gradient-to-br ${track.artClass} border border-white/15 shadow-lg flex items-center justify-center shrink-0 relative overflow-hidden transition-all duration-300`;
+        $('albumArt').querySelector('span').textContent = track.badge;
+        $('pillAlbumDot').className = `w-5 h-5 rounded-md bg-gradient-to-br ${track.dotClass} border border-white/20 flex items-center justify-center text-[9px] font-bold text-white shrink-0`;
+        leftEl.style.borderColor = track.glowColor;
+        $('lyricLine').textContent = track.lyrics[state.lyricIdx % track.lyrics.length];
+        $('btnPlayPause').innerHTML = state.musicPlaying ? '<svg class="w-6 h-6" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_bg" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#0284c7"/></linearGradient><linearGradient id="fl_hi" x1="16" y1="2" x2="16" y2="16" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="rgba(255,255,255,0.45)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="9" fill="url(#fl_bg)"/><rect x="2.5" y="2.5" width="27" height="27" rx="8.5" stroke="url(#fl_hi)"/><rect x="10.5" y="9" width="4" height="14" rx="2" fill="#ffffff"/><rect x="17.5" y="9" width="4" height="14" rx="2" fill="#ffffff"/></svg>' : '<svg class="w-6 h-6" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_bg_p" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#0284c7"/></linearGradient><linearGradient id="fl_hi_p" x1="16" y1="2" x2="16" y2="16" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="rgba(255,255,255,0.45)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="9" fill="url(#fl_bg_p)"/><rect x="2.5" y="2.5" width="27" height="27" rx="8.5" stroke="url(#fl_hi_p)"/><path d="M12.2 9.6c0-1 1.1-1.6 2-1.1l9.2 5.9c.8.5.8 1.7 0 2.2l-9.2 5.9c-.9.5-2-.1-2-1.1V9.6z" fill="#ffffff"/></svg>';
+        document.querySelectorAll('.eq-bar').forEach((b) => b.classList.toggle('paused', !state.musicPlaying));
+      } else {
+        leftEl.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+      }
+
+      if (!isConnected || state.routingMode === 'direct') {
+        $('exitIpText').textContent = '本地直连出口 · CN';
+        $('aiUnlockBadges').innerHTML = '<span class="px-1.5 py-0.5 rounded bg-white/10 text-slate-400">直连未代理</span>';
+      } else {
+        $('exitIpText').textContent = activeNode.ip;
+        $('aiUnlockBadges').innerHTML = `
+          <span class="px-1.5 py-0.5 rounded ${activeNode.gemini ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-rose-500/15 text-rose-300'}">Gemini ${activeNode.gemini ? '✓' : '✕'}</span>
+          <span class="px-1.5 py-0.5 rounded ${activeNode.gpt ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'bg-amber-500/15 text-amber-300 border border-amber-400/20'}">GPT ${activeNode.gpt ? '✓' : '✕'}</span>
+        `;
+      }
+
+      proxyEl.classList.toggle('fault-pulse', state.nodeTimeout);
+      const dot = $('capsuleDot');
+      if (state.nodeTimeout || !isConnected) {
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-rose-400 shrink-0';
+        $('trayStatus').innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span>${state.nodeTimeout ? '节点超时' : 'v2rayN 未代理'}`;
+        $('trayStatus').className = 'flex items-center gap-1.5 text-rose-300';
+      } else if (state.routingMode === 'direct') {
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0';
+        $('trayStatus').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span>v2rayN 直连';
+        $('trayStatus').className = 'flex items-center gap-1.5 text-amber-300';
+      } else {
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 dot-pulse shrink-0';
+        $('trayStatus').innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span>v2rayN 已连接';
+        $('trayStatus').className = 'flex items-center gap-1.5 text-emerald-300';
+      }
+
+      document.querySelectorAll('.scene-btn').forEach((b) => {
+        const active = b.dataset.scene === state.scene;
+        b.className = `scene-btn glass-tile py-1.5 px-2 text-[11px] font-medium flex items-center justify-center gap-1 ${active ? 'text-sky-200 border-sky-400/40 bg-sky-500/18' : 'text-slate-300'}`;
+      });
+
+      $('btnSysProxy').className = `glass-tile p-2.5 text-left flex items-center justify-between ${state.sysProxy ? 'active-blue' : ''}`;
+      $('sysProxySub').textContent = state.sysProxy ? '127.0.0.1:10809' : '已关闭系统代理';
+      $('sysProxySub').className = `text-[11px] mt-0.5 mono ${state.sysProxy ? 'text-sky-200/85' : 'text-slate-400'}`;
+      $('sysProxyTrack').className = `switch-track ${state.sysProxy ? 'on-blue' : ''}`;
+
+      $('btnTunMode').className = `glass-tile p-2.5 text-left flex items-center justify-between ${state.tunMode ? 'active-emerald' : ''}`;
+      $('tunSub').textContent = state.tunMode ? '虚拟网卡接管中' : 'sing-box 虚拟网卡';
+      $('tunSub').className = `text-[11px] mt-0.5 ${state.tunMode ? 'text-emerald-200/85' : 'text-slate-400'}`;
+      $('tunTrack').className = `switch-track ${state.tunMode ? 'on-emerald' : ''}`;
+
+      const modeIdx = state.routingMode === 'rule' ? 0 : state.routingMode === 'global' ? 1 : 2;
+      $('segIndicator').style.transform = `translateX(${modeIdx * 100}%)`;
+      document.querySelectorAll('.seg-btn').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.mode === state.routingMode);
+      });
+
+      $('activeNodeMeta').textContent = activeNode.protocol;
+      state.nodes.forEach((node) => {
+        const refs = nodeDomMap.get(node.id);
+        if (!refs) return;
+        const active = node.id === state.activeNodeId;
+        refs.row.classList.toggle('active', active);
+        refs.dot.className = `w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-200 ${active ? 'bg-sky-400' : 'bg-slate-500'}`;
+        refs.badge.className = `mono text-[11px] px-2 py-0.5 rounded-full border shrink-0 transition-colors duration-200 ${pingBadgeClass(node.ping)}`;
+        refs.badge.textContent = node.ping ? `${node.ping}ms` : '测速中';
+        if (popNodeId === node.id) {
+          refs.badge.classList.remove('ping-pop');
+          void refs.badge.offsetWidth;
+          refs.badge.classList.add('ping-pop');
+        }
+      });
+
+      renderChart();
+    }
+
+    function renderChart() {
+      const svg = $('trafficChart');
+      const w = 160;
+      const h = 36;
+      const maxVal = Math.max(2.6, ...state.downHistory);
+      const downPts = state.downHistory.map((v, i) => {
+        const x = (i / (state.downHistory.length - 1)) * w;
+        const y = h - 4 - (v / maxVal) * (h - 9);
+        return [x, y];
+      });
+      const ptsDownStr = downPts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+      const areaDownStr = `0,${h} ${ptsDownStr} ${w},${h}`;
+      const lastPt = downPts[downPts.length - 1];
+
+      const ptsUpStr = state.upHistory.map((v, i) => {
+        const x = (i / (state.upHistory.length - 1)) * w;
+        const y = h - 4 - (v / maxVal) * (h - 9);
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }).join(' ');
+
+      svg.innerHTML = `
+        <defs>
+          <linearGradient id="downGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="rgba(56, 189, 248, 0.32)" />
+            <stop offset="100%" stop-color="rgba(56, 189, 248, 0.0)" />
+          </linearGradient>
+        </defs>
+        <polygon fill="url(#downGrad)" points="${areaDownStr}" />
+        <polyline fill="none" stroke="rgba(56, 189, 248, 0.92)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" points="${ptsDownStr}" />
+        <polyline fill="none" stroke="rgba(52, 211, 153, 0.78)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" points="${ptsUpStr}" />
+        <circle cx="${lastPt[0].toFixed(1)}" cy="${lastPt[1].toFixed(1)}" r="2.4" fill="#38bdf8" />
+      `;
+    }
+
+    $('expandableHeader').addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      setOpenMode(state.openMode === 'proxy' ? 'none' : 'proxy');
+    });
+    $('btnCollapse').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('none'); });
+
+    leftPillBar.addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('left'); });
+    $('btnCloseMusic').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('none'); });
+    $('btnCloseTime').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('none'); });
+    leftEl.addEventListener('click', (e) => {
+      if (state.openMode === 'left' && !e.target.closest('.music-ctrl-btn') && !e.target.closest('.ltab-wrap') && !e.target.closest('#clipPanel') && !e.target.closest('#shelfPanel')) {
+        setOpenMode('none');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (state.openMode !== 'none' && !e.target.closest('#islandAnchor') && !e.target.closest('#demoCard')) {
+        setOpenMode('none');
+      }
+    });
+
+    document.querySelectorAll('.ltab-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => { e.stopPropagation(); setLeftTab(btn.dataset.ltab); });
+    });
+
+    $('btnQuickClip').addEventListener('click', (e) => {
+      e.stopPropagation();
+      setLeftTab('clipboard');
+      setOpenMode('left');
+    });
+
+    $('clipSearch').addEventListener('input', (e) => {
+      state.clipQuery = e.target.value;
+      renderClips(false);
+    });
+
+    $('btnClearClips').addEventListener('click', () => {
+      state.clips = state.clips.filter((c) => c.pinned);
+      renderClips(true);
+      showToast('已清空未置顶的剪贴板记录');
+    });
+
+    $('btnSimClipPush').addEventListener('click', () => {
+      const samples = [
+        { type: 'image', tag: '图片', text: '流量监控截图 1600×900 · 312 KB', meta: '1600×900 · PNG · 312 KB', imgSrc: "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 260'%3E%3Crect width='400' height='260' fill='%23090d16'/%3E%3Cpath d='M20 200 Q100 120 180 150 T340 70 L380 90 L380 240 L20 240 Z' fill='%2338bdf8' fill-opacity='0.22'/%3E%3Cpath d='M20 200 Q100 120 180 150 T340 70 L380 90' fill='none' stroke='%2338bdf8' stroke-width='3'/%3E%3Ccircle cx='340' cy='70' r='6' fill='%2334d399'/%3E%3Ctext x='200' y='44' fill='%23e2e8f0' font-family='sans-serif' font-size='14' text-anchor='middle'%3ETraffic Snapshot (428 KB)%3C/text%3E%3C/svg%3E" },
+        { type: 'code', tag: 'CLI', text: 'curl -x http://127.0.0.1:10809 https://ipinfo.io' },
+        { type: 'text', tag: '链接', text: 'https://github.com/2dust/v2rayN/releases' },
+        { type: 'node', tag: 'vmess://', text: 'vmess://eyJhZGQiOiJzZy0wMS5leGFtcGxlLmNvbSJ9' }
+      ];
+      const pick = samples[Math.floor(Math.random() * samples.length)];
+      const id = 'c_' + Date.now();
+      state.lastNewClipId = id;
+      state.clips.unshift({ id, pinned: false, time: '刚刚', ...pick });
+      renderClips(true);
+      showToast(`已捕获新剪贴板：${pick.tag}`);
+    });
+
+    document.querySelectorAll('.scene-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.scene = btn.dataset.scene;
+        state.nodeTimeout = false;
+        if (state.scene === 'dev') {
+          state.sysProxy = true; state.tunMode = false; state.routingMode = 'rule'; state.activeNodeId = 'hk-01';
+        } else if (state.scene === 'game') {
+          state.sysProxy = false; state.tunMode = true; state.routingMode = 'rule'; state.activeNodeId = 'jp-02';
+        } else if (state.scene === 'ai') {
+          state.sysProxy = true; state.tunMode = false; state.routingMode = 'global'; state.activeNodeId = 'us-01';
+        }
+        render();
+        showToast(`已切换场景：${btn.textContent.trim()}`);
+      });
+    });
+
+    $('btnSimSniff').addEventListener('click', () => {
+      showHud({
+        icon: '<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>',
+        text: '检测到 vless:// 节点链接',
+        actionLabel: '一键导入',
+        duration: 4200,
+        onAction: () => {
+          openImportConfirm({
+            id: 'kr-01',
+            name: 'KR-01 · 首尔新导入',
+            protocol: 'VLESS · Reality',
+            ping: 44,
+            ip: '211.45.12.xx · 首尔',
+            gpt: true,
+            gemini: true,
+            raw: 'vless://a9c4e2-reality@kr-01.example.com:443#KR-01'
+          });
+        }
+      });
+    });
+
+    $('btnSimTimeout').addEventListener('click', () => {
+      state.nodeTimeout = true;
+      render();
+      showHud({
+        icon: '<svg class="w-3.5 h-3.5 text-rose-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>',
+        text: '当前节点连接超时',
+        actionLabel: '切至备用',
+        duration: 4500,
+        onAction: () => {
+          state.nodeTimeout = false;
+          state.activeNodeId = 'jp-02';
+          render('jp-02');
+          showToast('已自动切换至备用节点 JP-02');
+        }
+      });
+    });
+
+    $('btnToggleMusicSim').addEventListener('click', () => {
+      state.musicActive = !state.musicActive;
+      render();
+      syncLeftHeight(state.openMode !== 'left');
+    });
+
+    $('btnPlayPause').addEventListener('click', (e) => { e.stopPropagation(); state.musicPlaying = !state.musicPlaying; render(); });
+    function triggerTrackTransition(dir) {
+      const cls = dir > 0 ? 'track-next-in' : 'track-prev-in';
+      [$('albumArt'), $('trackTitle'), $('trackArtist'), $('lyricLine')].forEach((el) => {
+        el.classList.remove('track-next-in', 'track-prev-in', 'lyric-swap-in');
+        void el.offsetWidth;
+        el.classList.add(cls);
+      });
+    }
+
+    $('btnPrevTrack').addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.trackIdx = (state.trackIdx - 1 + TRACKS.length) % TRACKS.length;
+      state.lyricIdx = 0; state.musicPct = 12;
+      $('musicProgress').style.width = `${state.musicPct}%`;
+      render();
+      triggerTrackTransition(-1);
+    });
+    $('btnNextTrack').addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.trackIdx = (state.trackIdx + 1) % TRACKS.length;
+      state.lyricIdx = 0; state.musicPct = 8;
+      $('musicProgress').style.width = `${state.musicPct}%`;
+      render();
+      triggerTrackTransition(1);
+    });
+    $('btnShuffle').addEventListener('click', (e) => { e.stopPropagation(); showToast('已切换随机播放'); });
+    $('btnRepeat').addEventListener('click', (e) => { e.stopPropagation(); showToast('已切换列表循环'); });
+
+    $('btnToggleExpandDemo').addEventListener('click', () => {
+      setOpenMode(state.openMode === 'proxy' ? 'none' : 'proxy');
+    });
+
+    $('btnToggleDock').addEventListener('click', () => {
+      state.dockRight = !state.dockRight;
+      $('islandAnchor').classList.toggle('dock-right', state.dockRight);
+      renderIslands();
+    });
+
+    document.querySelectorAll('.spring-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.springPreset = btn.dataset.spring;
+        document.querySelectorAll('.spring-btn').forEach((b) => {
+          const active = b.dataset.spring === state.springPreset;
+          b.className = `spring-btn px-2.5 py-1 rounded-lg ${active ? 'bg-white/16 text-white font-medium' : 'bg-white/6 text-slate-400 hover:text-slate-200'}`;
+        });
+        setOpenMode(state.openMode === 'none' ? 'proxy' : state.openMode);
+      });
+    });
+
+    $('btnSysProxy').addEventListener('click', () => {
+      state.sysProxy = !state.sysProxy;
+      render();
+      showToast(state.sysProxy ? '已开启 Windows 系统代理 (127.0.0.1:10809)' : '已清除 Windows 系统代理');
+    });
+
+    $('btnTunMode').addEventListener('click', () => {
+      state.tunMode = !state.tunMode;
+      render();
+      showToast(state.tunMode ? '已启用 sing-box TUN 虚拟网卡' : '已关闭 TUN 模式');
+    });
+
+    document.querySelectorAll('.seg-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.routingMode = btn.dataset.mode;
+        render();
+        showToast(`路由模式切换为：${btn.textContent}`);
+      });
+    });
+
+    $('btnPingAll').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (state.testing) return;
+      state.testing = true;
+      state.nodeTimeout = false;
+      $('pingSpinner').classList.add('animate-spin');
+      state.nodes.forEach((n) => { n.ping = null; });
+      render();
+
+      state.nodes.forEach((node, idx) => {
+        setTimeout(() => {
+          const base = node.id.startsWith('us') ? 132 : node.id.startsWith('hk') ? 34 : 52;
+          node.ping = base + Math.floor(Math.random() * 26);
+          if (idx === state.nodes.length - 1) {
+            state.testing = false;
+            $('pingSpinner').classList.remove('animate-spin');
+            showToast('全部节点真连接测速完成');
+          }
+          render(node.id);
+        }, 200 + idx * 140);
+      });
+    });
+
+    $('btnCopyPs').addEventListener('click', () => {
+      copyText('$env:HTTP_PROXY="http://127.0.0.1:10809"; $env:HTTPS_PROXY="http://127.0.0.1:10809"', 'PowerShell 代理变量');
+    });
+
+    $('btnCopyBash').addEventListener('click', () => {
+      copyText('export ALL_PROXY=socks5://127.0.0.1:10808', 'Bash ALL_PROXY 变量');
+    });
+
+    $('btnOpenMain').addEventListener('click', () => {
+      showToast('已发送信号唤起 v2rayN 主窗口');
+    });
+
+    setInterval(() => {
+      const active = state.sysProxy || state.tunMode;
+      const down = active && state.routingMode !== 'direct' ? +(0.9 + Math.random() * 1.9).toFixed(2) : +(0.02 + Math.random() * 0.08).toFixed(2);
+      const up = active && state.routingMode !== 'direct' ? +(0.12 + Math.random() * 0.25).toFixed(2) : +(0.01 + Math.random() * 0.03).toFixed(2);
+
+      state.downHistory.push(down);
+      state.downHistory.shift();
+      state.upHistory.push(up);
+      state.upHistory.shift();
+
+      $('capsuleDown').textContent = down >= 1 ? `${down.toFixed(1)}M` : `${Math.round(down * 1024)}K`;
+      $('panelDown').textContent = down >= 1 ? `${down.toFixed(2)} MB/s` : `${Math.round(down * 1024)} KB/s`;
+      $('panelUp').textContent = up >= 1 ? `${up.toFixed(2)} MB/s` : `${Math.round(up * 1024)} KB/s`;
+
+      if (state.musicActive && state.musicPlaying) {
+        state.musicPct = (state.musicPct + 1.2) % 100;
+        $('musicProgress').style.width = `${state.musicPct.toFixed(1)}%`;
+      }
+      renderChart();
+    }, 1500);
+
+    let lastPillLyric = '';
+    function triggerLyricSwap(el) {
+      el.classList.remove('lyric-swap-in');
+      void el.offsetWidth;
+      el.classList.add('lyric-swap-in');
+    }
+
+    function updatePillLyric(rawLyric) {
+      const el = $('pillTrack');
+      const vp = $('pillLyricViewport');
+      const changed = rawLyric !== lastPillLyric;
+      lastPillLyric = rawLyric;
+      el.textContent = rawLyric;
+      el.classList.remove('scrolling', 'paused');
+      if (!state.musicPlaying) el.classList.add('paused');
+      if (changed) triggerLyricSwap(vp);
+      requestAnimationFrame(() => {
+        const overflow = el.scrollWidth - vp.clientWidth;
+        if (overflow > 4) {
+          el.style.setProperty('--lyric-shift', `-${overflow + 6}px`);
+          el.style.setProperty('--lyric-dur', `${Math.max(4.5, (overflow / 26) + 2.8).toFixed(1)}s`);
+          el.classList.add('scrolling');
+        }
+      });
+    }
+
+    setInterval(() => {
+      if (state.musicActive && state.musicPlaying) {
+        state.lyricIdx += 1;
+        const track = TRACKS[state.trackIdx];
+        const full = track.lyrics[state.lyricIdx % track.lyrics.length];
+        $('lyricLine').textContent = full;
+        triggerLyricSwap($('lyricLine'));
+        updatePillLyric(full.replace(/♪/g, '').trim());
+      }
+    }, 4500);
+
+    function updateClock() {
+      const now = new Date();
+      const hm = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
+      const hms = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+      const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+      const wd = weekdays[now.getDay()];
+      $('clockText').textContent = hm;
+      $('pillTimeClock').textContent = hm;
+      $('pillTimeDate').textContent = `${now.getMonth() + 1}/${now.getDate()} ${wd}`;
+      $('expandedClock').textContent = hms;
+      $('expandedDate').textContent = `${now.getMonth() + 1}月${now.getDate()}日 · ${wd}`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+    window.addEventListener('resize', renderIslands);
+
+
+    // Cursor-following Halo Specular Border on all .morph-island containers
+    document.querySelectorAll('.morph-island').forEach((island) => {
+      island.addEventListener('mousemove', (e) => {
+        const rect = island.getBoundingClientRect();
+        island.style.setProperty('--mx', `${(e.clientX - rect.left).toFixed(1)}px`);
+        island.style.setProperty('--my', `${(e.clientY - rect.top).toFixed(1)}px`);
+        island.style.setProperty('--halo-op', '1');
+      });
+      island.addEventListener('mouseleave', () => {
+        island.style.setProperty('--halo-op', '0');
+      });
+    });
+
+
+    // Hover + Scroll Wheel Switch on Left pill ONLY (with directional blur-slide animation); Proxy wheel disabled
+    let lastWheelAt = 0;
+    leftPillBar.addEventListener('wheel', (e) => {
+      if (state.openMode !== 'none') return;
+      e.preventDefault();
+      const now = performance.now();
+      if (now - lastWheelAt < 240) return;
+      lastWheelAt = now;
+
+      const modes = ['heatmap', 'clipboard', 'shelf', 'music'];
+      const curMode = state.musicActive ? 'music' : state.leftTab;
+      const dir = e.deltaY > 0 ? 1 : -1;
+      const next = modes[(modes.indexOf(curMode) + dir + modes.length) % modes.length];
+      if (next === 'music') {
+        state.musicActive = true;
+      } else {
+        state.musicActive = false;
+        setLeftTab(next);
+      }
+      render();
+      syncLeftHeight(true);
+
+      const targetPill = next === 'music' ? $('musicPillContent') : next === 'shelf' ? $('shelfPillContent') : next === 'clipboard' ? $('clipPillContent') : $('timePillContent');
+      targetPill.classList.remove('pill-enter-down', 'pill-enter-up');
+      void targetPill.offsetWidth;
+      targetPill.classList.add(dir > 0 ? 'pill-enter-down' : 'pill-enter-up');
+    }, { passive: false });
+
+
+    function openImportConfirm(nodeObj) {
+      state.pendingImportNode = nodeObj;
+      $('importProtoBadge').textContent = nodeObj.protocol;
+      $('importNodePreview').textContent = `${nodeObj.name} (${nodeObj.raw || nodeObj.ip})`;
+      $('importConfirm').classList.add('show');
+    }
+
+    function commitImport(switchNow) {
+      const n = state.pendingImportNode;
+      if (!n) return;
+      if (!state.nodes.some((x) => x.id === n.id)) {
+        state.nodes.unshift(n);
+        rebuildNodeList();
+      }
+      if (switchNow) {
+        state.activeNodeId = n.id;
+        state.nodeTimeout = false;
+      }
+      $('importConfirm').classList.remove('show');
+      state.pendingImportNode = null;
+      render(switchNow ? n.id : null);
+      showToast(switchNow ? `已导入并切换至 ${n.name}` : `已添加 ${n.name} 到列表`);
+    }
+
+    $('btnImportCancel').addEventListener('click', (e) => {
+      e.stopPropagation();
+      $('importConfirm').classList.remove('show');
+      state.pendingImportNode = null;
+    });
+    $('btnImportAddOnly').addEventListener('click', (e) => { e.stopPropagation(); commitImport(false); });
+    $('btnImportAndSwitch').addEventListener('click', (e) => { e.stopPropagation(); commitImport(true); });
+
+    // Fullscreen Peeking Bar logic
+    function syncPeekState(hoveringTop) {
+      const anchor = $('islandAnchor');
+      const strip = $('peekStrip');
+      if (!state.peekingMode) {
+        anchor.classList.remove('peeking');
+        strip.classList.remove('visible');
+        return;
+      }
+      const shouldHide = !hoveringTop && state.openMode === 'none';
+      anchor.classList.toggle('peeking', shouldHide);
+      strip.classList.toggle('visible', shouldHide);
+    }
+
+    $('btnTogglePeek').addEventListener('click', () => {
+      state.peekingMode = !state.peekingMode;
+      $('peekLabel').textContent = state.peekingMode ? '开' : '关';
+      if (state.peekingMode && state.openMode !== 'none') setOpenMode('none');
+      syncPeekState(false);
+      showToast(state.peekingMode ? '已开启全屏贴边隐藏：鼠标移至屏幕顶部唤出' : '已关闭全屏贴边隐藏');
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!state.peekingMode) return;
+      if (e.clientY <= 20) {
+        syncPeekState(true);
+      } else if (e.clientY > 82 && state.openMode === 'none') {
+        syncPeekState(false);
+      }
+    });
+    $('peekStrip').addEventListener('mouseenter', () => syncPeekState(true));
+
+
+    function shelfIconSvg(kind) {
+      if (kind === 'folder') return '<svg class="w-4 h-4 text-sky-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>';
+      if (kind === 'app') return '<svg class="w-4 h-4 text-indigo-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="3"/><path d="m9 8 6 4-6 4Z"/></svg>';
+      if (kind === 'txt') return '<svg class="w-4 h-4 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" x2="16" y1="13" y2="13"/><line x1="8" x2="16" y1="17" y2="17"/></svg>';
+      return '<svg class="w-4 h-4 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+    }
+
+    function renderShelf() {
+      const grid = $('shelfGrid');
+      grid.innerHTML = '';
+      const sorted = [...state.shelf].sort((a, b) => Number(b.pinned) - Number(a.pinned));
+      if (!sorted.length) {
+        grid.innerHTML = '<div class="col-span-2 text-center text-[11px] text-slate-400 py-8 border border-dashed border-white/15 rounded-xl">将文件、文件夹、.txt 或快捷方式拖入此处暂存</div>';
+        return;
+      }
+
+      sorted.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.draggable = true;
+        card.className = 'clip-item stagger-enter glass-tile p-2 flex items-center justify-between gap-2 cursor-grab active:cursor-grabbing';
+        card.style.setProperty('--clip-idx', String(idx));
+        card.innerHTML = `
+          <div class="flex items-center gap-2 min-w-0 flex-1">
+            <span class="w-7 h-7 rounded-lg bg-white/8 border border-white/10 flex items-center justify-center shrink-0">${shelfIconSvg(item.kind)}</span>
+            <div class="min-w-0">
+              <div class="text-xs font-medium text-slate-100 truncate">${item.name}</div>
+              <div class="mono text-[10px] text-slate-400 truncate">${item.sub}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-0.5 shrink-0">
+            <button type="button" class="shelf-pin w-5 h-5 rounded flex items-center justify-center ${item.pinned ? 'bg-amber-500/25 text-amber-200' : 'text-slate-400 hover:text-white'}" title="${item.pinned ? '取消固定' : '固定'}"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="17" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg></button>
+            <button type="button" class="shelf-del w-5 h-5 rounded flex items-center justify-center text-slate-400 hover:text-rose-300" title="移出工作栏"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+          </div>
+        `;
+
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.shelf-pin') || e.target.closest('.shelf-del')) return;
+          if (item.kind === 'txt') {
+            showToast(`已打开预览：${item.name}`);
+          } else if (item.kind === 'folder') {
+            showToast(`xdg-open ${item.sub}`);
+          } else if (item.kind === 'app') {
+            showToast(`启动快捷方式：${item.name}`);
+          } else {
+            showToast(`已选中：${item.name}`);
+          }
+        });
+
+        card.querySelector('.shelf-pin').addEventListener('click', (e) => {
+          e.stopPropagation();
+          item.pinned = !item.pinned;
+          renderShelf();
+        });
+
+        card.querySelector('.shelf-del').addEventListener('click', (e) => {
+          e.stopPropagation();
+          state.shelf = state.shelf.filter((x) => x.id !== item.id);
+          renderShelf();
+          render();
+          showToast(`已移出 ${item.name}（不删除原文件）`);
+        });
+
+        grid.appendChild(card);
+      });
+    }
+
+    $('btnClearShelf').addEventListener('click', () => {
+      state.shelf = state.shelf.filter((x) => x.pinned);
+      renderShelf();
+      render();
+      showToast('已清理未固定的临时暂存项');
+    });
+
+    // Demo draggable chips -> drag into #leftIsland
+    document.querySelectorAll('.demo-drag-chip').forEach((chip) => {
+      chip.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('application/x-island-item', JSON.stringify({
+          kind: chip.dataset.dragKind,
+          name: chip.dataset.dragName,
+          sub: chip.dataset.dragSub
+        }));
+      });
+    });
+
+    // Drag-to-Wake & Dropzone on #leftIsland (supports real OS files + demo items + text)
+    let dragLeaveTimer = null;
+    leftEl.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      clearTimeout(dragLeaveTimer);
+      leftEl.classList.add('drop-active');
+      if (state.openMode !== 'left' || state.leftTab !== 'shelf' || state.musicActive) {
+        state.musicActive = false;
+        setLeftTab('shelf');
+        setOpenMode('left');
+      }
+    });
+
+    leftEl.addEventListener('dragleave', () => {
+      clearTimeout(dragLeaveTimer);
+      dragLeaveTimer = setTimeout(() => leftEl.classList.remove('drop-active'), 120);
+    });
+
+    leftEl.addEventListener('drop', (e) => {
+      e.preventDefault();
+      clearTimeout(dragLeaveTimer);
+      leftEl.classList.remove('drop-active');
+
+      const custom = e.dataTransfer.getData('application/x-island-item');
+      if (custom) {
+        try {
+          const obj = JSON.parse(custom);
+          state.shelf.unshift({ id: 's_' + Date.now(), pinned: false, ...obj });
+          renderShelf();
+          render();
+          showToast(`已暂存至工作栏：${obj.name}`);
+          return;
+        } catch (err) {}
+      }
+
+      const files = e.dataTransfer.files;
+      if (files && files.length > 0) {
+        Array.from(files).forEach((f, idx) => {
+          const ext = (f.name.split('.').pop() || '').toLowerCase();
+          const kind = ext === 'desktop' ? 'app' : (ext === 'txt' || ext === 'md') ? 'txt' : (!f.type && f.size === 0) ? 'folder' : 'file';
+          const kb = Math.max(1, Math.round(f.size / 1024));
+          state.shelf.unshift({
+            id: 's_' + Date.now() + '_' + idx,
+            kind,
+            name: f.name,
+            sub: kind === 'folder' ? '本地目录' : `${kb} KB`,
+            pinned: false
+          });
+        });
+        renderShelf();
+        render();
+        showToast(`已暂存 ${files.length} 个本地项目到工作栏`);
+        return;
+      }
+
+      const txt = e.dataTransfer.getData('text/plain');
+      if (txt) {
+        state.shelf.unshift({
+          id: 's_' + Date.now(),
+          kind: 'txt',
+          name: txt.slice(0, 18) + (txt.length > 18 ? '...' : ''),
+          sub: `${txt.length} 字符 · 文本片段`,
+          pinned: false
+        });
+        renderShelf();
+        render();
+        showToast('已暂存文本片段到工作栏');
+      }
+    });
+
+    initMatrixTrail();
+    buildHeatmap();
+    rebuildNodeList();
+    renderClips(false);
+    renderIslands();
+    render();
+  </script>
+</body>
+</html>
