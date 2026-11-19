@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
+      color-scheme: dark;
       --in-oklab: ;
       --glass-bg: linear-gradient(
         168deg,
@@ -31,6 +32,14 @@
       );
       --glass-border: rgba(255, 255, 255, 0.34);
       --glass-highlight: rgba(255, 255, 255, 0.65);
+      --tile-border: rgba(255, 255, 255, 0.16);
+      --halo-tint: rgba(125, 211, 252, 0.36);
+      --focus-ring: rgba(56, 189, 248, 0.88);
+      --scrollbar-thumb: rgba(255, 255, 255, 0.28);
+      --scrollbar-track: transparent;
+      --taskbar-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(15, 23, 42, 0.42) 100%);
+      --taskbar-border: rgba(255, 255, 255, 0.20);
+      --taskbar-text: #cbd5e1;
       --spring-ease: cubic-bezier(0.32, 1.18, 0.45, 1);
       --smooth-ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
@@ -56,10 +65,16 @@
           rgba(255, 255, 255, 0.08) 58%,
           rgba(15, 23, 42, 0.14) 100%
         );
+        --taskbar-bg: linear-gradient(180deg var(--in-oklab), rgba(255, 255, 255, 0.12) 0%, rgba(15, 23, 42, 0.42) 100%);
       }
     }
 
     * { box-sizing: border-box; user-select: none; }
+
+    :where(button, [role="button"], input, [tabindex]):focus-visible {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
 
     body {
       margin: 0;
@@ -70,7 +85,10 @@
       overflow-x: hidden;
     }
 
-    .mono { font-family: 'JetBrains Mono', monospace; }
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+    }
 
     .win-desktop {
       position: relative;
@@ -91,6 +109,12 @@
 
     /* Extreme Wallpaper Stress-Test Themes */
     .win-desktop.wp-bright {
+      --glass-card: linear-gradient(155deg var(--in-oklab), rgba(255, 255, 255, 0.15) 0%, rgba(15, 23, 42, 0.26) 100%);
+      --glass-card-hover: linear-gradient(155deg var(--in-oklab), rgba(255, 255, 255, 0.24) 0%, rgba(15, 23, 42, 0.20) 100%);
+      --tile-border: rgba(255, 255, 255, 0.24);
+      --taskbar-bg: linear-gradient(180deg var(--in-oklab), rgba(15, 23, 42, 0.62) 0%, rgba(15, 23, 42, 0.78) 100%);
+      --taskbar-border: rgba(255, 255, 255, 0.34);
+      --taskbar-text: #f1f5f9;
       background:
         radial-gradient(900px 500px at 20% 15%, rgba(186, 230, 253, 0.95), transparent 60%),
         radial-gradient(800px 520px at 80% 25%, rgba(254, 240, 138, 0.75), transparent 60%),
@@ -100,8 +124,9 @@
     .win-desktop.wp-bright .hud-island,
     .win-desktop.wp-bright .import-confirm,
     .win-desktop.wp-bright .clip-popover,
+    .win-desktop.wp-bright .drag-tear-hint,
     .win-desktop.wp-bright #demoCard {
-      background: linear-gradient(168deg var(--in-oklab), rgba(15, 23, 42, 0.54) 0%, rgba(15, 23, 42, 0.72) 100%);
+      background: linear-gradient(168deg var(--in-oklab), rgba(15, 23, 42, 0.56) 0%, rgba(15, 23, 42, 0.74) 100%);
       backdrop-filter: blur(28px) saturate(195%) brightness(0.92);
       -webkit-backdrop-filter: blur(28px) saturate(195%) brightness(0.92);
       border-color: rgba(255, 255, 255, 0.46);
@@ -111,8 +136,11 @@
         inset 0 1.5px 1px rgba(255, 255, 255, 0.58),
         inset 0 -1.5px 2px rgba(255, 255, 255, 0.22);
     }
+    .win-desktop.wp-bright #clockText { color: #e2e8f0; }
 
     .win-desktop.wp-cyber {
+      --tile-border: rgba(255, 255, 255, 0.20);
+      --taskbar-bg: linear-gradient(180deg var(--in-oklab), rgba(15, 23, 42, 0.54) 0%, rgba(12, 16, 30, 0.72) 100%);
       background:
         radial-gradient(600px 420px at 18% 12%, rgba(236, 72, 153, 0.78), transparent 58%),
         radial-gradient(650px 460px at 82% 14%, rgba(6, 182, 212, 0.75), transparent 58%),
@@ -120,7 +148,7 @@
         repeating-linear-gradient(45deg, #1e1b4b 0px, #1e1b4b 18px, #311042 18px, #311042 36px);
     }
     .win-desktop.wp-cyber .morph-island {
-      background: linear-gradient(168deg var(--in-oklab), rgba(255, 255, 255, 0.16) 0%, rgba(12, 16, 30, 0.52) 100%);
+      background: linear-gradient(168deg var(--in-oklab), rgba(255, 255, 255, 0.16) 0%, rgba(12, 16, 30, 0.54) 100%);
       backdrop-filter: blur(28px) saturate(230%) brightness(1.06);
       -webkit-backdrop-filter: blur(28px) saturate(230%) brightness(1.06);
       border-color: rgba(255, 255, 255, 0.38);
@@ -180,9 +208,10 @@
 
     .clip-popover {
       position: fixed;
-      top: 274px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-6px) scale(0.96);
+      top: var(--pop-y, 274px);
+      left: var(--pop-x, 12px);
+      transform: translateY(-6px) scale(0.96);
+      transform-origin: top center;
       width: min(416px, calc(100vw - 24px));
       padding: 10px 12px;
       border-radius: 16px;
@@ -198,7 +227,7 @@
     }
     .clip-popover.show {
       opacity: 1;
-      transform: translateX(-50%) translateY(0) scale(1);
+      transform: translateY(0) scale(1);
     }
 
     .import-confirm {
@@ -225,7 +254,18 @@
       transform: translateX(-50%) translateY(0) scale(1);
     }
 
-    .island-anchor.dock-right { left: calc(100% - 236px); }
+    .island-anchor.dock-right { left: calc(100% - 18px); }
+    .island-anchor.dock-right .hud-island,
+    .island-anchor.dock-right .import-confirm {
+      transform: translateX(-100%) translateY(-8px) scale(0.94);
+    }
+    .island-anchor.dock-right .hud-island.show,
+    .island-anchor.dock-right .import-confirm.show {
+      transform: translateX(-100%) translateY(0) scale(1);
+    }
+    .island-anchor.dock-right .drag-tear-hint {
+      transform: translateX(-100%);
+    }
 
     .morph-island {
       position: absolute;
@@ -251,7 +291,7 @@
     }
 
     #leftIsland { transform-origin: 22% 14%; }
-    #proxyIsland { transform-origin: 78% 14%; }
+    #proxyIsland { transform-origin: 78% 14%; touch-action: none; }
 
     .morph-island::before {
       content: '';
@@ -278,12 +318,13 @@
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      padding: 1px;
+      padding: 1.25px;
       background: radial-gradient(
-        210px circle at var(--mx, -200px) var(--my, -200px),
-        rgba(255, 255, 255, 0.78),
-        rgba(255, 255, 255, 0.24) 38%,
-        transparent 70%
+        220px circle at var(--mx, -200px) var(--my, -200px),
+        rgba(255, 255, 255, 0.86) 0%,
+        var(--halo-tint, rgba(125, 211, 252, 0.36)) 34%,
+        rgba(255, 255, 255, 0.14) 54%,
+        transparent 72%
       );
       -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
@@ -315,6 +356,7 @@
       align-items: center;
       justify-content: space-between;
       cursor: grab;
+      touch-action: none;
       overflow: hidden;
       z-index: 10;
     }
@@ -478,11 +520,20 @@
       width: 100%;
       height: 11px;
       border-radius: 2.5px;
-      transition: transform 0.18s var(--spring-ease), outline 0.15s ease, opacity 0.22s ease;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.18s var(--spring-ease), outline 0.15s ease, box-shadow 0.18s ease, opacity 0.22s ease;
     }
     .gh-cell:hover {
-      transform: scale(1.26);
-      outline: 1px solid rgba(255, 255, 255, 0.55);
+      transform: scale(1.28);
+      outline: 1.5px solid rgba(255, 255, 255, 0.72);
+      z-index: 2;
+    }
+    .gh-cell.selected {
+      transform: scale(1.34);
+      outline: 1.5px solid #ffffff;
+      box-shadow: 0 0 10px rgba(57, 211, 83, 0.92), 0 0 0 1px rgba(15, 23, 42, 0.45);
+      z-index: 3;
     }
 
     @keyframes ghWaveIn {
@@ -634,10 +685,23 @@
 
     .glass-tile {
       background: var(--glass-card);
-      border: 1px solid rgba(255, 255, 255, 0.16);
+      border: 1px solid var(--tile-border);
       border-radius: 14px;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -1px 0 rgba(255, 255, 255, 0.06);
       transition: background 0.22s ease, border-color 0.22s ease, box-shadow 0.26s ease, transform 0.14s var(--smooth-ease);
+    }
+
+    .clip-item.kbd-active,
+    .node-row.kbd-active {
+      border-color: rgba(125, 211, 252, 0.78) !important;
+      background: rgba(56, 189, 248, 0.20) !important;
+      box-shadow: 0 0 0 1px rgba(125, 211, 252, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.36);
+    }
+
+    .clip-item.shelf-dragging-out {
+      opacity: 0.45;
+      transform: scale(0.92);
+      border-color: rgba(251, 113, 133, 0.65) !important;
     }
 
     #clipSearch {
@@ -745,16 +809,114 @@
       animation: shelfBounceIn 0.42s var(--spring-ease) both;
     }
 
-    .vinyl-disc {
-      border-radius: 999px !important;
-      will-change: transform;
+    /* Vinyl 2.0: Static specular glass shell + lightweight GPU-textured grooved platter */
+    .vinyl-shell {
+      position: relative;
+      border-radius: 999px;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      box-shadow:
+        0 8px 20px rgba(2, 6, 23, 0.42),
+        inset 0 1px 1px rgba(255, 255, 255, 0.34);
     }
+    .vinyl-shell::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.34) 0%,
+        rgba(255, 255, 255, 0.08) 28%,
+        transparent 54%,
+        rgba(255, 255, 255, 0.09) 100%
+      );
+      pointer-events: none;
+      z-index: 6;
+    }
+    .vinyl-disc {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 999px !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      will-change: transform;
+      overflow: hidden;
+    }
+    .vinyl-disc::before,
+    .shared-vinyl-platter::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23000' stroke-opacity='0.22' stroke-width='0.9'%3E%3Ccircle cx='48' cy='48' r='44'/%3E%3Ccircle cx='48' cy='48' r='40'/%3E%3Ccircle cx='48' cy='48' r='36'/%3E%3Ccircle cx='48' cy='48' r='32'/%3E%3Ccircle cx='48' cy='48' r='28'/%3E%3C/g%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='0.09' stroke-width='0.7'%3E%3Ccircle cx='48' cy='48' r='42'/%3E%3Ccircle cx='48' cy='48' r='34'/%3E%3Ccircle cx='48' cy='48' r='26'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 100% 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .vinyl-label-core {
+      position: relative;
+      z-index: 2;
+      width: 48%;
+      height: 48%;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.24);
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .music-ctrl-btn {
+      position: relative;
+    }
+    .music-ctrl-btn.is-active {
+      filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.55));
+    }
+    .music-ctrl-btn.is-active::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: #38bdf8;
+      box-shadow: 0 0 6px rgba(56, 189, 248, 0.9);
+    }
+    .music-ctrl-btn.is-off {
+      opacity: 0.48;
+    }
+    .repeat-one-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      min-width: 12px;
+      height: 12px;
+      padding: 0 2px;
+      border-radius: 999px;
+      background: #34d399;
+      color: #022c22;
+      font-size: 8px;
+      font-weight: 700;
+      line-height: 12px;
+      text-align: center;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+      pointer-events: none;
+    }
+
     .music-seek-bar {
       position: relative;
       height: 14px;
       display: flex;
       align-items: center;
       cursor: pointer;
+      touch-action: none;
     }
     .music-seek-track {
       position: relative;
@@ -801,7 +963,31 @@
     }
     .music-ambient-mesh.active {
       opacity: 1;
-      animation: ambientBreathe 4.2s ease-in-out infinite;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .music-ambient-mesh.active {
+        animation: ambientBreathe 4.2s ease-in-out infinite;
+      }
+    }
+    .morph-island.is-animating .music-ambient-mesh {
+      animation-play-state: paused !important;
+    }
+
+    /* Zero-filter soft ambient glow for Proxy & Fused panels (no expensive offscreen blur pass) */
+    .proxy-ambient-mesh {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background:
+        radial-gradient(300px 220px at 18% 12%, var(--proxy-c1, rgba(56, 189, 248, 0.20)), transparent 72%),
+        radial-gradient(320px 240px at 84% 86%, var(--proxy-c2, rgba(16, 185, 129, 0.14)), transparent 74%);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+      transition: opacity 0.38s ease;
+    }
+    .proxy-ambient-mesh.active {
+      opacity: 1;
     }
     @keyframes ambientBreathe {
       0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.88; }
@@ -842,9 +1028,16 @@
     }
     .seg-btn.active { color: #ffffff; font-weight: 600; }
 
-    .node-scroll::-webkit-scrollbar { width: 4px; }
-    .node-scroll::-webkit-scrollbar-track { background: transparent; }
-    .node-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.22); border-radius: 99px; }
+    .node-scroll {
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    }
+    @supports not (scrollbar-color: auto) {
+      .node-scroll { scrollbar-width: auto; }
+      .node-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+      .node-scroll::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+      .node-scroll::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 99px; }
+    }
 
     .node-row {
       width: 100%;
@@ -926,6 +1119,7 @@
       pointer-events: none;
       z-index: 24;
       cursor: grab;
+      touch-action: none;
     }
     #fusedIsland:active { cursor: grabbing; }
     #fusedIsland.expanded { cursor: default; }
@@ -1090,21 +1284,100 @@
       will-change: transform, opacity;
     }
 
-    /* Shared Element Album Proxy (continuous size, radius, position & shortest-angle rotation) */
+    /* Shared Element Album Proxy: 1:1 visual parity with Vinyl 2.0 during morph */
     .shared-album-proxy {
       position: absolute;
       top: 0;
       left: 0;
       border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       pointer-events: none;
       opacity: 0;
       z-index: 25;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      box-shadow:
+        0 8px 20px rgba(2, 6, 23, calc(0.42 * var(--vinyl-morph, 0))),
+        inset 0 1px 1px rgba(255, 255, 255, calc(0.34 * var(--vinyl-morph, 0)));
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
       will-change: transform, width, height, border-radius;
+    }
+    .shared-album-proxy::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.34) 0%,
+        rgba(255, 255, 255, 0.08) 28%,
+        transparent 54%,
+        rgba(255, 255, 255, 0.09) 100%
+      );
+      opacity: var(--vinyl-morph, 0);
+      pointer-events: none;
+      z-index: 6;
+    }
+    .shared-vinyl-platter {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      will-change: transform;
+    }
+    .shared-vinyl-platter::before {
+      opacity: var(--vinyl-morph, 0);
+    }
+    .shared-vinyl-core {
+      position: relative;
+      z-index: 2;
+      width: 48%;
+      height: 48%;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .shared-vinyl-core::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: rgba(15, 23, 42, 0.24);
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.22);
+      opacity: var(--vinyl-morph, 0);
+      pointer-events: none;
+    }
+
+    /* Fused Joint Panel 4-Dot Module Indicator */
+    .fusion-mode-dots {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .fusion-mode-dot {
+      width: 6px;
+      height: 5px;
+      padding: 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.24);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      transition: width 0.34s var(--spring-ease), background-color 0.24s ease, box-shadow 0.28s ease;
+      cursor: pointer;
+    }
+    .fusion-mode-dot:hover {
+      background: rgba(255, 255, 255, 0.48);
+    }
+    .fusion-mode-dot.active {
+      width: 18px;
+      background: linear-gradient(90deg, #38bdf8, #34d399);
+      border-color: rgba(255, 255, 255, 0.52);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.55);
     }
 
     .drag-tear-hint {
@@ -1131,11 +1404,320 @@
 
     .win-taskbar {
       height: 46px;
-      background: linear-gradient(180deg var(--in-oklab), rgba(255, 255, 255, 0.12) 0%, rgba(15, 23, 42, 0.42) 100%);
+      background: var(--taskbar-bg);
+      color: var(--taskbar-text);
       backdrop-filter: blur(26px) saturate(190%);
       -webkit-backdrop-filter: blur(26px) saturate(190%);
-      border-top: 1px solid rgba(255, 255, 255, 0.20);
+      border-top: 1px solid var(--taskbar-border);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
+      transition: background 0.38s ease, border-color 0.38s ease, color 0.3s ease;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .dot-pulse,
+      .fusion-proxy-dot.state-ok,
+      .proxy-mini-dot.state-ok,
+      #proxyIsland.fault-pulse,
+      .eq-bar,
+      .lyric-pill-track.scrolling,
+      .gh-grid.wave-animate .gh-col .gh-cell,
+      .sonar-ripple {
+        animation: none !important;
+      }
+      .pill-enter-down,
+      .pill-enter-up,
+      .lyric-swap-in,
+      .track-next-in,
+      .track-prev-in,
+      .clip-item.stagger-enter,
+      .shelf-bounce-in {
+        animation-duration: 0.14s !important;
+      }
+    }
+
+    /* =====================================================================
+       Surface Theme 2: Obsidian Black (深邃黑曜石哑光暗黑质感)
+       ===================================================================== */
+    .win-desktop.theme-obsidian {
+      --glass-card: linear-gradient(155deg var(--in-oklab), rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.015) 55%, rgba(0, 0, 0, 0.24) 100%);
+      --glass-card-hover: linear-gradient(155deg var(--in-oklab), rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.03) 60%, rgba(0, 0, 0, 0.18) 100%);
+      --tile-border: rgba(255, 255, 255, 0.09);
+      --taskbar-bg: linear-gradient(180deg var(--in-oklab), rgba(14, 17, 24, 0.88) 0%, rgba(7, 9, 14, 0.96) 100%);
+      --taskbar-border: rgba(255, 255, 255, 0.10);
+      --taskbar-text: #cbd5e1;
+    }
+    .win-desktop.theme-obsidian .morph-island,
+    .win-desktop.theme-obsidian #fusedIsland,
+    .win-desktop.theme-obsidian .hud-island,
+    .win-desktop.theme-obsidian .import-confirm,
+    .win-desktop.theme-obsidian .clip-popover,
+    .win-desktop.theme-obsidian .drag-tear-hint,
+    .win-desktop.theme-obsidian #demoCard {
+      background: linear-gradient(
+        168deg var(--in-oklab),
+        rgba(22, 26, 36, 0.90) 0%,
+        rgba(10, 13, 20, 0.95) 58%,
+        rgba(5, 7, 12, 0.98) 100%
+      );
+      backdrop-filter: blur(22px) saturate(135%) brightness(0.90);
+      -webkit-backdrop-filter: blur(22px) saturate(135%) brightness(0.90);
+      border-color: rgba(255, 255, 255, 0.14);
+      box-shadow:
+        0 26px 64px rgba(0, 0, 0, 0.72),
+        0 8px 20px rgba(0, 0, 0, 0.50),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+    }
+    .win-desktop.theme-obsidian .morph-island::before {
+      background: linear-gradient(
+        155deg var(--in-oklab),
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.02) 28%,
+        transparent 56%
+      );
+    }
+    .win-desktop.theme-obsidian .seg-wrap,
+    .win-desktop.theme-obsidian .ltab-wrap {
+      background: rgba(0, 0, 0, 0.42);
+      border-color: rgba(255, 255, 255, 0.09);
+    }
+    .win-desktop.theme-obsidian .seg-indicator,
+    .win-desktop.theme-obsidian .ltab-indicator {
+      background: linear-gradient(180deg var(--in-oklab), rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.07) 100%);
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+    .win-desktop.theme-obsidian .node-row {
+      background: rgba(255, 255, 255, 0.035);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+    .win-desktop.theme-obsidian .node-row:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+    .win-desktop.theme-obsidian .proxy-ambient-mesh {
+      opacity: 0.55;
+    }
+    .win-desktop.theme-obsidian .proxy-ambient-mesh:not(.active) {
+      opacity: 0;
+    }
+
+    /* =====================================================================
+       Surface Theme 3: Apple Liquid Glass (极致通透水滴水晶透镜 + 锐利折光边)
+       ===================================================================== */
+    .win-desktop.theme-apple-glass {
+      --glass-card: linear-gradient(155deg var(--in-oklab), rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 55%, rgba(255, 255, 255, 0.05) 100%);
+      --glass-card-hover: linear-gradient(155deg var(--in-oklab), rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.04) 56%, rgba(255, 255, 255, 0.09) 100%);
+      --tile-border: rgba(255, 255, 255, 0.28);
+      --taskbar-bg: linear-gradient(180deg var(--in-oklab), rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
+      --taskbar-border: rgba(255, 255, 255, 0.36);
+    }
+    .win-desktop.theme-apple-glass .morph-island,
+    .win-desktop.theme-apple-glass #fusedIsland,
+    .win-desktop.theme-apple-glass .hud-island,
+    .win-desktop.theme-apple-glass .import-confirm,
+    .win-desktop.theme-apple-glass .clip-popover,
+    .win-desktop.theme-apple-glass .drag-tear-hint,
+    .win-desktop.theme-apple-glass #demoCard {
+      background: linear-gradient(
+        158deg var(--in-oklab),
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.01) 46%,
+        rgba(255, 255, 255, 0.05) 100%
+      );
+      backdrop-filter: blur(5px) saturate(215%) brightness(1.12) contrast(1.06);
+      -webkit-backdrop-filter: blur(5px) saturate(215%) brightness(1.12) contrast(1.06);
+      border-color: rgba(255, 255, 255, 0.62);
+      box-shadow:
+        0 20px 52px rgba(2, 6, 23, 0.28),
+        0 4px 14px rgba(2, 6, 23, 0.14),
+        inset 0 1.5px 1.5px rgba(255, 255, 255, 0.94),
+        inset 0 6px 14px rgba(255, 255, 255, 0.12),
+        inset 0 -1.5px 2px rgba(255, 255, 255, 0.52),
+        inset 1.5px 0 2px rgba(186, 230, 253, 0.52),
+        inset -1.5px 0 2px rgba(244, 212, 255, 0.38);
+    }
+    .win-desktop.theme-apple-glass .morph-island::before {
+      background: linear-gradient(
+        175deg var(--in-oklab),
+        rgba(255, 255, 255, 0.34) 0%,
+        rgba(255, 255, 255, 0.07) 11%,
+        transparent 26%,
+        transparent 84%,
+        rgba(255, 255, 255, 0.18) 100%
+      );
+    }
+    .win-desktop.theme-apple-glass .morph-island {
+      text-shadow: 0 1px 8px rgba(2, 6, 23, 0.58);
+    }
+    .win-desktop.theme-apple-glass .glass-tile {
+      box-shadow:
+        inset 0 1px 0.5px rgba(255, 255, 255, 0.52),
+        inset 0 -1px 0.5px rgba(255, 255, 255, 0.18);
+    }
+    .win-desktop.theme-apple-glass .seg-wrap,
+    .win-desktop.theme-apple-glass .ltab-wrap {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.32);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.38);
+    }
+    .win-desktop.theme-apple-glass .seg-indicator,
+    .win-desktop.theme-apple-glass .ltab-indicator {
+      background: linear-gradient(180deg var(--in-oklab), rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.10) 100%);
+      border-color: rgba(255, 255, 255, 0.68);
+      box-shadow: 0 2px 8px rgba(2, 6, 23, 0.14), inset 0 1px 1px rgba(255, 255, 255, 0.90);
+    }
+    .win-desktop.theme-apple-glass .node-row {
+      background: rgba(255, 255, 255, 0.045);
+      border-color: rgba(255, 255, 255, 0.24);
+    }
+    .win-desktop.theme-apple-glass .node-row:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.48);
+    }
+    .win-desktop.theme-apple-glass .node-row.active {
+      background: linear-gradient(155deg var(--in-oklab), rgba(56, 189, 248, 0.16) 0%, rgba(255, 255, 255, 0.06) 100%);
+      border-color: rgba(186, 230, 253, 0.66);
+    }
+    .win-desktop.theme-apple-glass .grain-overlay {
+      opacity: 0;
+    }
+    .win-desktop.theme-apple-glass .proxy-ambient-mesh.active {
+      opacity: 0.45;
+    }
+
+    /* Apple Liquid Glass on Bright Light Wallpaper (Ultra-Clear Water-Drop Crystal) */
+    .win-desktop.wp-bright.theme-apple-glass {
+      color-scheme: light;
+      --glass-card: linear-gradient(155deg var(--in-oklab), rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.06) 56%, rgba(255, 255, 255, 0.18) 100%);
+      --glass-card-hover: linear-gradient(155deg var(--in-oklab), rgba(255, 255, 255, 0.40) 0%, rgba(255, 255, 255, 0.16) 58%, rgba(255, 255, 255, 0.30) 100%);
+      --tile-border: rgba(255, 255, 255, 0.78);
+      --scrollbar-thumb: rgba(15, 23, 42, 0.26);
+      --taskbar-bg: linear-gradient(180deg var(--in-oklab), rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.10) 100%);
+      --taskbar-border: rgba(255, 255, 255, 0.88);
+      --taskbar-text: #0f172a;
+    }
+    .win-desktop.wp-bright.theme-apple-glass .morph-island,
+    .win-desktop.wp-bright.theme-apple-glass #fusedIsland,
+    .win-desktop.wp-bright.theme-apple-glass .hud-island,
+    .win-desktop.wp-bright.theme-apple-glass .import-confirm,
+    .win-desktop.wp-bright.theme-apple-glass .clip-popover,
+    .win-desktop.wp-bright.theme-apple-glass .drag-tear-hint,
+    .win-desktop.wp-bright.theme-apple-glass #demoCard {
+      background: linear-gradient(
+        158deg var(--in-oklab),
+        rgba(255, 255, 255, 0.24) 0%,
+        rgba(255, 255, 255, 0.04) 48%,
+        rgba(255, 255, 255, 0.16) 100%
+      );
+      backdrop-filter: blur(6px) saturate(200%) brightness(1.05) contrast(1.04);
+      -webkit-backdrop-filter: blur(6px) saturate(200%) brightness(1.05) contrast(1.04);
+      border-color: rgba(255, 255, 255, 0.92);
+      box-shadow:
+        0 18px 46px rgba(15, 23, 42, 0.13),
+        0 4px 12px rgba(15, 23, 42, 0.07),
+        inset 0 2px 2px rgba(255, 255, 255, 1),
+        inset 0 6px 14px rgba(255, 255, 255, 0.22),
+        inset 0 -1.5px 2px rgba(100, 116, 139, 0.28),
+        inset 1.5px 0 2px rgba(255, 255, 255, 0.88),
+        inset -1.5px 0 2px rgba(255, 255, 255, 0.78);
+      text-shadow: 0 1px 4px rgba(255, 255, 255, 0.65);
+      color: #0f172a;
+    }
+    .win-desktop.wp-bright.theme-apple-glass .text-white,
+    .win-desktop.wp-bright.theme-apple-glass .text-slate-100 { color: #0f172a !important; }
+    .win-desktop.wp-bright.theme-apple-glass .text-slate-200 { color: #1e293b !important; }
+    .win-desktop.wp-bright.theme-apple-glass .text-slate-300 { color: #334155 !important; }
+    .win-desktop.wp-bright.theme-apple-glass .text-slate-400,
+    .win-desktop.wp-bright.theme-apple-glass #clockText { color: #475569 !important; }
+    .win-desktop.wp-bright.theme-apple-glass .text-emerald-200,
+    .win-desktop.wp-bright.theme-apple-glass .text-emerald-200\/85,
+    .win-desktop.wp-bright.theme-apple-glass .text-emerald-200\/90,
+    .win-desktop.wp-bright.theme-apple-glass .text-emerald-300,
+    .win-desktop.wp-bright.theme-apple-glass .text-emerald-100 { color: #047857 !important; }
+    .win-desktop.wp-bright.theme-apple-glass .text-sky-100,
+    .win-desktop.wp-bright.theme-apple-glass .text-sky-200,
+    .win-desktop.wp-bright.theme-apple-glass .text-sky-200\/80,
+    .win-desktop.wp-bright.theme-apple-glass .text-sky-200\/85,
+    .win-desktop.wp-bright.theme-apple-glass .text-sky-300 { color: #0369a1 !important; }
+    .win-desktop.wp-bright.theme-apple-glass .text-indigo-100,
+    .win-desktop.wp-bright.theme-apple-glass .text-indigo-200,
+    .win-desktop.wp-bright.theme-apple-glass .text-violet-200 { color: #4338ca !important; }
+    .win-desktop.wp-bright.theme-apple-glass .text-rose-200,
+    .win-desktop.wp-bright.theme-apple-glass .text-rose-300 { color: #be123c !important; }
+    .win-desktop.wp-bright.theme-apple-glass .text-amber-200,
+    .win-desktop.wp-bright.theme-apple-glass .text-amber-300 { color: #b45309 !important; }
+    .win-desktop.wp-bright.theme-apple-glass .seg-btn { color: #475569; }
+    .win-desktop.wp-bright.theme-apple-glass .seg-btn.active,
+    .win-desktop.wp-bright.theme-apple-glass .ltab-btn.active { color: #0f172a; }
+    .win-desktop.wp-bright.theme-apple-glass .ltab-btn { color: #475569; }
+    .win-desktop.wp-bright.theme-apple-glass .seg-wrap,
+    .win-desktop.wp-bright.theme-apple-glass .ltab-wrap {
+      background: rgba(15, 23, 42, 0.045);
+      border-color: rgba(255, 255, 255, 0.80);
+    }
+    .win-desktop.wp-bright.theme-apple-glass .seg-indicator,
+    .win-desktop.wp-bright.theme-apple-glass .ltab-indicator {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.36));
+      border-color: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.09);
+    }
+    .win-desktop.wp-bright.theme-apple-glass .node-row {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.72);
+    }
+    .win-desktop.wp-bright.theme-apple-glass .node-row:hover {
+      background: rgba(255, 255, 255, 0.36);
+    }
+    .win-desktop.wp-bright.theme-apple-glass .node-row.active {
+      background: linear-gradient(155deg, rgba(56, 189, 248, 0.16), rgba(255, 255, 255, 0.30));
+      border-color: rgba(2, 132, 199, 0.45);
+    }
+    .win-desktop.wp-bright.theme-apple-glass .switch-track {
+      background: rgba(15, 23, 42, 0.16);
+    }
+    .win-desktop.wp-bright.theme-apple-glass .switch-track.on-blue { background: #0284c7; }
+    .win-desktop.wp-bright.theme-apple-glass .switch-track.on-emerald { background: #059669; }
+    .win-desktop.wp-bright.theme-apple-glass #clipSearch {
+      background: rgba(255, 255, 255, 0.32);
+      color: #0f172a;
+      border-color: rgba(15, 23, 42, 0.14);
+    }
+    .win-desktop.wp-bright.theme-apple-glass #clipSearch::placeholder { color: #64748b; }
+    .win-desktop.wp-bright.theme-apple-glass .gh-0 { background: rgba(15, 23, 42, 0.08); }
+    .win-desktop.wp-bright.theme-apple-glass .gh-cell:hover {
+      outline-color: rgba(15, 23, 42, 0.55);
+    }
+    .win-desktop.wp-bright.theme-apple-glass .gh-cell.selected {
+      outline-color: #0f172a;
+      box-shadow: 0 0 8px rgba(5, 150, 105, 0.75);
+    }
+    .win-desktop.wp-bright.theme-apple-glass .fusion-mode-dot {
+      background: rgba(15, 23, 42, 0.18);
+      border-color: rgba(15, 23, 42, 0.12);
+    }
+    .win-desktop.wp-bright.theme-apple-glass .vinyl-label-core svg,
+    .win-desktop.wp-bright.theme-apple-glass .shared-vinyl-core svg,
+    .win-desktop.wp-bright.theme-apple-glass #pillAlbumDot svg,
+    .win-desktop.wp-bright.theme-apple-glass #fusionMusicBadge svg {
+      color: #ffffff !important;
+    }
+    .win-desktop.wp-bright.theme-apple-glass .bg-white\/16,
+    .win-desktop.wp-bright.theme-apple-glass .bg-white\/18 {
+      background-color: rgba(15, 23, 42, 0.12) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    }
+    .win-desktop.wp-bright.theme-apple-glass .bg-white\/6,
+    .win-desktop.wp-bright.theme-apple-glass .bg-white\/8,
+    .win-desktop.wp-bright.theme-apple-glass .bg-white\/10 {
+      background-color: rgba(15, 23, 42, 0.055) !important;
+    }
+    .win-desktop.wp-bright.theme-apple-glass .bg-black\/35 {
+      background-color: rgba(15, 23, 42, 0.07) !important;
+    }
+    .win-desktop.wp-bright.theme-apple-glass .border-white\/10,
+    .win-desktop.wp-bright.theme-apple-glass .border-white\/12,
+    .win-desktop.wp-bright.theme-apple-glass .border-white\/8 {
+      border-color: rgba(15, 23, 42, 0.12) !important;
     }
   </style>
 </head>
@@ -1148,8 +1730,12 @@
       <div id="leftIsland" class="morph-island" role="region" aria-label="时间与音乐灵动岛">
         <div class="grain-overlay"></div>
         <div id="musicAmbientMesh" class="music-ambient-mesh"></div>
-        <div id="sharedAlbumProxy" class="shared-album-proxy bg-gradient-to-br from-rose-500/60 to-amber-600/60 border border-white/25">
-          <svg id="sharedAlbumSvg" class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        <div id="sharedAlbumProxy" class="shared-album-proxy">
+          <div id="sharedAlbumPlatter" class="shared-vinyl-platter bg-gradient-to-br from-rose-500/60 to-amber-600/60">
+            <div class="shared-vinyl-core">
+              <svg id="sharedAlbumSvg" class="w-3 h-3 text-white relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            </div>
+          </div>
         </div>
 
         <!-- Compact Mini Pill (shown when Right Proxy Island is expanded) -->
@@ -1263,8 +1849,12 @@
 
           <!-- Expanded Music Card -->
           <div id="musicCardContent" class="hidden p-4 items-center gap-4 h-[146px]">
-            <div id="albumArt" class="vinyl-disc w-24 h-24 bg-gradient-to-br from-rose-500/60 to-amber-600/60 border border-white/25 flex items-center justify-center shrink-0 relative overflow-hidden">
-              <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            <div class="vinyl-shell w-24 h-24">
+              <div id="albumArt" class="vinyl-disc bg-gradient-to-br from-rose-500/60 to-amber-600/60">
+                <div class="vinyl-label-core">
+                  <svg class="w-5 h-5 text-white relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                </div>
+              </div>
             </div>
 
             <div class="flex-1 min-w-0 flex flex-col justify-between gap-2">
@@ -1289,11 +1879,11 @@
               </div>
 
               <div class="flex items-center justify-between px-1">
-                <button id="btnShuffle" type="button" class="music-ctrl-btn w-7 h-7 rounded-lg hover:scale-110 active:scale-95 flex items-center justify-center transition" title="随机播放"><svg class="w-5 h-5" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_shuf" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#93c5fd"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.16)"/><path d="M8 21h4.2c1.2 0 2.3-.6 3-1.6l3.6-5.2c.7-1 1.8-1.6 3-1.6H24m0 0-2.5-2.5M24 12.6l-2.5 2.5" stroke="url(#fl_shuf)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 11h4.2c1.2 0 2.3.6 3 1.6l.8 1.2m3 4.3.8 1.1c.7 1 1.8 1.6 3 1.6H24m0 0-2.5-2.5M24 20.8l-2.5 2.5" stroke="url(#fl_shuf)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/></svg></button>
+                <button id="btnShuffle" type="button" aria-pressed="false" class="music-ctrl-btn is-off w-7 h-7 rounded-lg hover:scale-110 active:scale-95 flex items-center justify-center transition" title="随机播放：关"><svg class="w-5 h-5" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_shuf" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#93c5fd"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.16)"/><path d="M8 21h4.2c1.2 0 2.3-.6 3-1.6l3.6-5.2c.7-1 1.8-1.6 3-1.6H24m0 0-2.5-2.5M24 12.6l-2.5 2.5" stroke="url(#fl_shuf)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 11h4.2c1.2 0 2.3.6 3 1.6l.8 1.2m3 4.3.8 1.1c.7 1 1.8 1.6 3 1.6H24m0 0-2.5-2.5M24 20.8l-2.5 2.5" stroke="url(#fl_shuf)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/></svg></button>
                 <button id="btnPrevTrack" type="button" class="music-ctrl-btn w-7 h-7 rounded-lg hover:scale-110 active:scale-95 flex items-center justify-center transition" title="上一首"><svg class="w-5 h-5" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_prev" x1="6" y1="6" x2="26" y2="26" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#f8fafc"/><stop offset="100%" stop-color="#94a3b8"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="8" fill="rgba(255,255,255,0.09)" stroke="rgba(255,255,255,0.18)"/><rect x="8.5" y="9" width="3" height="14" rx="1.5" fill="url(#fl_prev)"/><path d="M22.5 10.2c0-1.1-1.2-1.7-2.1-1.1l-7.2 5.3c-.7.5-.7 1.6 0 2.2l7.2 5.3c.9.6 2.1 0 2.1-1.1V10.2z" fill="url(#fl_prev)"/></svg></button>
                 <button id="btnPlayPause" type="button" class="music-ctrl-btn w-9 h-9 rounded-xl hover:scale-105 active:scale-95 flex items-center justify-center shadow-lg transition" title="播放 / 暂停"><svg class="w-6 h-6" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_bg" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#0284c7"/></linearGradient><linearGradient id="fl_hi" x1="16" y1="2" x2="16" y2="16" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="rgba(255,255,255,0.45)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="9" fill="url(#fl_bg)"/><rect x="2.5" y="2.5" width="27" height="27" rx="8.5" stroke="url(#fl_hi)"/><rect x="10.5" y="9" width="4" height="14" rx="2" fill="#ffffff"/><rect x="17.5" y="9" width="4" height="14" rx="2" fill="#ffffff"/></svg></button>
                 <button id="btnNextTrack" type="button" class="music-ctrl-btn w-7 h-7 rounded-lg hover:scale-110 active:scale-95 flex items-center justify-center transition" title="下一首"><svg class="w-5 h-5" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_next" x1="6" y1="6" x2="26" y2="26" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#f8fafc"/><stop offset="100%" stop-color="#94a3b8"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="8" fill="rgba(255,255,255,0.09)" stroke="rgba(255,255,255,0.18)"/><rect x="20.5" y="9" width="3" height="14" rx="1.5" fill="url(#fl_next)"/><path d="M9.5 10.2c0-1.1 1.2-1.7 2.1-1.1l7.2 5.3c.7.5.7 1.6 0 2.2l-7.2 5.3c-.9.6-2.1 0-2.1-1.1V10.2z" fill="url(#fl_next)"/></svg></button>
-                <button id="btnRepeat" type="button" class="music-ctrl-btn w-7 h-7 rounded-lg hover:scale-110 active:scale-95 flex items-center justify-center transition" title="循环模式"><svg class="w-5 h-5" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_rep" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#6ee7b7"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.16)"/><path d="M21 8.5l2.8 2.7L21 13.9M8.5 15.5v-1.3a3 3 0 0 1 3-3h12.2" stroke="url(#fl_rep)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 23.5l-2.8-2.7L11 18.1M23.5 16.5v1.3a3 3 0 0 1-3 3H8.3" stroke="url(#fl_rep)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                <button id="btnRepeat" type="button" class="music-ctrl-btn is-active w-7 h-7 rounded-lg hover:scale-110 active:scale-95 flex items-center justify-center transition" title="列表循环"><svg class="w-5 h-5" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="fl_rep" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#6ee7b7"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="8" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.16)"/><path d="M21 8.5l2.8 2.7L21 13.9M8.5 15.5v-1.3a3 3 0 0 1 3-3h12.2" stroke="url(#fl_rep)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 23.5l-2.8-2.7L11 18.1M23.5 16.5v1.3a3 3 0 0 1-3 3H8.3" stroke="url(#fl_rep)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="repeatBadge" class="repeat-one-badge hidden">1</span></button>
               </div>
             </div>
           </div>
@@ -1303,6 +1893,7 @@
       <!-- Independent Fused Super-Island (372x42 High-Frequency Micro-Controls + Expandable Joint View) -->
       <div id="fusedIsland" class="morph-island flex flex-col is-shell-hidden" role="region" aria-label="双岛超级控制条">
         <div class="grain-overlay"></div>
+        <div id="fusionProxyMesh" class="proxy-ambient-mesh"></div>
         <div id="fusionPillContent" class="fusion-pill-content">
           <div id="fusionLeftZone" class="flex items-center gap-1.5 min-w-0 flex-1 cursor-pointer" title="滚轮切换模式 · 点击展开合岛">
             <!-- Time Mode Left Content -->
@@ -1362,10 +1953,18 @@
           </div>
         </div>
 
-        <!-- Expandable Joint Panel for Fused Island (Design Prototype Draft) -->
+        <!-- Expandable Joint Panel for Fused Island -->
         <div id="fusionExpandedBody" class="fusion-expanded-body" style="width: min(468px, calc(100vw - 24px));">
           <div class="flex items-center justify-between text-[10px] text-slate-400 px-0.5">
-            <span>合岛联合中控（设计草案预览 · 滚轮切换左侧模块）</span>
+            <div class="flex items-center gap-2">
+              <div id="fusionModeDots" class="fusion-mode-dots" role="tablist" aria-label="合岛左侧模块切换">
+                <button type="button" data-fmodetab="heatmap" class="fusion-mode-dot active" title="时间与活力" aria-label="时间与活力"></button>
+                <button type="button" data-fmodetab="clipboard" class="fusion-mode-dot" title="辅助粘贴板" aria-label="辅助粘贴板"></button>
+                <button type="button" data-fmodetab="shelf" class="fusion-mode-dot" title="文件工作栏" aria-label="文件工作栏"></button>
+                <button type="button" data-fmodetab="music" class="fusion-mode-dot" title="媒体播放" aria-label="媒体播放"></button>
+              </div>
+              <span class="text-[10px] text-slate-400/90">双岛联合中控</span>
+            </div>
             <span id="fusionExpModeTag" class="mono text-sky-300">时间 · 代理协同</span>
           </div>
           <div class="grid grid-cols-2 gap-2.5">
@@ -1377,16 +1976,26 @@
                 <div id="fusionExpTimePane" class="flex flex-col gap-1">
                   <div id="fusionExpClockText" class="mono text-xl font-bold text-white tracking-tight leading-none">08:03:29</div>
                   <div id="fusionExpDateText" class="text-[11px] text-slate-300 mt-0.5">11月18日 · 周三</div>
-                  <div class="mt-2 px-2 py-1.5 rounded-lg bg-white/5 border border-white/8 text-[10px] text-slate-400 leading-relaxed">
-                    在此卡片滚轮切换「粘贴板 / 工作栏 / 音乐」
+                  <div class="mt-2 px-2 py-1.5 rounded-lg bg-white/5 border border-white/8 flex items-center justify-between text-[10px] text-slate-300">
+                    <span class="flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-[2px] gh-1"></span>
+                      <span class="w-1.5 h-1.5 rounded-[2px] gh-3"></span>
+                      <span class="w-1.5 h-1.5 rounded-[2px] gh-4"></span>
+                      <span class="mono ml-1">近22周 · 418</span>
+                    </span>
+                    <span class="text-slate-400">滚轮切卡</span>
                   </div>
                 </div>
 
-                <!-- Pane B: Music (Vinyl Spin + EQ Bars + Ambient Mesh) -->
+                <!-- Pane B: Music (Vinyl 2.0 Spin + EQ Bars + Ambient Mesh) -->
                 <div id="fusionExpMusicPane" class="hidden flex-col gap-2">
                   <div class="flex items-center gap-2.5">
-                    <div id="fusionExpVinyl" class="vinyl-disc w-12 h-12 bg-gradient-to-br from-rose-500/60 to-amber-600/60 border border-white/25 flex items-center justify-center shrink-0 relative overflow-hidden">
-                      <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                    <div class="vinyl-shell w-12 h-12">
+                      <div id="fusionExpVinyl" class="vinyl-disc bg-gradient-to-br from-rose-500/60 to-amber-600/60">
+                        <div class="vinyl-label-core">
+                          <svg class="w-3.5 h-3.5 text-white relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                        </div>
+                      </div>
                     </div>
                     <div class="min-w-0 flex-1">
                       <div class="flex items-center justify-between gap-1.5">
@@ -1443,6 +2052,7 @@
 
       <!-- Right Island: Proxy (Pure Minimal 40x40 Status Dot when Collapsed; Full Panel when Expanded) -->
       <div id="proxyIsland" class="morph-island" role="region" aria-label="v2rayN 灵动岛" title="左键展开面板 · 右键快捷开/关代理">
+        <div id="proxyAmbientMesh" class="proxy-ambient-mesh"></div>
         <div id="proxyMiniStatus" class="proxy-mini-status">
           <span id="proxyMiniDot" class="proxy-mini-dot state-ok"></span>
         </div>
@@ -1530,13 +2140,34 @@
 
             <div class="stagger-item stagger-5 glass-tile px-3 py-1.5 flex items-center justify-between gap-3">
               <div class="flex flex-col gap-0.5 shrink-0">
-                <div class="text-[10px] text-slate-400">实时吞吐</div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] text-slate-400">实时吞吐</span>
+                  <span id="trafficPeakLabel" class="mono text-[9px] px-1 rounded bg-white/8 text-slate-300">峰值 2.3M</span>
+                </div>
                 <div class="flex items-center gap-2.5 mono text-xs">
                   <span class="text-sky-300 font-medium">↓ <span id="panelDown">1.84 MB/s</span></span>
                   <span class="text-emerald-300 font-medium">↑ <span id="panelUp">240 KB/s</span></span>
                 </div>
               </div>
-              <svg id="trafficChart" class="w-44 h-8 shrink-0" viewBox="0 0 160 36" preserveAspectRatio="none"></svg>
+              <svg id="trafficChart" class="w-44 h-8 shrink-0 overflow-visible" viewBox="0 0 160 36" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="downGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="rgba(56, 189, 248, 0.36)" />
+                    <stop offset="100%" stop-color="rgba(56, 189, 248, 0.0)" />
+                  </linearGradient>
+                  <linearGradient id="upGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="rgba(52, 211, 153, 0.22)" />
+                    <stop offset="100%" stop-color="rgba(52, 211, 153, 0.0)" />
+                  </linearGradient>
+                </defs>
+                <line x1="0" y1="18" x2="160" y2="18" stroke="rgba(255,255,255,0.06)" stroke-dasharray="2 3" stroke-width="0.8" />
+                <path id="downAreaPath" fill="url(#downGrad)" d="" />
+                <path id="upAreaPath" fill="url(#upGrad)" d="" />
+                <path id="downLinePath" fill="none" stroke="rgba(56, 189, 248, 0.94)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="" />
+                <path id="upLinePath" fill="none" stroke="rgba(52, 211, 153, 0.80)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" d="" />
+                <circle id="downTipHalo" cx="160" cy="18" r="5" fill="rgba(56, 189, 248, 0.28)" />
+                <circle id="downTipDot" cx="160" cy="18" r="2.3" fill="#7dd3fc" />
+              </svg>
             </div>
           </div>
         </div>
@@ -1625,6 +2256,13 @@
         </div>
 
         <div class="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center justify-center gap-2 text-[11px]">
+          <span class="text-slate-400">岛屿材质主题：</span>
+          <button type="button" data-theme="liquid" class="theme-btn px-2.5 py-1 rounded-lg bg-white/16 text-white font-medium">标准液态（当前）</button>
+          <button type="button" data-theme="obsidian" class="theme-btn px-2.5 py-1 rounded-lg bg-white/6 text-slate-300 hover:text-white">曜石黑质感</button>
+          <button type="button" data-theme="apple-glass" class="theme-btn px-2.5 py-1 rounded-lg bg-white/6 text-slate-300 hover:text-white">Apple 透明液态玻璃</button>
+        </div>
+
+        <div class="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center justify-center gap-2 text-[11px]">
           <span class="text-slate-400">壁纸压力测试：</span>
           <button type="button" data-wp="dark" class="wp-btn px-2.5 py-1 rounded-lg bg-white/16 text-white font-medium">深空暗夜</button>
           <button type="button" data-wp="bright" class="wp-btn px-2.5 py-1 rounded-lg bg-white/6 text-slate-300 hover:text-white">纯白高亮壁纸</button>
@@ -1637,15 +2275,16 @@
           <span class="px-2 py-0.5 rounded bg-white/8 border border-white/12 mono text-slate-200">Alt + V</span><span>粘贴板</span>
           <span class="px-2 py-0.5 rounded bg-white/8 border border-white/12 mono text-slate-200">Alt + W</span><span>工作栏</span>
           <span class="px-2 py-0.5 rounded bg-white/8 border border-white/12 mono text-slate-200">Alt + P</span><span>一键测速</span>
+          <span class="px-2 py-0.5 rounded bg-white/8 border border-white/12 mono text-slate-200">↑ / ↓ / Enter</span><span>列表选定</span>
           <span class="px-2 py-0.5 rounded bg-white/8 border border-white/12 mono text-slate-200">右键右岛</span><span>快捷开/关代理</span>
         </div>
       </div>
     </main>
 
-    <footer class="win-taskbar px-4 flex items-center justify-between text-xs text-slate-300">
-      <div class="flex items-center gap-2 opacity-75">
+    <footer class="win-taskbar px-4 flex items-center justify-between text-xs">
+      <div class="flex items-center gap-2 opacity-90">
         <span class="w-4 h-4 rounded bg-sky-500/30 border border-sky-400/40 inline-block"></span>
-        <span class="text-[11px]">Linux Wayland / Niri Desktop</span>
+        <span class="text-[11px] font-medium">Linux Wayland / Niri Desktop</span>
       </div>
       <div class="flex items-center gap-3 mono text-[11px]">
         <span id="trayStatus" class="flex items-center gap-1.5 text-emerald-300">
@@ -1711,9 +2350,26 @@
       }
     ];
 
+    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let prefersReducedMotion = reducedMotionQuery.matches;
+    reducedMotionQuery.addEventListener('change', (e) => {
+      prefersReducedMotion = e.matches;
+      syncVinylSpin();
+    });
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     const state = {
       openMode: 'none',
       leftTab: 'heatmap',
+      lockedHeatLabel: null,
       lastNewShelfId: null,
       shelf: [
         { id: 's1', kind: 'folder', name: 'island-demo', sub: '~/Projects/island-demo', pinned: true },
@@ -1724,6 +2380,8 @@
       clipQuery: '',
       lastNewClipId: null,
       clipStaggerPending: false,
+      kbdClipIdx: -1,
+      kbdNodeIdx: -1,
       clips: [
         { id: 'c1', type: 'node', tag: 'vless://', pinned: true, time: '刚刚', text: 'vless://a9c4e2-reality@jp-02.example.com:443#JP-02' },
         { id: 'c_img1', type: 'image', tag: '图片', pinned: false, time: '1分钟前', text: '桌面截图 1920×1080 · 428 KB', meta: '1920×1080 · PNG · 428 KB', imgSrc: "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 270'%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%230f172a'/%3E%3Cstop offset='100%25' stop-color='%231e293b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='480' height='270' fill='url(%23g1)'/%3E%3Crect x='24' y='24' width='432' height='222' rx='14' fill='%230b1120' stroke='%2338bdf8' stroke-opacity='0.35'/%3E%3Ccircle cx='52' cy='48' r='6' fill='%23f43f5e'/%3E%3Ccircle cx='72' cy='48' r='6' fill='%23fbbf24'/%3E%3Ccircle cx='92' cy='48' r='6' fill='%2334d399'/%3E%3Crect x='48' y='78' width='180' height='14' rx='4' fill='%2338bdf8' fill-opacity='0.45'/%3E%3Crect x='48' y='106' width='320' height='10' rx='4' fill='%2394a3b8' fill-opacity='0.3'/%3E%3Crect x='48' y='128' width='260' height='10' rx='4' fill='%2394a3b8' fill-opacity='0.25'/%3E%3Crect x='48' y='162' width='384' height='60' rx='10' fill='%2310b981' fill-opacity='0.15' stroke='%2334d399' stroke-opacity='0.4'/%3E%3Ctext x='240' y='198' fill='%23a7f3d0' font-family='monospace' font-size='15' text-anchor='middle'%3E1920 x 1080 Screen Capture%3C/text%3E%3C/svg%3E" },
@@ -1732,6 +2390,8 @@
       ],
       musicActive: false,
       musicPlaying: true,
+      musicShuffle: false,
+      musicRepeat: 'all', // 'all' | 'one' | 'off'
       fusedMode: false,
       fusionExpanded: false,
       trackIdx: 0,
@@ -1769,15 +2429,15 @@
     const nodeDomMap = new Map();
 
     let cachedWinW = window.innerWidth;
-    const proxySpring = { p: 0, v: 0, target: 0, rafId: null, lastTime: 0, speed: 0.85 };
-    const leftSpring = { p: 0, v: 0, target: 0, rafId: null, lastTime: 0, speed: 1.0 };
-    const fusionSpring = { p: 0, v: 0, target: 0, rafId: null, lastTime: 0, speed: 0.84 };
-    const fusionExpandSpring = { p: 0, v: 0, target: 0, rafId: null, lastTime: 0, speed: 0.92 };
-    const bumpSpring = { x: 0, v: 0, rafId: null, lastTime: 0 };
-    const leftRubber = { y: 0, v: 0, rafId: null, lastTime: 0 };
-    const fusionRubber = { y: 0, v: 0, rafId: null, lastTime: 0 };
+    const proxySpring = { p: 0, v: 0, target: 0, active: false, speed: 0.85 };
+    const leftSpring = { p: 0, v: 0, target: 0, active: false, speed: 1.0 };
+    const fusionSpring = { p: 0, v: 0, target: 0, active: false, speed: 0.84 };
+    const fusionExpandSpring = { p: 0, v: 0, target: 0, active: false, speed: 0.92 };
+    const leftHeightSpring = { p: 216, v: 0, target: 216, active: false };
+    const bumpSpring = { x: 0, v: 0, active: false };
+    const leftRubber = { y: 0, v: 0, active: false };
+    const fusionRubber = { y: 0, v: 0, active: false };
     let lastProxyPrefs = { sysProxy: true, tunMode: false };
-    const leftHeightSpring = { p: 216, v: 0, target: 216, rafId: null, lastTime: 0 };
     const vinylSpin = { angle: 0, vel: 0, rafId: null, lastTime: 0 };
     const albumAnim = { retractStartAngle: 0, isRetracting: false };
 
@@ -1786,13 +2446,14 @@
       left: { x: 0, v: 0, target: 0 },
       proxy: { x: 0, v: 0, target: 0 },
       split: { x: 0, v: 0, target: 0 },
-      rafId: null,
-      lastTime: 0
+      active: false
     };
 
     const dragGesture = {
       active: false,
       source: null,
+      pointerId: null,
+      captureEl: null,
       startX: 0,
       lastX: 0,
       lastT: 0,
@@ -1801,6 +2462,10 @@
       moved: false
     };
     let isSeekingMusic = false;
+    let seekPointerId = null;
+
+    let physicsRafId = null;
+    let physicsLastTime = 0;
 
     function smoothstep(e0, e1, x) {
       const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0)));
@@ -1817,46 +2482,222 @@
       return sign * (limit * (1 - Math.exp(-abs / (limit * 1.15))));
     }
 
-    function ensureDragPhysLoop() {
-      if (dragPhys.rafId) return;
-      dragPhys.lastTime = 0;
-      const stepDragPhys = (now) => {
-        if (!dragPhys.lastTime) dragPhys.lastTime = now;
-        const dt = Math.min(0.032, Math.max(0.008, (now - dragPhys.lastTime) / 1000));
-        dragPhys.lastTime = now;
+    // Unified Single-rAF Physics Scheduler: steps all active springs & renders once per frame (0-frame idle)
+    function ensurePhysicsLoop() {
+      if (physicsRafId !== null) return;
+      physicsLastTime = 0;
+      physicsRafId = requestAnimationFrame(stepAllPhysics);
+    }
 
-        let anyActive = dragGesture.active;
+    function stepNormalizedSpring(sp, baseDt) {
+      if (!sp.active) return false;
+      if (prefersReducedMotion) {
+        sp.p = sp.target;
+        sp.v = 0;
+        sp.active = false;
+        if (sp === leftSpring && sp.target === 0) {
+          albumAnim.isRetracting = false;
+          vinylSpin.angle = 0;
+        }
+        return false;
+      }
+      const dt = baseDt * (sp.speed || 1);
+      const base = SPRING_PRESETS[state.springPreset];
+      let stiffness = sp.target === 0 ? base.stiffness * 0.95 : base.stiffness;
+      let damping = sp.target === 0 ? Math.max(base.damping * 1.45, 2 * Math.sqrt(stiffness) * 1.04) : base.damping;
+      if (sp === fusionSpring && sp.target === 1) {
+        stiffness = 182;
+        damping = 16.5;
+      }
+
+      const force = -stiffness * (sp.p - sp.target);
+      const accel = force - damping * sp.v;
+      sp.v += accel * dt;
+      sp.p += sp.v * dt;
+
+      if (sp.target === 0 && sp.p < 0) { sp.p = 0; sp.v = 0; }
+
+      const done =
+        (sp.target === 0 && sp.p <= 0.0015 && Math.abs(sp.v) < 0.02) ||
+        (Math.abs(sp.p - sp.target) < 0.0008 && Math.abs(sp.v) < 0.003);
+
+      if (done) {
+        sp.p = sp.target;
+        sp.v = 0;
+        sp.active = false;
+        if (sp === leftSpring && sp.target === 0) {
+          albumAnim.isRetracting = false;
+          vinylSpin.angle = 0;
+        }
+        if (sp === leftSpring && state.openMode === 'left' && !state.musicActive && state.leftTab === 'heatmap' && matrixTrail.start) {
+          matrixTrail.start();
+        }
+        return false;
+      }
+      return true;
+    }
+
+    function stepAllPhysics(now) {
+      if (!physicsLastTime) physicsLastTime = now;
+      let rawDt = (now - physicsLastTime) / 1000;
+      if (!Number.isFinite(rawDt) || rawDt <= 0) rawDt = 0.016;
+      const dt = Math.min(0.032, rawDt);
+      physicsLastTime = now;
+
+      let anyActive = false;
+
+      if (stepNormalizedSpring(leftSpring, dt)) anyActive = true;
+      if (stepNormalizedSpring(proxySpring, dt)) anyActive = true;
+      if (stepNormalizedSpring(fusionSpring, dt)) anyActive = true;
+      if (stepNormalizedSpring(fusionExpandSpring, dt)) anyActive = true;
+
+      if (leftHeightSpring.active) {
+        if (prefersReducedMotion) {
+          leftHeightSpring.p = leftHeightSpring.target;
+          leftHeightSpring.v = 0;
+          leftHeightSpring.active = false;
+        } else {
+          const k = 240;
+          const c = 2 * Math.sqrt(k) * 1.03;
+          const accel = -k * (leftHeightSpring.p - leftHeightSpring.target) - c * leftHeightSpring.v;
+          leftHeightSpring.v += accel * dt;
+          leftHeightSpring.p += leftHeightSpring.v * dt;
+          if (Math.abs(leftHeightSpring.p - leftHeightSpring.target) < 0.4 && Math.abs(leftHeightSpring.v) < 1.5) {
+            leftHeightSpring.p = leftHeightSpring.target;
+            leftHeightSpring.v = 0;
+            leftHeightSpring.active = false;
+          } else {
+            anyActive = true;
+          }
+        }
+      }
+
+      if (bumpSpring.active) {
+        if (prefersReducedMotion) {
+          bumpSpring.x = 0; bumpSpring.v = 0; bumpSpring.active = false;
+        } else {
+          const accel = -290 * bumpSpring.x - 17 * bumpSpring.v;
+          bumpSpring.v += accel * dt;
+          bumpSpring.x += bumpSpring.v * dt;
+          if (Math.abs(bumpSpring.x) < 0.15 && Math.abs(bumpSpring.v) < 1.2) {
+            bumpSpring.x = 0;
+            bumpSpring.v = 0;
+            bumpSpring.active = false;
+          } else {
+            anyActive = true;
+          }
+        }
+      }
+
+      [leftRubber, fusionRubber].forEach((rb) => {
+        if (!rb.active) return;
+        if (prefersReducedMotion) {
+          rb.y = 0; rb.v = 0; rb.active = false;
+          return;
+        }
+        const accel = -340 * rb.y - 19 * rb.v;
+        rb.v += accel * dt;
+        rb.y += rb.v * dt;
+        if (Math.abs(rb.y) < 0.12 && Math.abs(rb.v) < 1.0) {
+          rb.y = 0;
+          rb.v = 0;
+          rb.active = false;
+        } else {
+          anyActive = true;
+        }
+      });
+
+      if (dragPhys.active || (dragGesture.active && dragGesture.moved)) {
+        let dragMoving = dragGesture.active && dragGesture.moved;
         ['left', 'proxy', 'split'].forEach((key) => {
           const sp = dragPhys[key];
-          const k = dragGesture.active && dragGesture.source === (key === 'split' ? 'fusion-split' : key) ? 420 : 260;
-          const c = dragGesture.active && dragGesture.source === (key === 'split' ? 'fusion-split' : key) ? 32 : 19;
+          const isDriven = dragGesture.active && dragGesture.moved && dragGesture.source === (key === 'split' ? 'fusion-split' : key);
+          const k = isDriven ? 420 : 260;
+          const c = isDriven ? 32 : 19;
           const accel = -k * (sp.x - sp.target) - c * sp.v;
           sp.v += accel * dt;
           sp.x += sp.v * dt;
           if (Math.abs(sp.x - sp.target) > 0.08 || Math.abs(sp.v) > 0.6) {
-            anyActive = true;
+            dragMoving = true;
           } else {
             sp.x = sp.target;
             sp.v = 0;
           }
         });
+        dragPhys.active = dragMoving;
+        if (dragMoving) anyActive = true;
+      }
 
+      renderIslands();
+
+      if (!anyActive) {
+        physicsRafId = null;
+        physicsLastTime = 0;
         renderIslands();
-
-        if (!anyActive) {
-          dragPhys.rafId = null;
-          dragPhys.lastTime = 0;
-          return;
+        if (state.openMode === 'left' && !state.musicActive && state.leftTab === 'heatmap' && matrixTrail.start) {
+          matrixTrail.start();
         }
-        dragPhys.rafId = requestAnimationFrame(stepDragPhys);
-      };
-      dragPhys.rafId = requestAnimationFrame(stepDragPhys);
+        return;
+      }
+      physicsRafId = requestAnimationFrame(stepAllPhysics);
+    }
+
+    function ensureDragPhysLoop() {
+      dragPhys.active = true;
+      ensurePhysicsLoop();
+    }
+
+    function kickSpring(sp, target) {
+      sp.target = target;
+      sp.active = true;
+      ensurePhysicsLoop();
+    }
+
+    function syncLeftHeight(immediate = false) {
+      const target = getLeftExpandedHeightTarget();
+      leftHeightSpring.target = target;
+      if (immediate || prefersReducedMotion) {
+        leftHeightSpring.p = target;
+        leftHeightSpring.v = 0;
+        leftHeightSpring.active = false;
+        renderIslands();
+        return;
+      }
+      leftHeightSpring.active = true;
+      ensurePhysicsLoop();
+    }
+
+    function triggerElasticBump(impulse = 16) {
+      if (prefersReducedMotion) return;
+      bumpSpring.v += impulse * 12;
+      bumpSpring.active = true;
+      ensurePhysicsLoop();
+    }
+
+    function triggerVerticalRubber(rubberState, impulseY) {
+      if (prefersReducedMotion) return;
+      rubberState.v = Math.max(-180, Math.min(180, rubberState.v + impulseY * 14));
+      rubberState.active = true;
+      ensurePhysicsLoop();
     }
 
     function syncVinylSpin() {
+      if (prefersReducedMotion) {
+        if (vinylSpin.rafId) {
+          cancelAnimationFrame(vinylSpin.rafId);
+          vinylSpin.rafId = null;
+        }
+        vinylSpin.vel = 0;
+        return;
+      }
       if (vinylSpin.rafId) return;
       vinylSpin.lastTime = 0;
       const stepVinyl = (now) => {
+        if (prefersReducedMotion) {
+          vinylSpin.vel = 0;
+          vinylSpin.rafId = null;
+          return;
+        }
         if (!vinylSpin.lastTime) vinylSpin.lastTime = now;
         const dt = Math.min(0.05, Math.max(0.008, (now - vinylSpin.lastTime) / 1000));
         vinylSpin.lastTime = now;
@@ -1893,8 +2734,10 @@
       ctx: null,
       w: 0,
       h: 0,
+      dpr: 1,
       drops: [],
       trails: [],
+      lastPt: { x: -999, y: -999 },
       chars: '01ABCDEF79$#*+',
       rafId: null,
       lastTime: 0
@@ -1906,42 +2749,64 @@
       matrixTrail.canvas = canvas;
       matrixTrail.ctx = canvas.getContext('2d');
 
-      const resize = () => {
-        const rect = tile.getBoundingClientRect();
-        if (rect.width < 10 || rect.height < 10) return;
+      const syncCanvasSize = (width, height) => {
+        if (width < 10 || height < 10) return;
         const dpr = window.devicePixelRatio || 1;
-        matrixTrail.w = rect.width;
-        matrixTrail.h = rect.height;
-        canvas.width = Math.floor(rect.width * dpr);
-        canvas.height = Math.floor(rect.height * dpr);
+        if (Math.abs(width - matrixTrail.w) < 0.5 && Math.abs(height - matrixTrail.h) < 0.5 && dpr === matrixTrail.dpr) {
+          return;
+        }
+        matrixTrail.w = width;
+        matrixTrail.h = height;
+        matrixTrail.dpr = dpr;
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
         matrixTrail.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        const cols = Math.max(12, Math.floor(rect.width / 16));
+        const cols = Math.max(12, Math.floor(width / 16));
         if (matrixTrail.drops.length !== cols) {
           matrixTrail.drops = Array.from({ length: cols }, () => ({
-            y: Math.random() * rect.height,
+            y: Math.random() * height,
             speed: 18 + Math.random() * 24,
             ch: matrixTrail.chars[Math.floor(Math.random() * matrixTrail.chars.length)]
           }));
         }
       };
 
-      tile.addEventListener('mousemove', (e) => {
+      if (typeof ResizeObserver !== 'undefined') {
+        const ro = new ResizeObserver((entries) => {
+          for (const entry of entries) {
+            syncCanvasSize(entry.contentRect.width, entry.contentRect.height);
+          }
+        });
+        ro.observe(tile);
+      }
+
+      tile.addEventListener('pointermove', (e) => {
+        if (prefersReducedMotion) return;
         const rect = tile.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
+        if (Math.hypot(x - matrixTrail.lastPt.x, y - matrixTrail.lastPt.y) < 10) return;
+        matrixTrail.lastPt.x = x;
+        matrixTrail.lastPt.y = y;
         matrixTrail.trails.push({
           x, y,
           born: performance.now(),
           ch: matrixTrail.chars[Math.floor(Math.random() * matrixTrail.chars.length)]
         });
+        if (matrixTrail.trails.length > 42) {
+          matrixTrail.trails.splice(0, matrixTrail.trails.length - 42);
+        }
       });
 
       const tick = (now) => {
-        if (state.openMode !== 'left' || state.musicActive || state.leftTab !== 'heatmap' || leftSpring.rafId !== null) {
+        if (prefersReducedMotion || state.openMode !== 'left' || state.musicActive || state.leftTab !== 'heatmap' || leftSpring.active) {
           matrixTrail.rafId = null;
           return;
         }
-        resize();
+        if (matrixTrail.w < 10 || matrixTrail.h < 10) {
+          const rect = tile.getBoundingClientRect();
+          syncCanvasSize(rect.width, rect.height);
+        }
         const ctx = matrixTrail.ctx;
         const w = matrixTrail.w;
         const h = matrixTrail.h;
@@ -1985,6 +2850,9 @@
       };
 
       matrixTrail.start = () => {
+        if (prefersReducedMotion) return;
+        const rect = tile.getBoundingClientRect();
+        syncCanvasSize(rect.width, rect.height);
         if (!matrixTrail.rafId) {
           matrixTrail.lastTime = performance.now();
           matrixTrail.rafId = requestAnimationFrame(tick);
@@ -1992,16 +2860,41 @@
       };
     }
 
+    let heatmapWaveTimer = null;
     function triggerHeatmapWave() {
+      if (prefersReducedMotion) return;
       const grid = $('ghGrid');
+      clearTimeout(heatmapWaveTimer);
       grid.classList.remove('wave-animate');
       void grid.offsetWidth;
       grid.classList.add('wave-animate');
+      // Remove wave-animate after completion so animation fill-mode never overrides :hover / .selected scale
+      heatmapWaveTimer = setTimeout(() => {
+        grid.classList.remove('wave-animate');
+      }, 650);
+    }
+
+    const DEFAULT_HEATMAP_TIP = '近22周 · 418 次活跃';
+    let selectedHeatCellEl = null;
+
+    function clearHeatSelection(restoreDefaultTip = true) {
+      if (selectedHeatCellEl) {
+        selectedHeatCellEl.classList.remove('selected');
+        selectedHeatCellEl = null;
+      }
+      state.lockedHeatLabel = null;
+      if (restoreDefaultTip) {
+        const tip = $('ghHoverTip');
+        tip.textContent = DEFAULT_HEATMAP_TIP;
+        tip.classList.remove('pop');
+      }
     }
 
     function buildHeatmap() {
       const grid = $('ghGrid');
       grid.innerHTML = '';
+      selectedHeatCellEl = null;
+      state.lockedHeatLabel = null;
       const levels = [0, 1, 2, 1, 3, 4, 2, 0, 2, 3, 4, 3, 1, 2, 0, 1, 3, 4, 2, 3, 1];
       const now = new Date();
       for (let col = 0; col < 22; col++) {
@@ -2019,15 +2912,50 @@
           const label = `${d.getMonth() + 1}月${d.getDate()}日 · ${count} 次活跃`;
           cell.addEventListener('mouseenter', () => {
             const tip = $('ghHoverTip');
-            tip.textContent = label;
+            tip.textContent = selectedHeatCellEl === cell ? `${label}（已锁定）` : label;
             tip.classList.remove('pop');
             void tip.offsetWidth;
             tip.classList.add('pop');
+          });
+          cell.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const tip = $('ghHoverTip');
+            if (selectedHeatCellEl === cell) {
+              clearHeatSelection(false);
+              tip.textContent = label;
+              tip.classList.remove('pop');
+              void tip.offsetWidth;
+              tip.classList.add('pop');
+            } else {
+              if (selectedHeatCellEl) selectedHeatCellEl.classList.remove('selected');
+              cell.classList.add('selected');
+              selectedHeatCellEl = cell;
+              state.lockedHeatLabel = `${label}（已锁定）`;
+              tip.textContent = state.lockedHeatLabel;
+              tip.classList.remove('pop');
+              void tip.offsetWidth;
+              tip.classList.add('pop');
+            }
           });
           colEl.appendChild(cell);
         }
         grid.appendChild(colEl);
       }
+      grid.addEventListener('mouseleave', () => {
+        const tip = $('ghHoverTip');
+        if (state.lockedHeatLabel) {
+          tip.textContent = state.lockedHeatLabel;
+          tip.classList.add('pop');
+        } else {
+          tip.textContent = DEFAULT_HEATMAP_TIP;
+          tip.classList.remove('pop');
+        }
+      });
+      $('ghTile').addEventListener('click', (e) => {
+        if (!e.target.closest('.gh-cell') && selectedHeatCellEl) {
+          clearHeatSelection(true);
+        }
+      });
     }
 
     function renderIslands() {
@@ -2089,27 +3017,24 @@
       const ph = (40 - proxySquashY * (1 - pp) + (466 - 40 + proxySquashY) * pp) * (1 - fpClamped) + (42 + 3.4 * mergeSqueeze) * fpClamped;
       const pr = 20 + (24 - 20) * pp * (1 - fpClamped);
 
-      // 3. Centers & Collision-free Symmetric Positioning ([-137 .. +137] perfectly centered!)
-      let lxCenter, pxCenter;
-      if (state.dockRight) {
-        lxCenter = -lw / 2;
-        pxCenter = -pw / 2;
-      } else {
-        const expandedProxyCenter = Math.min((cachedWinW / 2) - (pw / 2) - 8, 42);
-        const leftBesideExpandedProxy = Math.max(-(cachedWinW / 2) + (lw / 2) + 8, expandedProxyCenter - (pw / 2) - (lw / 2) - 8);
+      // 3. Unified Centers & Collision-free Positioning (dockRight reuses 100% of centered motion & fusion physics!)
+      const expandedProxyCenter = Math.min((cachedWinW / 2) - (pw / 2) - 8, 42);
+      const leftBesideExpandedProxy = Math.max(-(cachedWinW / 2) + (lw / 2) + 8, expandedProxyCenter - (pw / 2) - (lw / 2) - 8);
 
-        const lxRest = -26;
-        const lxFusedCenter = (-halfFused + splitJointX) / 2; // -77
-        const lxBase = (lxRest * (1 - lp) + dlx + leftAttractPull) * (1 - pp) + leftBesideExpandedProxy * pp;
-        lxCenter = lxBase * (1 - fpClamped) + lxFusedCenter * fpClamped + 16 * mergeSqueeze;
+      const lxRest = -26;
+      const lxFusedCenter = (-halfFused + splitJointX) / 2; // -77
+      const lxBaseNoDrag = lxRest * (1 - lp) * (1 - pp) + leftBesideExpandedProxy * pp;
+      const lxBase = (lxRest * (1 - lp) + dlx + leftAttractPull) * (1 - pp) + leftBesideExpandedProxy * pp;
+      const lxCenter = lxBase * (1 - fpClamped) + lxFusedCenter * fpClamped + 16 * mergeSqueeze;
 
-        const rxRest = 117;
-        const besideLeftX = Math.min((cachedWinW / 2) - (pw / 2) - 10, (lw / 2) + (pw / 2) + 8);
-        const rxFusedCenter = (splitJointX + halfFused) / 2; // +109
-        const collapsedX = rxRest + (besideLeftX - rxRest) * lp + bump + drx + proxyAttractPull;
-        const pxBase = collapsedX * (1 - pp) + expandedProxyCenter * pp;
-        pxCenter = pxBase * (1 - fpClamped) + rxFusedCenter * fpClamped - 18 * mergeSqueeze;
-      }
+      const rxRest = 117;
+      const besideLeftX = Math.min((cachedWinW / 2) - (pw / 2) - 10, (lw / 2) + (pw / 2) + 8);
+      const rxFusedCenter = (splitJointX + halfFused) / 2; // +109
+      const collapsedXNoDrag = rxRest + (besideLeftX - rxRest) * lp;
+      const collapsedX = collapsedXNoDrag + bump + drx + proxyAttractPull;
+      const pxBaseNoDrag = collapsedXNoDrag * (1 - pp) + expandedProxyCenter * pp;
+      const pxBase = collapsedX * (1 - pp) + expandedProxyCenter * pp;
+      const pxCenter = pxBase * (1 - fpClamped) + rxFusedCenter * fpClamped - 18 * mergeSqueeze;
 
       // Split tear impulse shifts both halves outward smoothly right from fp=1
       const splitPull = fpClamped > 0 ? Math.abs(dSplit) * 0.42 : 0;
@@ -2118,42 +3043,11 @@
 
       // Prevent crossing past seam while dragging in normal separated mode
       const rawGap = proxyLeft - (leftPos + lw);
-      const clampTouch = !state.dockRight && fpClamped < 0.05 && lp < 0.05 && pp < 0.05 && rawGap < -2;
+      const clampTouch = fpClamped < 0.05 && lp < 0.05 && pp < 0.05 && rawGap < -2;
       const safeLeftPos = clampTouch && dragGesture.source === 'left' ? proxyLeft - lw + 2 : leftPos;
       const safeProxyLeft = clampTouch && dragGesture.source === 'proxy' ? leftPos + lw - 2 : proxyLeft;
 
-      // Directional solid-first handoff so merged obsidian glass never flashes semi-transparent
-      const fusedShellAlpha = isMerging
-        ? smoothstep(0.24, 0.48, fpClamped)
-        : smoothstep(0.66, 0.88, fpClamped);
-      const pairUnderFusedAlpha = isMerging
-        ? 1 - smoothstep(0.46, 0.64, fpClamped)
-        : 1 - smoothstep(0.84, 0.96, fpClamped);
-
-      const leftOpacity = (state.dockRight ? Math.max(0, 1 - pp * 2.5) : 1) * pairUnderFusedAlpha;
-      leftEl.style.width = `${lw.toFixed(2)}px`;
-      leftEl.style.height = `${lh.toFixed(2)}px`;
-      leftEl.style.borderRadius = `${lr.toFixed(2)}px`;
-      leftEl.style.opacity = leftOpacity.toFixed(3);
-      leftEl.classList.toggle('is-shell-hidden', leftOpacity <= 0.004);
-      leftEl.style.pointerEvents = (leftOpacity > 0.25 && fpClamped < 0.6) ? 'auto' : 'none';
-      leftEl.style.transform = `translate3d(${safeLeftPos.toFixed(2)}px, ${leftRubber.y.toFixed(2)}px, 0)`;
-      leftEl.style.zIndex = (lp >= pp) ? '20' : '15';
-
-      const proxyOpacity = (state.dockRight ? Math.max(0, 1 - lp * 2.5) : 1) * pairUnderFusedAlpha;
-      proxyEl.style.width = `${pw.toFixed(2)}px`;
-      proxyEl.style.height = `${ph.toFixed(2)}px`;
-      proxyEl.style.borderRadius = `${pr.toFixed(2)}px`;
-      proxyEl.style.opacity = proxyOpacity.toFixed(3);
-      proxyEl.classList.toggle('is-shell-hidden', proxyOpacity <= 0.004);
-      proxyEl.style.pointerEvents = (proxyOpacity > 0.25 && fpClamped < 0.6) ? 'auto' : 'none';
-      proxyEl.style.transform = `translate3d(${safeProxyLeft.toFixed(2)}px, 0, 0)`;
-      proxyEl.classList.toggle('is-animating', proxySpring.rafId !== null || fusionSpring.rafId !== null || dragPhys.rafId !== null);
-      leftEl.classList.toggle('is-animating', leftSpring.rafId !== null || fusionSpring.rafId !== null || dragPhys.rafId !== null);
-      proxyEl.style.zIndex = pp > lp ? '20' : '15';
-      $('capsuleNode').style.display = (lp > 0.35 && pp < 0.2) ? 'none' : 'inline';
-
-      // Unified Fused Super-Island Shell: seamlessly morphs from colliding pair bounds & supports expansion
+      // Unified Fused Super-Island Shell in centered local coordinates
       const pairOuterLeft = Math.min(safeLeftPos, safeProxyLeft);
       const pairOuterRight = Math.max(safeLeftPos + lw, safeProxyLeft + pw);
       const pairOuterW = pairOuterRight - pairOuterLeft;
@@ -2164,7 +3058,7 @@
       const baseFusedH = 42 + (266 - 42) * fe;
       const targetFusedW = baseFusedW + fpOver * 110 * (1 - feClamped) + splitStretchW * (1 - feClamped);
       const targetFusedH = Math.max(36, baseFusedH - fpOver * 18 * (1 - feClamped) - splitWaistPinch * (1 - feClamped));
-      const targetFusedLeft = (state.dockRight ? -targetFusedW : -targetFusedW / 2) + dSplit * 0.16 * (1 - feClamped);
+      const targetFusedLeft = -targetFusedW / 2 + dSplit * 0.16 * (1 - feClamped);
 
       let fusedDrawW, fusedDrawH, fusedDrawLeft;
       if (isMerging && fe === 0) {
@@ -2180,14 +3074,58 @@
       }
       const fusedDrawR = 21 * (1 - feClamped) + 24 * feClamped;
 
+      // Single global shift for dockRight: aligns the resting right edge of the centered group to x = 0
+      // so every drag, merge, split, bounce & expand animation behaves identically in both positions.
+      const lxRestRight = (lxBaseNoDrag * (1 - fpClamped) + lxFusedCenter * fpClamped) + lw / 2;
+      const pxRestRight = (pxBaseNoDrag * (1 - fpClamped) + rxFusedCenter * fpClamped) + pw / 2;
+      const pairRestRight = Math.max(lxRestRight, pxRestRight);
+      const fusedRestRight = baseFusedW / 2;
+      const groupRestRight = pairRestRight * (1 - fpClamped) + fusedRestRight * fpClamped;
+      const dockShiftX = state.dockRight ? -groupRestRight : 0;
+
+      const dockTight = state.dockRight && (lw + 8 + pw > cachedWinW - 36);
+      const dockTightHideLeft = dockTight && pp > lp;
+      const dockTightHideProxy = dockTight && lp >= pp;
+
+      // Directional solid-first handoff so merged obsidian glass never flashes semi-transparent
+      const fusedShellAlpha = isMerging
+        ? smoothstep(0.24, 0.48, fpClamped)
+        : smoothstep(0.66, 0.88, fpClamped);
+      const pairUnderFusedAlpha = isMerging
+        ? 1 - smoothstep(0.46, 0.64, fpClamped)
+        : 1 - smoothstep(0.84, 0.96, fpClamped);
+
+      const leftOpacity = (dockTightHideLeft ? Math.max(0, 1 - pp * 2.5) : 1) * pairUnderFusedAlpha;
+      leftEl.style.width = `${lw.toFixed(2)}px`;
+      leftEl.style.height = `${lh.toFixed(2)}px`;
+      leftEl.style.borderRadius = `${lr.toFixed(2)}px`;
+      leftEl.style.opacity = leftOpacity.toFixed(3);
+      leftEl.classList.toggle('is-shell-hidden', leftOpacity <= 0.004);
+      leftEl.style.pointerEvents = (leftOpacity > 0.25 && fpClamped < 0.6) ? 'auto' : 'none';
+      leftEl.style.transform = `translate3d(${(safeLeftPos + dockShiftX).toFixed(2)}px, ${leftRubber.y.toFixed(2)}px, 0)`;
+      leftEl.style.zIndex = (lp >= pp) ? '20' : '15';
+
+      const proxyOpacity = (dockTightHideProxy ? Math.max(0, 1 - lp * 2.5) : 1) * pairUnderFusedAlpha;
+      proxyEl.style.width = `${pw.toFixed(2)}px`;
+      proxyEl.style.height = `${ph.toFixed(2)}px`;
+      proxyEl.style.borderRadius = `${pr.toFixed(2)}px`;
+      proxyEl.style.opacity = proxyOpacity.toFixed(3);
+      proxyEl.classList.toggle('is-shell-hidden', proxyOpacity <= 0.004);
+      proxyEl.style.pointerEvents = (proxyOpacity > 0.25 && fpClamped < 0.6) ? 'auto' : 'none';
+      proxyEl.style.transform = `translate3d(${(safeProxyLeft + dockShiftX).toFixed(2)}px, 0, 0)`;
+      proxyEl.classList.toggle('is-animating', proxySpring.active || fusionSpring.active || dragPhys.active);
+      leftEl.classList.toggle('is-animating', leftSpring.active || fusionSpring.active || dragPhys.active);
+      proxyEl.style.zIndex = pp > lp ? '20' : '15';
+      $('capsuleNode').style.display = (lp > 0.35 && pp < 0.2) ? 'none' : 'inline';
+
       fusedEl.style.width = `${fusedDrawW.toFixed(2)}px`;
       fusedEl.style.height = `${fusedDrawH.toFixed(2)}px`;
       fusedEl.style.borderRadius = `${fusedDrawR.toFixed(2)}px`;
-      fusedEl.style.transform = `translate3d(${fusedDrawLeft.toFixed(2)}px, ${(splitWaistPinch * 0.5 + fusionRubber.y * (1 - feClamped)).toFixed(2)}px, 0)`;
+      fusedEl.style.transform = `translate3d(${(fusedDrawLeft + dockShiftX).toFixed(2)}px, ${(splitWaistPinch * 0.5 + fusionRubber.y * (1 - feClamped)).toFixed(2)}px, 0)`;
       fusedEl.style.opacity = fusedShellAlpha.toFixed(3);
       fusedEl.classList.toggle('is-shell-hidden', fusedShellAlpha <= 0.004);
       fusedEl.style.pointerEvents = fusedShellAlpha > 0.55 ? 'auto' : 'none';
-      fusedEl.classList.toggle('is-animating', fusionSpring.rafId !== null || fusionExpandSpring.rafId !== null || dragPhys.rafId !== null);
+      fusedEl.classList.toggle('is-animating', fusionSpring.active || fusionExpandSpring.active || dragPhys.active);
 
       // Fused pill inner content elastic reveal / hide
       const fusionContentEl = $('fusionPillContent');
@@ -2198,17 +3136,20 @@
       fusionContentEl.style.opacity = fusionContentAlpha.toFixed(3);
       fusionContentEl.style.transform = `scale(${fusionContentScale.toFixed(3)})`;
 
-      // Shared Element Album Proxy: 100% continuous position, size, radius, icon scale & shortest-angle rotation
+      // Shared Element Album Proxy: 1:1 visual parity (outer specular shell + inner rotating platter)
       const sharedAlbum = $('sharedAlbumProxy');
+      const sharedPlatter = $('sharedAlbumPlatter');
       const sharedSvg = $('sharedAlbumSvg');
       const albumArtEl = $('albumArt');
+      const albumShellEl = albumArtEl.parentElement;
       const pillDotEl = $('pillAlbumDot');
       if (state.musicActive && lp > 0.002 && lp < 0.998 && fpClamped < 0.15) {
         const ax = 12 + (16 - 12) * lp;
         const ay = 10 + (25 - 10) * lp;
         const asize = 20 + (96 - 20) * lp;
         const arad = 6 + (48 - 6) * lp;
-        const svgSize = 12 + (24 - 12) * lp;
+        const svgSize = 12 + (20 - 12) * lp;
+        const morphT = smoothstep(0.18, 0.92, lp);
         const effectiveAngle = albumAnim.isRetracting
           ? albumAnim.retractStartAngle * lp
           : vinylSpin.angle;
@@ -2217,14 +3158,18 @@
         sharedAlbum.style.width = `${asize.toFixed(1)}px`;
         sharedAlbum.style.height = `${asize.toFixed(1)}px`;
         sharedAlbum.style.borderRadius = `${arad.toFixed(1)}px`;
-        sharedAlbum.style.transform = `translate3d(${ax.toFixed(1)}px, ${ay.toFixed(1)}px, 0) rotate(${effectiveAngle.toFixed(2)}deg)`;
+        sharedAlbum.style.setProperty('--vinyl-morph', morphT.toFixed(3));
+        sharedAlbum.style.transform = `translate3d(${ax.toFixed(1)}px, ${ay.toFixed(1)}px, 0)`;
+        if (sharedPlatter) {
+          sharedPlatter.style.transform = `rotate(${effectiveAngle.toFixed(2)}deg)`;
+        }
         sharedSvg.style.width = `${svgSize.toFixed(1)}px`;
         sharedSvg.style.height = `${svgSize.toFixed(1)}px`;
-        albumArtEl.style.visibility = 'hidden';
+        if (albumShellEl) albumShellEl.style.visibility = 'hidden';
         pillDotEl.style.visibility = 'hidden';
       } else {
         sharedAlbum.style.opacity = '0';
-        albumArtEl.style.visibility = 'visible';
+        if (albumShellEl) albumShellEl.style.visibility = 'visible';
         pillDotEl.style.visibility = 'visible';
       }
 
@@ -2267,129 +3212,6 @@
       $('capsuleDownWrap').style.display = 'none';
     }
 
-    function stepSpring(sp, now) {
-      if (!sp.lastTime) sp.lastTime = now;
-      let rawDt = (now - sp.lastTime) / 1000;
-      if (!Number.isFinite(rawDt) || rawDt <= 0) rawDt = 0.016;
-      const dt = Math.min(0.032, rawDt) * (sp.speed || 1);
-      sp.lastTime = now;
-
-      const base = SPRING_PRESETS[state.springPreset];
-      let stiffness = sp.target === 0 ? base.stiffness * 0.95 : base.stiffness;
-      let damping = sp.target === 0 ? Math.max(base.damping * 1.45, 2 * Math.sqrt(stiffness) * 1.04) : base.damping;
-      if (sp === fusionSpring && sp.target === 1) {
-        stiffness = 182;
-        damping = 16.5;
-      }
-
-      const force = -stiffness * (sp.p - sp.target);
-      const accel = force - damping * sp.v;
-      sp.v += accel * dt;
-      sp.p += sp.v * dt;
-
-      if (sp.target === 0 && sp.p < 0) { sp.p = 0; sp.v = 0; }
-
-      renderIslands();
-
-      const done =
-        (sp.target === 0 && sp.p <= 0.0015 && Math.abs(sp.v) < 0.02) ||
-        (Math.abs(sp.p - sp.target) < 0.0008 && Math.abs(sp.v) < 0.003);
-
-      if (done) {
-        sp.p = sp.target;
-        sp.v = 0;
-        sp.rafId = null;
-        sp.lastTime = 0;
-        if (sp === leftSpring && sp.target === 0) {
-          albumAnim.isRetracting = false;
-          vinylSpin.angle = 0;
-        }
-        renderIslands();
-        if (sp === leftSpring && state.openMode === 'left' && !state.musicActive && state.leftTab === 'heatmap' && matrixTrail.start) {
-          matrixTrail.start();
-        }
-        return;
-      }
-      sp.rafId = requestAnimationFrame((t) => stepSpring(sp, t));
-    }
-
-    function stepHeightSpring(now) {
-      const sp = leftHeightSpring;
-      if (!sp.lastTime) sp.lastTime = now;
-      let rawDt = (now - sp.lastTime) / 1000;
-      if (!Number.isFinite(rawDt) || rawDt <= 0) rawDt = 0.016;
-      const dt = Math.min(0.032, rawDt);
-      sp.lastTime = now;
-
-      const stiffness = 240;
-      const damping = 2 * Math.sqrt(stiffness) * 1.03;
-      const force = -stiffness * (sp.p - sp.target);
-      const accel = force - damping * sp.v;
-      sp.v += accel * dt;
-      sp.p += sp.v * dt;
-
-      renderIslands();
-
-      if (Math.abs(sp.p - sp.target) < 0.4 && Math.abs(sp.v) < 1.5) {
-        sp.p = sp.target;
-        sp.v = 0;
-        sp.rafId = null;
-        sp.lastTime = 0;
-        renderIslands();
-        return;
-      }
-      sp.rafId = requestAnimationFrame(stepHeightSpring);
-    }
-
-    function syncLeftHeight(immediate = false) {
-      const target = getLeftExpandedHeightTarget();
-      leftHeightSpring.target = target;
-      if (immediate) {
-        leftHeightSpring.p = target;
-        leftHeightSpring.v = 0;
-        renderIslands();
-        return;
-      }
-      if (!leftHeightSpring.rafId) {
-        leftHeightSpring.lastTime = 0;
-        leftHeightSpring.rafId = requestAnimationFrame(stepHeightSpring);
-      }
-    }
-
-    function kickSpring(sp, target) {
-      sp.target = target;
-      if (!sp.rafId) {
-        sp.lastTime = 0;
-        sp.rafId = requestAnimationFrame((t) => stepSpring(sp, t));
-      }
-    }
-
-    function triggerElasticBump(impulse = 16) {
-      bumpSpring.v += impulse * 12;
-      if (!bumpSpring.rafId) {
-        bumpSpring.lastTime = 0;
-        const stepBump = (now) => {
-          if (!bumpSpring.lastTime) bumpSpring.lastTime = now;
-          const dt = Math.min(0.032, Math.max(0.008, (now - bumpSpring.lastTime) / 1000));
-          bumpSpring.lastTime = now;
-          const force = -290 * bumpSpring.x;
-          const accel = force - 17 * bumpSpring.v;
-          bumpSpring.v += accel * dt;
-          bumpSpring.x += bumpSpring.v * dt;
-          renderIslands();
-          if (Math.abs(bumpSpring.x) < 0.15 && Math.abs(bumpSpring.v) < 1.2) {
-            bumpSpring.x = 0;
-            bumpSpring.v = 0;
-            bumpSpring.rafId = null;
-            renderIslands();
-            return;
-          }
-          bumpSpring.rafId = requestAnimationFrame(stepBump);
-        };
-        bumpSpring.rafId = requestAnimationFrame(stepBump);
-      }
-    }
-
     function setFusionExpanded(expanded) {
       if (expanded && !state.fusedMode) return;
       state.fusionExpanded = expanded;
@@ -2403,6 +3225,7 @@
         $('islandAnchor').classList.remove('idle-dim');
         renderFusionExpanded();
       }
+      syncAmbientAndHalo(state.sysProxy || state.tunMode);
       syncVinylSpin();
       kickSpring(fusionExpandSpring, expanded ? 1 : 0);
     }
@@ -2444,6 +3267,8 @@
       const wasLeftClosed = state.openMode !== 'left';
       const wasProxyClosed = state.openMode !== 'proxy';
       state.openMode = mode;
+      state.kbdClipIdx = -1;
+      state.kbdNodeIdx = mode === 'proxy' ? state.nodes.findIndex((n) => n.id === state.activeNodeId) : -1;
       if (mode !== 'none') {
         hudEl.classList.remove('show');
         $('importConfirm').classList.remove('show');
@@ -2548,6 +3373,42 @@
       setTimeout(() => { el.textContent = orig; }, 1100);
     }
 
+    function positionClipPopover() {
+      const pop = $('clipPopover');
+      const rect = leftEl.getBoundingClientRect();
+      const popW = Math.min(416, window.innerWidth - 24);
+      const rawX = rect.left + (rect.width - popW) / 2;
+      const clampedX = Math.max(12, Math.min(window.innerWidth - popW - 12, rawX));
+      const popY = Math.min(window.innerHeight - 160, Math.max(56, rect.bottom + 10));
+      pop.style.setProperty('--pop-x', `${clampedX.toFixed(1)}px`);
+      pop.style.setProperty('--pop-y', `${popY.toFixed(1)}px`);
+    }
+
+    function getFilteredClips() {
+      const q = state.clipQuery.trim().toLowerCase();
+      const sorted = [...state.clips].sort((a, b) => Number(b.pinned) - Number(a.pinned));
+      return q ? sorted.filter((c) => c.text.toLowerCase().includes(q) || c.tag.toLowerCase().includes(q)) : sorted;
+    }
+
+    function syncClipKbdHighlight() {
+      const rows = Array.from($('clipList').querySelectorAll('.clip-item[data-clip-id]'));
+      rows.forEach((row, idx) => {
+        const active = idx === state.kbdClipIdx;
+        row.classList.toggle('kbd-active', active);
+        if (active) row.scrollIntoView({ block: 'nearest' });
+      });
+    }
+
+    function syncNodeKbdHighlight() {
+      state.nodes.forEach((node, idx) => {
+        const refs = nodeDomMap.get(node.id);
+        if (!refs) return;
+        const active = idx === state.kbdNodeIdx;
+        refs.row.classList.toggle('kbd-active', active);
+        if (active) refs.row.scrollIntoView({ block: 'nearest' });
+      });
+    }
+
     function renderClips(useFlip = false) {
       const list = $('clipList');
       const firstTops = new Map();
@@ -2557,9 +3418,10 @@
         });
       }
 
-      const q = state.clipQuery.trim().toLowerCase();
-      const sorted = [...state.clips].sort((a, b) => Number(b.pinned) - Number(a.pinned));
-      const filtered = q ? sorted.filter((c) => c.text.toLowerCase().includes(q) || c.tag.toLowerCase().includes(q)) : sorted;
+      const filtered = getFilteredClips();
+      if (state.kbdClipIdx >= filtered.length) {
+        state.kbdClipIdx = filtered.length ? filtered.length - 1 : -1;
+      }
 
       list.innerHTML = '';
       if (!filtered.length) {
@@ -2571,6 +3433,7 @@
         const row = document.createElement('div');
         row.dataset.clipId = item.id;
         row.className = 'clip-item glass-tile px-2.5 py-2 flex items-center justify-between gap-2';
+        if (idx === state.kbdClipIdx) row.classList.add('kbd-active');
         if (state.lastNewClipId === item.id) {
           row.classList.add('new-glow');
         } else if (state.clipStaggerPending) {
@@ -2578,32 +3441,38 @@
           row.style.setProperty('--clip-idx', String(idx));
         }
 
+        const safeTag = escapeHtml(item.tag);
+        const safeTime = escapeHtml(item.time);
+        const safeText = escapeHtml(item.text);
+
         const left = document.createElement('div');
         left.className = 'min-w-0 flex-1 cursor-pointer flex items-center gap-2';
         left.title = '点击复制';
         if (item.type === 'image' && item.imgSrc) {
           left.innerHTML = `
-            <img src="${item.imgSrc}" alt="缩略图" class="w-8 h-8 rounded-lg object-cover border border-white/15 shrink-0 bg-black/40" />
+            <img src="${escapeHtml(item.imgSrc)}" alt="缩略图" class="w-8 h-8 rounded-lg object-cover border border-white/15 shrink-0 bg-black/40" />
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5">
-                <span class="clip-tag mono text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 shrink-0">${item.tag}</span>
-                <span class="text-[10px] text-slate-400">${item.time}</span>
+                <span class="clip-tag mono text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 shrink-0">${safeTag}</span>
+                <span class="text-[10px] text-slate-400">${safeTime}</span>
               </div>
-              <div class="mono text-[11px] text-slate-100 truncate mt-0.5">${item.text}</div>
+              <div class="mono text-[11px] text-slate-100 truncate mt-0.5">${safeText}</div>
             </div>
           `;
         } else {
           left.innerHTML = `
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5">
-                <span class="clip-tag mono text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-sky-300 shrink-0">${item.tag}</span>
-                <span class="text-[10px] text-slate-400">${item.time}</span>
+                <span class="clip-tag mono text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-sky-300 shrink-0">${safeTag}</span>
+                <span class="text-[10px] text-slate-400">${safeTime}</span>
               </div>
-              <div class="mono text-[11px] text-slate-100 truncate mt-0.5">${item.text}</div>
+              <div class="mono text-[11px] text-slate-100 truncate mt-0.5">${safeText}</div>
             </div>
           `;
         }
         left.addEventListener('click', () => {
+          state.kbdClipIdx = idx;
+          syncClipKbdHighlight();
           copyText(item.text, item.type === 'image' ? '图片' : '剪贴板条目');
           flashCheckFeedback(left.querySelector('.clip-tag'), '✓ 已复制');
         });
@@ -2619,11 +3488,12 @@
               $('clipPopImg').src = item.imgSrc;
               $('clipPopImg').classList.remove('hidden');
             } else {
-              $('clipPopMeta').textContent = '点击条目即可复制';
+              $('clipPopMeta').textContent = '点击条目或按 Enter 复制';
               $('clipPopImg').classList.add('hidden');
               $('clipPopBody').textContent = item.text;
               $('clipPopBody').classList.remove('hidden');
             }
+            positionClipPopover();
             $('clipPopover').classList.add('show');
           }, 340);
         });
@@ -2677,6 +3547,7 @@
           e.stopPropagation();
           state.clips = state.clips.filter((c) => c.id !== item.id);
           renderClips(true);
+          render();
         });
         actions.appendChild(del);
 
@@ -2688,7 +3559,7 @@
       state.clipStaggerPending = false;
       state.lastNewClipId = null;
 
-      if (useFlip && firstTops.size > 0) {
+      if (useFlip && firstTops.size > 0 && !prefersReducedMotion) {
         list.querySelectorAll('.clip-item[data-clip-id]').forEach((el) => {
           const oldTop = firstTops.get(el.dataset.clipId);
           if (oldTop === undefined) return;
@@ -2705,6 +3576,7 @@
 
     function setLeftTab(tab) {
       state.leftTab = tab;
+      state.kbdClipIdx = -1;
       const tabIdx = tab === 'heatmap' ? 0 : tab === 'clipboard' ? 1 : 2;
       $('ltabIndicator').style.transform = `translateX(${tabIdx * 100}%)`;
       document.querySelectorAll('.ltab-btn').forEach((b) => {
@@ -2749,7 +3621,7 @@
       const listEl = $('nodeList');
       listEl.innerHTML = '';
       nodeDomMap.clear();
-      state.nodes.forEach((node) => {
+      state.nodes.forEach((node, idx) => {
         const row = document.createElement('button');
         row.type = 'button';
         row.className = 'node-row';
@@ -2778,6 +3650,7 @@
         row.appendChild(badge);
         row.addEventListener('click', () => {
           state.activeNodeId = node.id;
+          state.kbdNodeIdx = idx;
           state.nodeTimeout = false;
           render();
           showToast(`已切换节点：${node.name}`);
@@ -2826,6 +3699,59 @@
       };
     }
 
+    function syncAmbientAndHalo(isConnected) {
+      const proxyMesh = $('proxyAmbientMesh');
+      const fusionMesh = $('fusionProxyMesh');
+      let c1 = 'rgba(56, 189, 248, 0.22)';
+      let c2 = 'rgba(16, 185, 129, 0.14)';
+      let proxyHalo = 'rgba(56, 189, 248, 0.42)';
+      let hasGlow = isConnected;
+
+      if (state.nodeTimeout) {
+        c1 = 'rgba(244, 63, 94, 0.28)';
+        c2 = 'rgba(251, 113, 133, 0.18)';
+        proxyHalo = 'rgba(251, 113, 133, 0.54)';
+        hasGlow = true;
+      } else if (!isConnected) {
+        proxyHalo = 'rgba(148, 163, 184, 0.32)';
+        hasGlow = false;
+      } else if (state.scene === 'game') {
+        c1 = 'rgba(16, 185, 129, 0.24)';
+        c2 = 'rgba(45, 212, 191, 0.16)';
+        proxyHalo = 'rgba(52, 211, 153, 0.48)';
+      } else if (state.scene === 'ai') {
+        c1 = 'rgba(139, 92, 246, 0.26)';
+        c2 = 'rgba(56, 189, 248, 0.18)';
+        proxyHalo = 'rgba(167, 139, 250, 0.48)';
+      }
+
+      if (proxyMesh) {
+        proxyMesh.style.setProperty('--proxy-c1', c1);
+        proxyMesh.style.setProperty('--proxy-c2', c2);
+        proxyMesh.classList.toggle('active', hasGlow && state.openMode === 'proxy');
+      }
+      if (fusionMesh) {
+        fusionMesh.style.setProperty('--proxy-c1', c1);
+        fusionMesh.style.setProperty('--proxy-c2', c2);
+        fusionMesh.classList.toggle('active', hasGlow && state.fusedMode && state.fusionExpanded);
+      }
+
+      proxyEl.style.setProperty('--halo-tint', proxyHalo);
+      fusedEl.style.setProperty('--halo-tint', proxyHalo);
+
+      if (state.nodeTimeout) {
+        leftEl.style.setProperty('--halo-tint', 'rgba(251, 113, 133, 0.50)');
+      } else if (state.musicActive) {
+        leftEl.style.setProperty('--halo-tint', TRACKS[state.trackIdx].meshC1);
+      } else if (state.leftTab === 'shelf') {
+        leftEl.style.setProperty('--halo-tint', 'rgba(129, 140, 248, 0.44)');
+      } else if (state.leftTab === 'heatmap') {
+        leftEl.style.setProperty('--halo-tint', 'rgba(52, 211, 153, 0.42)');
+      } else {
+        leftEl.style.setProperty('--halo-tint', 'rgba(56, 189, 248, 0.42)');
+      }
+    }
+
     function toggleProxyMaster(prefix = '') {
       if (state.sysProxy || state.tunMode) {
         lastProxyPrefs = { sysProxy: state.sysProxy, tunMode: state.tunMode };
@@ -2850,9 +3776,16 @@
       const isConnected = state.sysProxy || state.tunMode;
       const pv = getProxyStatusVisual(activeNode, isConnected);
       const pillMode = state.musicActive ? 'music' : (state.leftTab === 'shelf' ? 'shelf' : state.leftTab === 'clipboard' ? 'clipboard' : 'time');
+      const dotKey = state.musicActive ? 'music' : state.leftTab;
 
       const modeLabels = { time: '时间 · 代理协同', clipboard: '粘贴板 · 代理协同', shelf: '工作栏 · 代理协同', music: '音乐 · 代理协同' };
       $('fusionExpModeTag').textContent = modeLabels[pillMode];
+
+      document.querySelectorAll('.fusion-mode-dot').forEach((dot) => {
+        const isActive = dot.dataset.fmodetab === dotKey;
+        dot.classList.toggle('active', isActive);
+        dot.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
 
       // Toggle persistent left panes without destroying animated elements
       $('fusionExpTimePane').classList.toggle('hidden', pillMode !== 'time');
@@ -2867,7 +3800,7 @@
       const fMesh = $('fusionAmbientMesh');
       if (pillMode === 'music') {
         const tr = TRACKS[state.trackIdx];
-        $('fusionExpVinyl').className = `vinyl-disc w-12 h-12 bg-gradient-to-br ${tr.dotClass} border border-white/25 flex items-center justify-center shrink-0 relative overflow-hidden`;
+        $('fusionExpVinyl').className = `vinyl-disc bg-gradient-to-br ${tr.dotClass}`;
         $('fusionExpTrackTitle').textContent = tr.title;
         $('fusionExpTrackArtist').textContent = tr.artist;
         $('fusionExpLyric').textContent = tr.lyrics[state.lyricIdx % tr.lyrics.length];
@@ -2882,9 +3815,9 @@
           const clipItems = $('fusionExpClipItems');
           const items = state.clips.slice(0, 2);
           clipItems.innerHTML = items.map((c) => `
-            <button type="button" data-fclip="${c.id}" class="fusion-quick-clip w-full text-left px-2 py-1.5 rounded-lg bg-white/6 hover:bg-white/12 border border-white/8 transition">
-              <div class="flex items-center justify-between text-[9px] text-slate-400"><span>${c.tag}</span><span>${c.time}</span></div>
-              <div class="mono text-[10px] text-slate-200 truncate mt-0.5">${c.text.replace(/</g, '&lt;')}</div>
+            <button type="button" data-fclip="${escapeHtml(c.id)}" class="fusion-quick-clip w-full text-left px-2 py-1.5 rounded-lg bg-white/6 hover:bg-white/12 border border-white/8 transition">
+              <div class="flex items-center justify-between text-[9px] text-slate-400"><span>${escapeHtml(c.tag)}</span><span>${escapeHtml(c.time)}</span></div>
+              <div class="mono text-[10px] text-slate-200 truncate mt-0.5">${escapeHtml(c.text)}</div>
             </button>
           `).join('') || '<div class="text-[10px] text-slate-400 py-3">暂无记录</div>';
           clipItems.querySelectorAll('.fusion-quick-clip').forEach((btn) => {
@@ -2899,8 +3832,8 @@
           const items = state.shelf.slice(0, 2);
           $('fusionExpShelfItems').innerHTML = items.map((s) => `
             <div class="px-2 py-1.5 rounded-lg bg-white/6 border border-white/8">
-              <div class="text-[11px] font-medium text-slate-100 truncate">${s.name}</div>
-              <div class="mono text-[9px] text-slate-400 truncate">${s.sub}</div>
+              <div class="text-[11px] font-medium text-slate-100 truncate">${escapeHtml(s.name)}</div>
+              <div class="mono text-[9px] text-slate-400 truncate">${escapeHtml(s.sub)}</div>
             </div>
           `).join('') || '<div class="text-[10px] text-slate-400 py-3">工作栏为空</div>';
         }
@@ -2930,6 +3863,27 @@
         ? '<rect x="10.5" y="9" width="4" height="14" rx="2" fill="#ffffff"/><rect x="17.5" y="9" width="4" height="14" rx="2" fill="#ffffff"/>'
         : '<path d="M12.2 9.6c0-1 1.1-1.6 2-1.1l9.2 5.9c.8.5.8 1.7 0 2.2l-9.2 5.9c-.9.5-2-.1-2-1.1V9.6z" fill="#ffffff"/>';
       return `<svg class="${sizeCls}" viewBox="0 0 32 32" fill="none"><defs><linearGradient id="${bgId}" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#0284c7"/></linearGradient><linearGradient id="${hiId}" x1="16" y1="2" x2="16" y2="16" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="rgba(255,255,255,0.45)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></linearGradient></defs><rect x="2" y="2" width="28" height="28" rx="9" fill="url(#${bgId})"/><rect x="2.5" y="2.5" width="27" height="27" rx="8.5" stroke="url(#${hiId})"/>${glyph}</svg>`;
+    }
+
+    function syncMusicModeButtons() {
+      const shuf = $('btnShuffle');
+      const rep = $('btnRepeat');
+      const repBadge = $('repeatBadge');
+      if (shuf) {
+        shuf.classList.toggle('is-active', state.musicShuffle);
+        shuf.classList.toggle('is-off', !state.musicShuffle);
+        shuf.setAttribute('aria-pressed', state.musicShuffle ? 'true' : 'false');
+        shuf.title = state.musicShuffle ? '随机播放：开' : '随机播放：关';
+      }
+      if (rep) {
+        const repOn = state.musicRepeat !== 'off';
+        rep.classList.toggle('is-active', repOn);
+        rep.classList.toggle('is-off', !repOn);
+        rep.title = state.musicRepeat === 'one' ? '单曲循环' : state.musicRepeat === 'all' ? '列表循环' : '顺序播放（关闭循环）';
+      }
+      if (repBadge) {
+        repBadge.classList.toggle('hidden', state.musicRepeat !== 'one');
+      }
     }
 
     let lastProxyKind = null;
@@ -3013,14 +3967,15 @@
         updatePillLyric(rawLyric);
         $('trackTitle').textContent = track.title;
         $('trackArtist').textContent = track.artist;
-        $('albumArt').className = `vinyl-disc w-24 h-24 bg-gradient-to-br ${track.dotClass} border border-white/25 flex items-center justify-center shrink-0 relative overflow-hidden`;
+        $('albumArt').className = `vinyl-disc bg-gradient-to-br ${track.dotClass}`;
         $('pillAlbumDot').className = `w-5 h-5 rounded-md bg-gradient-to-br ${track.dotClass} border border-white/20 flex items-center justify-center text-white shrink-0`;
-        $('sharedAlbumProxy').className = `shared-album-proxy bg-gradient-to-br ${track.dotClass} border border-white/25`;
+        $('sharedAlbumPlatter').className = `shared-vinyl-platter bg-gradient-to-br ${track.dotClass}`;
         leftEl.style.borderColor = track.glowColor;
         meshEl.style.setProperty('--ambient-c1', track.meshC1);
         meshEl.style.setProperty('--ambient-c2', track.meshC2);
-        meshEl.classList.toggle('active', state.musicPlaying);
+        meshEl.classList.toggle('active', state.musicPlaying && state.openMode === 'left');
         syncVinylSpin();
+        syncMusicModeButtons();
         $('lyricLine').textContent = track.lyrics[state.lyricIdx % track.lyrics.length];
         $('btnPlayPause').innerHTML = playPauseSvgHtml(state.musicPlaying, 'w-6 h-6', 'fl');
         document.querySelectorAll('.eq-bar').forEach((b) => b.classList.toggle('paused', !state.musicPlaying));
@@ -3052,9 +4007,16 @@
       $('trayStatus').innerHTML = pv.trayHtml;
       $('trayStatus').className = pv.trayClass;
 
+      syncAmbientAndHalo(isConnected);
+
       document.querySelectorAll('.scene-btn').forEach((b) => {
         const active = b.dataset.scene === state.scene;
-        b.className = `scene-btn glass-tile py-1.5 px-2 text-[11px] font-medium flex items-center justify-center gap-1 ${active ? 'text-sky-200 border-sky-400/40 bg-sky-500/18' : 'text-slate-300'}`;
+        const activeCls = state.scene === 'game'
+          ? 'text-emerald-200 border-emerald-400/40 bg-emerald-500/18'
+          : state.scene === 'ai'
+            ? 'text-violet-200 border-violet-400/40 bg-violet-500/18'
+            : 'text-sky-200 border-sky-400/40 bg-sky-500/18';
+        b.className = `scene-btn glass-tile py-1.5 px-2 text-[11px] font-medium flex items-center justify-center gap-1 ${active ? activeCls : 'text-slate-300'}`;
       });
 
       $('btnSysProxy').className = `glass-tile p-2.5 text-left flex items-center justify-between ${state.sysProxy ? 'active-blue' : ''}`;
@@ -3074,11 +4036,12 @@
       });
 
       $('activeNodeMeta').textContent = activeNode.protocol;
-      state.nodes.forEach((node) => {
+      state.nodes.forEach((node, idx) => {
         const refs = nodeDomMap.get(node.id);
         if (!refs) return;
         const active = node.id === state.activeNodeId;
         refs.row.classList.toggle('active', active);
+        refs.row.classList.toggle('kbd-active', idx === state.kbdNodeIdx);
         refs.dot.className = `w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-200 ${active ? 'bg-sky-400' : 'bg-slate-500'}`;
         refs.badge.className = `mono text-[11px] px-2 py-0.5 rounded-full border shrink-0 transition-colors duration-200 ${pingBadgeClass(node.ping)}`;
         refs.badge.textContent = node.ping ? `${node.ping}ms` : '测速中';
@@ -3089,47 +4052,73 @@
         }
       });
 
-      renderChart();
+      if (state.openMode === 'proxy') renderChart();
       if (state.fusedMode) renderFusionExpanded();
     }
 
+    function pointsToSmoothPath(pts) {
+      if (!pts.length) return '';
+      if (pts.length === 1) return `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+      let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[Math.max(0, i - 1)];
+        const p1 = pts[i];
+        const p2 = pts[i + 1];
+        const p3 = pts[Math.min(pts.length - 1, i + 2)];
+        const cp1x = p1[0] + (p2[0] - p0[0]) / 6;
+        const cp1y = Math.max(2, Math.min(34, p1[1] + (p2[1] - p0[1]) / 6));
+        const cp2x = p2[0] - (p3[0] - p1[0]) / 6;
+        const cp2y = Math.max(2, Math.min(34, p2[1] - (p3[1] - p1[1]) / 6));
+        d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+      }
+      return d;
+    }
+
     function renderChart() {
-      const svg = $('trafficChart');
       const w = 160;
       const h = 36;
-      const maxVal = Math.max(2.6, ...state.downHistory);
-      const downPts = state.downHistory.map((v, i) => {
-        const x = (i / (state.downHistory.length - 1)) * w;
-        const y = h - 4 - (v / maxVal) * (h - 9);
-        return [x, y];
-      });
-      const ptsDownStr = downPts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
-      const areaDownStr = `0,${h} ${ptsDownStr} ${w},${h}`;
+      const peakDown = Math.max(...state.downHistory);
+      const maxVal = Math.max(2.6, peakDown * 1.08);
+      const peakEl = $('trafficPeakLabel');
+      if (peakEl) {
+        peakEl.textContent = peakDown >= 1 ? `峰值 ${peakDown.toFixed(1)}M` : `峰值 ${Math.round(peakDown * 1024)}K`;
+      }
+
+      const downPts = state.downHistory.map((v, i) => [
+        (i / (state.downHistory.length - 1)) * w,
+        h - 4 - (v / maxVal) * (h - 9)
+      ]);
+      const upPts = state.upHistory.map((v, i) => [
+        (i / (state.upHistory.length - 1)) * w,
+        h - 4 - (v / maxVal) * (h - 9)
+      ]);
+
+      const downLine = pointsToSmoothPath(downPts);
+      const upLine = pointsToSmoothPath(upPts);
+      const downArea = `${downLine} L ${w} ${h} L 0 ${h} Z`;
+      const upArea = `${upLine} L ${w} ${h} L 0 ${h} Z`;
       const lastPt = downPts[downPts.length - 1];
 
-      const ptsUpStr = state.upHistory.map((v, i) => {
-        const x = (i / (state.upHistory.length - 1)) * w;
-        const y = h - 4 - (v / maxVal) * (h - 9);
-        return `${x.toFixed(1)},${y.toFixed(1)}`;
-      }).join(' ');
-
-      svg.innerHTML = `
-        <defs>
-          <linearGradient id="downGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="rgba(56, 189, 248, 0.32)" />
-            <stop offset="100%" stop-color="rgba(56, 189, 248, 0.0)" />
-          </linearGradient>
-        </defs>
-        <polygon fill="url(#downGrad)" points="${areaDownStr}" />
-        <polyline fill="none" stroke="rgba(56, 189, 248, 0.92)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" points="${ptsDownStr}" />
-        <polyline fill="none" stroke="rgba(52, 211, 153, 0.78)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" points="${ptsUpStr}" />
-        <circle cx="${lastPt[0].toFixed(1)}" cy="${lastPt[1].toFixed(1)}" r="2.4" fill="#38bdf8" />
-      `;
+      $('downAreaPath').setAttribute('d', downArea);
+      $('upAreaPath').setAttribute('d', upArea);
+      $('downLinePath').setAttribute('d', downLine);
+      $('upLinePath').setAttribute('d', upLine);
+      $('downTipHalo').setAttribute('cx', lastPt[0].toFixed(1));
+      $('downTipHalo').setAttribute('cy', lastPt[1].toFixed(1));
+      $('downTipDot').setAttribute('cx', lastPt[0].toFixed(1));
+      $('downTipDot').setAttribute('cy', lastPt[1].toFixed(1));
     }
 
     $('expandableHeader').addEventListener('click', (e) => {
       if (e.target.closest('button') || dragGesture.moved) return;
+      e.stopPropagation();
       setOpenMode(state.openMode === 'proxy' ? 'none' : 'proxy');
+    });
+
+    proxyEl.addEventListener('click', (e) => {
+      if (state.openMode !== 'none' || state.fusedMode || dragGesture.moved) return;
+      e.stopPropagation();
+      setOpenMode('proxy');
     });
 
     leftPillBar.addEventListener('click', (e) => {
@@ -3138,34 +4127,47 @@
       setOpenMode('left');
     });
 
-    function startIslandDrag(source, clientX) {
-      if (state.dockRight || state.openMode !== 'none') return;
+    function releaseDragCapture() {
+      if (dragGesture.captureEl && dragGesture.pointerId !== null) {
+        try {
+          if (dragGesture.captureEl.hasPointerCapture(dragGesture.pointerId)) {
+            dragGesture.captureEl.releasePointerCapture(dragGesture.pointerId);
+          }
+        } catch (err) {}
+      }
+      dragGesture.captureEl = null;
+      dragGesture.pointerId = null;
+    }
+
+    function startIslandDrag(source, e, captureEl) {
+      if (state.openMode !== 'none') return;
       dragGesture.active = true;
       dragGesture.source = source;
-      dragGesture.startX = clientX;
-      dragGesture.lastX = clientX;
+      dragGesture.pointerId = e.pointerId;
+      dragGesture.captureEl = captureEl;
+      dragGesture.startX = e.clientX;
+      dragGesture.lastX = e.clientX;
       dragGesture.lastT = performance.now();
       dragGesture.vx = 0;
       dragGesture.dx = 0;
       dragGesture.moved = false;
-      ensureDragPhysLoop();
     }
 
-    leftPillBar.addEventListener('mousedown', (e) => {
+    leftPillBar.addEventListener('pointerdown', (e) => {
       if (e.button !== 0 || e.target.closest('#btnQuickClip')) return;
-      startIslandDrag('left', e.clientX);
+      startIslandDrag('left', e, leftPillBar);
     });
-    proxyEl.addEventListener('mousedown', (e) => {
+    proxyEl.addEventListener('pointerdown', (e) => {
       if (e.button !== 0 || state.openMode !== 'none' || state.fusedMode) return;
-      startIslandDrag('proxy', e.clientX);
+      startIslandDrag('proxy', e, proxyEl);
     });
-    fusedEl.addEventListener('mousedown', (e) => {
+    fusedEl.addEventListener('pointerdown', (e) => {
       if (e.button !== 0 || e.target.closest('button') || state.fusionExpanded) return;
-      startIslandDrag('fusion-split', e.clientX);
+      startIslandDrag('fusion-split', e, fusedEl);
     });
 
-    window.addEventListener('mousemove', (e) => {
-      if (!dragGesture.active) return;
+    window.addEventListener('pointermove', (e) => {
+      if (!dragGesture.active || (dragGesture.pointerId !== null && e.pointerId !== dragGesture.pointerId)) return;
       const now = performance.now();
       const dt = Math.max(4, now - dragGesture.lastT) / 1000;
       const instVx = (e.clientX - dragGesture.lastX) / dt;
@@ -3174,8 +4176,12 @@
       dragGesture.lastT = now;
 
       const rawDx = e.clientX - dragGesture.startX;
-      if (Math.abs(rawDx) > 7) {
+      if (!dragGesture.moved && Math.abs(rawDx) > 7) {
         dragGesture.moved = true;
+        if (dragGesture.captureEl && dragGesture.pointerId !== null) {
+          try { dragGesture.captureEl.setPointerCapture(dragGesture.pointerId); } catch (err) {}
+        }
+        ensureDragPhysLoop();
         $('dragTearHint').textContent = dragGesture.source === 'fusion-split'
           ? '继续向外拉拽即可撕裂回双岛'
           : '继续拉近即可融合为控制条';
@@ -3189,6 +4195,7 @@
         if (rawDx >= 44 || (rawDx >= 28 && dragGesture.vx > 360)) {
           dragGesture.active = false;
           dragGesture.source = null;
+          releaseDragCapture();
           $('dragTearHint').classList.remove('show');
           setFusedMode(true, dragGesture.vx);
           showToast('双岛碰撞吸合，已融合为超级控制条');
@@ -3199,6 +4206,7 @@
         if (rawDx <= -44 || (rawDx <= -28 && dragGesture.vx < -360)) {
           dragGesture.active = false;
           dragGesture.source = null;
+          releaseDragCapture();
           $('dragTearHint').classList.remove('show');
           setFusedMode(true, dragGesture.vx);
           showToast('双岛碰撞吸合，已融合为超级控制条');
@@ -3209,6 +4217,7 @@
         if (Math.abs(rawDx) >= 58 || (Math.abs(rawDx) >= 38 && Math.abs(dragGesture.vx) > 460)) {
           dragGesture.active = false;
           dragGesture.source = null;
+          releaseDragCapture();
           $('dragTearHint').classList.remove('show');
           const dir = rawDx >= 0 ? 1 : -1;
           // Transfer tear momentum directly to splitting islands for springy rebound!
@@ -3221,11 +4230,12 @@
       }
     });
 
-    window.addEventListener('mouseup', () => {
-      if (!dragGesture.active) return;
+    function finishIslandDrag(e) {
+      if (!dragGesture.active || (e && dragGesture.pointerId !== null && e.pointerId !== dragGesture.pointerId)) return;
       const { source, dx, vx, moved } = dragGesture;
       dragGesture.active = false;
       dragGesture.source = null;
+      releaseDragCapture();
       $('dragTearHint').classList.remove('show');
 
       if (moved) {
@@ -3243,13 +4253,10 @@
         }
         ensureDragPhysLoop();
         setTimeout(() => { dragGesture.moved = false; }, 60);
-      } else {
-        dragPhys.left.target = 0;
-        dragPhys.proxy.target = 0;
-        dragPhys.split.target = 0;
-        ensureDragPhysLoop();
       }
-    });
+    }
+    window.addEventListener('pointerup', finishIslandDrag);
+    window.addEventListener('pointercancel', finishIslandDrag);
 
     document.addEventListener('click', (e) => {
       if (!e.target || !document.contains(e.target)) return;
@@ -3263,10 +4270,18 @@
       btn.addEventListener('click', (e) => { e.stopPropagation(); setLeftTab(btn.dataset.ltab); });
     });
 
-    $('btnQuickClip').addEventListener('click', (e) => {
+    const openQuickClip = (e) => {
       e.stopPropagation();
+      state.musicActive = false;
       setLeftTab('clipboard');
       setOpenMode('left');
+    };
+    $('btnQuickClip').addEventListener('click', openQuickClip);
+    $('btnQuickClip').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openQuickClip(e);
+      }
     });
 
     $('btnCloseMusic').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('none'); });
@@ -3274,7 +4289,15 @@
     $('leftMiniPill').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('left'); });
     leftEl.addEventListener('click', (e) => {
       if (!e.target || !document.contains(e.target)) return;
-      if (state.openMode === 'left' && !e.target.closest('.music-ctrl-btn') && !e.target.closest('.ltab-wrap') && !e.target.closest('#clipPanel') && !e.target.closest('#shelfPanel') && !e.target.closest('#musicSeekBar')) {
+      if (
+        state.openMode === 'left' &&
+        !e.target.closest('.music-ctrl-btn') &&
+        !e.target.closest('.ltab-wrap') &&
+        !e.target.closest('#ghTile') &&
+        !e.target.closest('#clipPanel') &&
+        !e.target.closest('#shelfPanel') &&
+        !e.target.closest('#musicSeekBar')
+      ) {
         setOpenMode('none');
       }
     });
@@ -3286,6 +4309,22 @@
     });
 
     $('btnCollapse').addEventListener('click', (e) => { e.stopPropagation(); setOpenMode('none'); });
+
+    document.querySelectorAll('.theme-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const theme = btn.dataset.theme;
+        const desk = document.querySelector('.win-desktop');
+        desk.classList.remove('theme-obsidian', 'theme-apple-glass');
+        if (theme === 'obsidian') desk.classList.add('theme-obsidian');
+        if (theme === 'apple-glass') desk.classList.add('theme-apple-glass');
+        document.querySelectorAll('.theme-btn').forEach((b) => {
+          const active = b.dataset.theme === theme;
+          b.className = `theme-btn px-2.5 py-1 rounded-lg ${active ? 'bg-white/16 text-white font-medium' : 'bg-white/6 text-slate-300 hover:text-white'}`;
+        });
+        const names = { liquid: '标准液态（默认）', obsidian: '曜石黑质感', 'apple-glass': 'Apple 透明液态玻璃' };
+        showToast(`已切换材质主题：${names[theme] || theme}`);
+      });
+    });
 
     document.querySelectorAll('.wp-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -3312,19 +4351,21 @@
         }
       }, 3000);
     }
-    document.addEventListener('mousemove', (e) => {
+    document.addEventListener('pointermove', (e) => {
       if (e.clientY <= 72) wakeTopIslands();
     });
     wakeTopIslands();
 
     $('clipSearch').addEventListener('input', (e) => {
       state.clipQuery = e.target.value;
+      state.kbdClipIdx = -1;
       renderClips(false);
     });
 
     $('btnClearClips').addEventListener('click', () => {
       state.clips = state.clips.filter((c) => c.pinned);
       renderClips(true);
+      render();
       showToast('已清空未置顶的剪贴板记录');
     });
 
@@ -3340,6 +4381,7 @@
       state.lastNewClipId = id;
       state.clips.unshift({ id, pinned: false, time: '刚刚', ...pick });
       renderClips(true);
+      render();
       showToast(`已捕获新剪贴板：${pick.tag}`);
     });
 
@@ -3412,6 +4454,26 @@
       setFusedMode(false);
     });
 
+    function stepTrack(dir, showPrefixToast = false) {
+      if (state.musicShuffle && TRACKS.length > 1) {
+        let nextIdx = state.trackIdx;
+        while (nextIdx === state.trackIdx) {
+          nextIdx = Math.floor(Math.random() * TRACKS.length);
+        }
+        state.trackIdx = nextIdx;
+      } else {
+        state.trackIdx = (state.trackIdx + dir + TRACKS.length) % TRACKS.length;
+      }
+      state.lyricIdx = 0;
+      state.musicPct = dir > 0 ? 8 : 12;
+      $('musicProgress').style.width = `${state.musicPct}%`;
+      render();
+      triggerTrackTransition(dir);
+      if (showPrefixToast) {
+        showToast(`${dir > 0 ? '已切至下一首' : '已切至上一首'}：${TRACKS[state.trackIdx].title}`);
+      }
+    }
+
     $('btnFusionPlay').addEventListener('click', (e) => {
       e.stopPropagation();
       state.musicPlaying = !state.musicPlaying;
@@ -3420,19 +4482,11 @@
     });
     $('btnFusionPrev').addEventListener('click', (e) => {
       e.stopPropagation();
-      state.trackIdx = (state.trackIdx - 1 + TRACKS.length) % TRACKS.length;
-      state.lyricIdx = 0;
-      render();
-      triggerTrackTransition(-1);
-      showToast(`已切至上一首：${TRACKS[state.trackIdx].title}`);
+      stepTrack(-1, true);
     });
     $('btnFusionNext').addEventListener('click', (e) => {
       e.stopPropagation();
-      state.trackIdx = (state.trackIdx + 1) % TRACKS.length;
-      state.lyricIdx = 0;
-      render();
-      triggerTrackTransition(1);
-      showToast(`已切至下一首：${TRACKS[state.trackIdx].title}`);
+      stepTrack(1, true);
     });
     $('btnFusionProxyToggle').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -3493,22 +4547,34 @@
       state.musicPct = pct;
       $('musicProgress').style.width = `${pct.toFixed(1)}%`;
     }
-    seekBar.addEventListener('mousedown', (e) => {
+    seekBar.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
       e.stopPropagation();
       isSeekingMusic = true;
+      seekPointerId = e.pointerId;
       seekBar.classList.add('dragging');
+      try { seekBar.setPointerCapture(e.pointerId); } catch (err) {}
       applySeekClientX(e.clientX);
     });
-    window.addEventListener('mousemove', (e) => {
-      if (!isSeekingMusic) return;
+    seekBar.addEventListener('pointermove', (e) => {
+      if (!isSeekingMusic || (seekPointerId !== null && e.pointerId !== seekPointerId)) return;
       applySeekClientX(e.clientX);
     });
-    window.addEventListener('mouseup', () => {
-      if (!isSeekingMusic) return;
+    function finishSeek(e) {
+      if (!isSeekingMusic || (e && seekPointerId !== null && e.pointerId !== seekPointerId)) return;
       isSeekingMusic = false;
+      try {
+        if (seekPointerId !== null && seekBar.hasPointerCapture(seekPointerId)) {
+          seekBar.releasePointerCapture(seekPointerId);
+        }
+      } catch (err) {}
+      seekPointerId = null;
       seekBar.classList.remove('dragging');
       showToast(`已定位播放进度：${Math.round(state.musicPct)}%`);
-    });
+    }
+    seekBar.addEventListener('pointerup', finishSeek);
+    seekBar.addEventListener('pointercancel', finishSeek);
+
     function triggerTrackTransition(dir) {
       const cls = dir > 0 ? 'track-next-in' : 'track-prev-in';
       [$('albumArt'), $('trackTitle'), $('trackArtist'), $('lyricLine'), $('fusionExpVinyl'), $('fusionExpTrackTitle'), $('fusionExpTrackArtist'), $('fusionExpLyric')].forEach((el) => {
@@ -3521,22 +4587,26 @@
 
     $('btnPrevTrack').addEventListener('click', (e) => {
       e.stopPropagation();
-      state.trackIdx = (state.trackIdx - 1 + TRACKS.length) % TRACKS.length;
-      state.lyricIdx = 0; state.musicPct = 12;
-      $('musicProgress').style.width = `${state.musicPct}%`;
-      render();
-      triggerTrackTransition(-1);
+      stepTrack(-1, false);
     });
     $('btnNextTrack').addEventListener('click', (e) => {
       e.stopPropagation();
-      state.trackIdx = (state.trackIdx + 1) % TRACKS.length;
-      state.lyricIdx = 0; state.musicPct = 8;
-      $('musicProgress').style.width = `${state.musicPct}%`;
-      render();
-      triggerTrackTransition(1);
+      stepTrack(1, false);
     });
-    $('btnShuffle').addEventListener('click', (e) => { e.stopPropagation(); showToast('已切换随机播放'); });
-    $('btnRepeat').addEventListener('click', (e) => { e.stopPropagation(); showToast('已切换列表循环'); });
+    $('btnShuffle').addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.musicShuffle = !state.musicShuffle;
+      syncMusicModeButtons();
+      showToast(state.musicShuffle ? '已开启随机播放' : '已关闭随机播放');
+    });
+    $('btnRepeat').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const order = ['all', 'one', 'off'];
+      state.musicRepeat = order[(order.indexOf(state.musicRepeat) + 1) % order.length];
+      syncMusicModeButtons();
+      const labels = { all: '已切换：列表循环', one: '已切换：单曲循环', off: '已切换：顺序播放（关闭循环）' };
+      showToast(labels[state.musicRepeat]);
+    });
 
     $('btnToggleExpandDemo').addEventListener('click', () => {
       setOpenMode(state.openMode === 'proxy' ? 'none' : 'proxy');
@@ -3625,10 +4695,25 @@
       $('panelUp').textContent = up >= 1 ? `${up.toFixed(2)} MB/s` : `${Math.round(up * 1024)} KB/s`;
 
       if (state.musicActive && state.musicPlaying && !isSeekingMusic) {
-        state.musicPct = (state.musicPct + 1.2) % 100;
-        $('musicProgress').style.width = `${state.musicPct.toFixed(1)}%`;
+        const nextPct = state.musicPct + 1.2;
+        if (nextPct >= 100) {
+          if (state.musicRepeat === 'one') {
+            state.musicPct = 0;
+            $('musicProgress').style.width = '0%';
+          } else if (state.musicRepeat === 'all') {
+            stepTrack(1, false);
+          } else {
+            state.musicPct = 100;
+            state.musicPlaying = false;
+            $('musicProgress').style.width = '100%';
+            render();
+          }
+        } else {
+          state.musicPct = nextPct;
+          $('musicProgress').style.width = `${state.musicPct.toFixed(1)}%`;
+        }
       }
-      if (!proxySpring.rafId && !leftSpring.rafId) renderChart();
+      if (state.openMode === 'proxy' && !proxySpring.active && !leftSpring.active) renderChart();
     }, 1500);
 
     let lastPillLyric = '';
@@ -3689,45 +4774,36 @@
     }
     updateClock();
     setInterval(updateClock, 1000);
-    window.addEventListener('resize', () => { cachedWinW = window.innerWidth; renderIslands(); });
+    window.addEventListener('resize', () => {
+      cachedWinW = window.innerWidth;
+      renderIslands();
+      if ($('clipPopover').classList.contains('show')) positionClipPopover();
+    });
 
     document.querySelectorAll('.morph-island').forEach((island) => {
-      island.addEventListener('mousemove', (e) => {
-        const rect = island.getBoundingClientRect();
-        island.style.setProperty('--mx', `${(e.clientX - rect.left).toFixed(1)}px`);
-        island.style.setProperty('--my', `${(e.clientY - rect.top).toFixed(1)}px`);
-        island.style.setProperty('--halo-op', '1');
+      let haloRaf = null;
+      let pendingX = 0;
+      let pendingY = 0;
+      island.addEventListener('pointermove', (e) => {
+        pendingX = e.clientX;
+        pendingY = e.clientY;
+        if (haloRaf !== null) return;
+        haloRaf = requestAnimationFrame(() => {
+          haloRaf = null;
+          const rect = island.getBoundingClientRect();
+          island.style.setProperty('--mx', `${(pendingX - rect.left).toFixed(1)}px`);
+          island.style.setProperty('--my', `${(pendingY - rect.top).toFixed(1)}px`);
+          island.style.setProperty('--halo-op', '1');
+        });
       });
-      island.addEventListener('mouseleave', () => {
+      island.addEventListener('pointerleave', () => {
+        if (haloRaf !== null) {
+          cancelAnimationFrame(haloRaf);
+          haloRaf = null;
+        }
         island.style.setProperty('--halo-op', '0');
       });
     });
-
-    function triggerVerticalRubber(rubberState, impulseY) {
-      rubberState.v = Math.max(-180, Math.min(180, rubberState.v + impulseY * 14));
-      if (!rubberState.rafId) {
-        rubberState.lastTime = 0;
-        const stepRubber = (now) => {
-          if (!rubberState.lastTime) rubberState.lastTime = now;
-          const dt = Math.min(0.032, Math.max(0.008, (now - rubberState.lastTime) / 1000));
-          rubberState.lastTime = now;
-          const force = -340 * rubberState.y;
-          const accel = force - 19 * rubberState.v;
-          rubberState.v += accel * dt;
-          rubberState.y += rubberState.v * dt;
-          renderIslands();
-          if (Math.abs(rubberState.y) < 0.12 && Math.abs(rubberState.v) < 1.0) {
-            rubberState.y = 0;
-            rubberState.v = 0;
-            rubberState.rafId = null;
-            renderIslands();
-            return;
-          }
-          rubberState.rafId = requestAnimationFrame(stepRubber);
-        };
-        rubberState.rafId = requestAnimationFrame(stepRubber);
-      }
-    }
 
     function attachRubberScroll(el) {
       if (!el) return;
@@ -3754,22 +4830,12 @@
     attachRubberScroll($('clipList'));
     attachRubberScroll($('shelfGrid'));
 
-    let lastWheelAt = 0;
-    function cyclePillModeByWheel(e, isFusion) {
-      e.preventDefault();
-      const now = performance.now();
-      const dir = e.deltaY > 0 ? 1 : -1;
-      if (now - lastWheelAt < 240) return;
-      lastWheelAt = now;
-
-      // Only apply subtle vertical bounce to compact pill; keep expanded island shell rock-steady
+    const PILL_MODES = ['heatmap', 'clipboard', 'shelf', 'music'];
+    function switchLeftPillMode(next, dir, isFusion) {
       if (!isFusion || !state.fusionExpanded) {
         triggerVerticalRubber(isFusion ? fusionRubber : leftRubber, dir * 2.6);
       }
 
-      const modes = ['heatmap', 'clipboard', 'shelf', 'music'];
-      const curMode = state.musicActive ? 'music' : state.leftTab;
-      const next = modes[(modes.indexOf(curMode) + dir + modes.length) % modes.length];
       if (next === 'music') {
         state.musicActive = true;
       } else {
@@ -3800,6 +4866,30 @@
         expPane.classList.add(animClass);
       }
     }
+
+    let lastWheelAt = 0;
+    function cyclePillModeByWheel(e, isFusion) {
+      e.preventDefault();
+      const now = performance.now();
+      const dir = e.deltaY > 0 ? 1 : -1;
+      if (now - lastWheelAt < 240) return;
+      lastWheelAt = now;
+
+      const curMode = state.musicActive ? 'music' : state.leftTab;
+      const next = PILL_MODES[(PILL_MODES.indexOf(curMode) + dir + PILL_MODES.length) % PILL_MODES.length];
+      switchLeftPillMode(next, dir, isFusion);
+    }
+
+    document.querySelectorAll('.fusion-mode-dot').forEach((dot) => {
+      dot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const target = dot.dataset.fmodetab;
+        const curMode = state.musicActive ? 'music' : state.leftTab;
+        if (target === curMode) return;
+        const dir = PILL_MODES.indexOf(target) > PILL_MODES.indexOf(curMode) ? 1 : -1;
+        switchLeftPillMode(target, dir, true);
+      });
+    });
 
     leftPillBar.addEventListener('wheel', (e) => {
       if (state.openMode !== 'none' || state.fusedMode) return;
@@ -3869,7 +4959,7 @@
       showToast(state.peekingMode ? '已开启全屏贴边隐藏：鼠标移至屏幕顶部唤出' : '已关闭全屏贴边隐藏');
     });
 
-    document.addEventListener('mousemove', (e) => {
+    document.addEventListener('pointermove', (e) => {
       if (!state.peekingMode) return;
       if (e.clientY <= 20) {
         syncPeekState(true);
@@ -3905,8 +4995,8 @@
           <div class="flex items-center gap-2 min-w-0 flex-1">
             <span class="w-7 h-7 rounded-lg bg-white/8 border border-white/10 flex items-center justify-center shrink-0">${shelfIconSvg(item.kind)}</span>
             <div class="min-w-0">
-              <div class="text-xs font-medium text-slate-100 truncate">${item.name}</div>
-              <div class="mono text-[10px] text-slate-400 truncate">${item.sub}</div>
+              <div class="text-xs font-medium text-slate-100 truncate">${escapeHtml(item.name)}</div>
+              <div class="mono text-[10px] text-slate-400 truncate">${escapeHtml(item.sub)}</div>
             </div>
           </div>
           <div class="flex items-center gap-0.5 shrink-0">
@@ -3939,6 +5029,7 @@
             $('clipPopImg').classList.add('hidden');
             $('clipPopBody').textContent = item.content || `# ${item.name}\n暂存备忘片段 (${item.sub})`;
             $('clipPopBody').classList.remove('hidden');
+            positionClipPopover();
             $('clipPopover').classList.add('show');
           }, 500);
         });
@@ -3953,7 +5044,21 @@
           e.dataTransfer.setData('text/plain', item.content || item.sub || item.name);
           e.dataTransfer.setData('application/x-island-restore', item.id);
         });
+        card.addEventListener('drag', (e) => {
+          if (e.clientX === 0 && e.clientY === 0) return;
+          const rect = leftEl.getBoundingClientRect();
+          const outside = e.clientX < rect.left - 16 || e.clientX > rect.right + 16 || e.clientY > rect.bottom + 16;
+          card.classList.toggle('shelf-dragging-out', outside);
+          if (outside) {
+            $('dragTearHint').textContent = `松手即可还原「${item.name}」至桌面`;
+            $('dragTearHint').classList.add('show');
+          } else {
+            $('dragTearHint').classList.remove('show');
+          }
+        });
         card.addEventListener('dragend', (e) => {
+          card.classList.remove('shelf-dragging-out');
+          $('dragTearHint').classList.remove('show');
           const rect = leftEl.getBoundingClientRect();
           const outside = e.clientX < rect.left - 16 || e.clientX > rect.right + 16 || e.clientY > rect.bottom + 16;
           if (outside && e.clientX > 0 && e.clientY > 0) {
@@ -4145,14 +5250,65 @@
         }
         return;
       }
+
+      // Keyboard list navigation for Clipboard (works even while #clipSearch is focused)
+      if (!e.altKey && !e.ctrlKey && !e.metaKey && state.openMode === 'left' && !state.musicActive && state.leftTab === 'clipboard') {
+        const filtered = getFilteredClips();
+        if (filtered.length > 0 && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+          e.preventDefault();
+          const dir = e.key === 'ArrowDown' ? 1 : -1;
+          state.kbdClipIdx = state.kbdClipIdx < 0
+            ? (dir > 0 ? 0 : filtered.length - 1)
+            : (state.kbdClipIdx + dir + filtered.length) % filtered.length;
+          syncClipKbdHighlight();
+          return;
+        }
+        if (e.key === 'Enter' && filtered.length > 0) {
+          const targetIdx = state.kbdClipIdx >= 0 ? state.kbdClipIdx : 0;
+          const item = filtered[targetIdx];
+          if (item) {
+            e.preventDefault();
+            state.kbdClipIdx = targetIdx;
+            syncClipKbdHighlight();
+            copyText(item.text, item.type === 'image' ? '图片' : '剪贴板条目');
+            const row = $('clipList').querySelectorAll('.clip-item[data-clip-id]')[targetIdx];
+            if (row) flashCheckFeedback(row.querySelector('.clip-tag'), '✓ 已复制');
+          }
+          return;
+        }
+      }
+
+      // Keyboard list navigation for Proxy Nodes
+      if (!e.altKey && !e.ctrlKey && !e.metaKey && !isInputFocused && state.openMode === 'proxy' && state.nodes.length > 0) {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          const dir = e.key === 'ArrowDown' ? 1 : -1;
+          state.kbdNodeIdx = state.kbdNodeIdx < 0
+            ? (dir > 0 ? 0 : state.nodes.length - 1)
+            : (state.kbdNodeIdx + dir + state.nodes.length) % state.nodes.length;
+          syncNodeKbdHighlight();
+          return;
+        }
+        if (e.key === 'Enter' && state.kbdNodeIdx >= 0 && state.nodes[state.kbdNodeIdx]) {
+          e.preventDefault();
+          const chosen = state.nodes[state.kbdNodeIdx];
+          state.activeNodeId = chosen.id;
+          state.nodeTimeout = false;
+          render(chosen.id);
+          showToast(`已切换节点：${chosen.name}`);
+          return;
+        }
+      }
     });
 
     initMatrixTrail();
     buildHeatmap();
     rebuildNodeList();
+    syncMusicModeButtons();
     renderClips(false);
     renderShelf();
     renderIslands();
+    renderChart();
     render();
   </script>
 </body>
